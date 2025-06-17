@@ -79,6 +79,7 @@ ApiRoute::group(['namespace' => 'App\Http\Controllers\Api'], function () {
         ApiRoute::resource('holidays', 'HolidayController', $options);
 
         ApiRoute::resource('shifts', 'ShiftController', $options);
+        ApiRoute::resource('employee_types', 'EmployeeTypeController', $options);
         ApiRoute::resource('departments', 'DepartmentController', $options);
         ApiRoute::resource('designations', 'DesignationController', $options);
         ApiRoute::resource('leave-types', 'LeaveTypeController', $options);
