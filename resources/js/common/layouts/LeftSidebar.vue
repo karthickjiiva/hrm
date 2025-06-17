@@ -7,7 +7,8 @@
             position: 'fixed',
             paddingTop: '8px',
             zIndex: 998,
-            borderRight: themeMode == 'dark' ? '1px solid #303030' : '1px solid #f0f0f0',
+            borderRight:
+                themeMode == 'dark' ? '1px solid #303030' : '1px solid #f0f0f0',
         }"
         :trigger="null"
         :collapsed="menuCollapsed"
@@ -108,7 +109,11 @@
                 }"
             >
                 <a-menu
-                    :theme="themeMode == 'dark' ? 'light' : appSetting.left_sidebar_theme"
+                    :theme="
+                        themeMode == 'dark'
+                            ? 'light'
+                            : appSetting.left_sidebar_theme
+                    "
                     :openKeys="openKeys"
                     v-model:selectedKeys="selectedKeys"
                     :mode="mode"
@@ -144,6 +149,24 @@
                                 <span>{{ $t("menu.staff_members") }}</span>
                             </span>
                         </template>
+                        <a-menu-item
+                            v-if="
+                                permsArray.includes('users_view') ||
+                                permsArray.includes('admin')
+                            "
+                            @click="
+                                () => {
+                                    menuSelected();
+                                    $router.push({
+                                        name: 'admin.employee_types.index',
+                                    });
+                                }
+                            "
+                            key="employee_type"
+                        >
+                            <!-- <span>{{ $t("menu.staff_members") }}</span> -->
+                            <span>Employee Type</span>
+                        </a-menu-item>
                         <a-menu-item
                             v-if="
                                 permsArray.includes('users_view') ||
@@ -551,8 +574,9 @@
                         </a-menu-item>
                         <a-menu-item
                             v-if="
-                                permsArray.includes('increments_promotions_view') ||
-                                permsArray.includes('admin')
+                                permsArray.includes(
+                                    'increments_promotions_view'
+                                ) || permsArray.includes('admin')
                             "
                             @click="
                                 () => {
@@ -722,8 +746,9 @@
                         </template>
                         <a-menu-item
                             v-if="
-                                permsArray.includes('letter_head_templates_view') ||
-                                permsArray.includes('admin')
+                                permsArray.includes(
+                                    'letter_head_templates_view'
+                                ) || permsArray.includes('admin')
                             "
                             @click="
                                 () => {
@@ -893,8 +918,9 @@
                         </a-menu-item>
                         <a-menu-item
                             v-if="
-                                permsArray.includes('deposit_categories_view') ||
-                                permsArray.includes('admin')
+                                permsArray.includes(
+                                    'deposit_categories_view'
+                                ) || permsArray.includes('admin')
                             "
                             @click="
                                 () => {
@@ -910,8 +936,9 @@
                         </a-menu-item>
                         <a-menu-item
                             v-if="
-                                permsArray.includes('expense_categories_view') ||
-                                permsArray.includes('admin')
+                                permsArray.includes(
+                                    'expense_categories_view'
+                                ) || permsArray.includes('admin')
                             "
                             @click="
                                 () => {
@@ -984,7 +1011,10 @@
                     </a-menu-item>
 
                     <a-menu-item
-                        v-if="appType == 'saas' && appSetting.x_admin_id == user.xid"
+                        v-if="
+                            appType == 'saas' &&
+                            appSetting.x_admin_id == user.xid
+                        "
                         @click="
                             () => {
                                 menuSelected();
@@ -1014,7 +1044,11 @@
                 }"
             >
                 <a-menu
-                    :theme="themeMode == 'dark' ? 'light' : appSetting.left_sidebar_theme"
+                    :theme="
+                        themeMode == 'dark'
+                            ? 'light'
+                            : appSetting.left_sidebar_theme
+                    "
                     :openKeys="openKeys"
                     v-model:selectedKeys="selectedKeys"
                     :mode="mode"
@@ -1236,7 +1270,9 @@
                     </a-menu-item>
                     <a-menu-item
                         key="expenses"
-                        @click="$router.push({ name: 'admin.self.expenses.index' })"
+                        @click="
+                            $router.push({ name: 'admin.self.expenses.index' })
+                        "
                     >
                         <template #icon>
                             <UserOutlined />
@@ -1321,7 +1357,9 @@
                     </a-menu-item>
                     <a-menu-item
                         key="profile"
-                        @click="$router.push({ name: 'admin.self.profile.index' })"
+                        @click="
+                            $router.push({ name: 'admin.self.profile.index' })
+                        "
                     >
                         <template #icon>
                             <UserOutlined />
@@ -1453,7 +1491,12 @@ export default defineComponent({
             willSubscriptionModuleVisible,
             themeMode,
         } = common();
-        const rootSubmenuKeys = ["dashboard", "users", "settings", "subscription"];
+        const rootSubmenuKeys = [
+            "dashboard",
+            "users",
+            "settings",
+            "subscription",
+        ];
         const authStore = useAuthStore();
         const route = useRoute();
 
@@ -1463,7 +1506,9 @@ export default defineComponent({
         const mode = ref("inline");
         const activeKey = ref(user.value.is_manager == 1 ? "manager" : "self");
         const leftbarHeight =
-            user.value.is_manager == 1 ? "calc(100vh - 124px)" : "calc(100vh - 61px)";
+            user.value.is_manager == 1
+                ? "calc(100vh - 124px)"
+                : "calc(100vh - 61px)";
 
         onMounted(() => {
             if (route.meta.barKey && route.meta.barKey === "self") {
@@ -1485,7 +1530,9 @@ export default defineComponent({
             if (innerWidth <= 991) {
                 openKeys.value = [];
             } else {
-                openKeys.value = menuCollapsed.value ? [] : [route.meta.menuParent];
+                openKeys.value = menuCollapsed.value
+                    ? []
+                    : [route.meta.menuParent];
             }
 
             selectedKeys.value = [menuKey.replace("-", "_")];
@@ -1545,7 +1592,9 @@ export default defineComponent({
                 if (innerWidth <= 991 && menuCollapsed.value) {
                     openKeys.value = [];
                 } else {
-                    openKeys.value = menuCollapsed.value ? [] : [route.meta.menuParent];
+                    openKeys.value = menuCollapsed.value
+                        ? []
+                        : [route.meta.menuParent];
                 }
 
                 if (route.meta.menuParent == "settings") {

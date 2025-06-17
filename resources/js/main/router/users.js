@@ -63,6 +63,18 @@ export default [
                     permission: "employees_view",
                 },
             },
+            {
+                path: "/admin/employee_types",
+                component: () =>
+                    import("../views/staff-members/employee_types/index.vue"),
+                name: "admin.employee_types.index",
+                meta: {
+                    requireAuth: true,
+                    menuParent: "staff",
+                    menuKey: "employee_type",
+                    permission: "users_view",
+                },
+            },
         ],
     },
 ];
