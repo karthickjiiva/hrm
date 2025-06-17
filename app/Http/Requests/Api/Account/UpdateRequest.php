@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Http\Requests\Api\Account;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class UpdateRequest extends FormRequest
+{
+	/**
+	 * Determine if the user is authorized to make this request.
+	 *
+	 * @return bool
+	 */
+
+	public function authorize()
+	{
+		return true;
+	}
+
+	/**
+	 * Get the validation rules that apply to the request.
+	 *
+	 * @return array
+	 */
+	public function rules()
+	{
+
+		$rules = [
+			'name' => 'required',
+			'initial_balance' => 'required',
+			'hra' => 'nullable|numeric',
+	        'performance_pay' => 'nullable|numeric',
+	        'allowance' => 'nullable|numeric',
+		];
+
+		return $rules;
+	}
+}
