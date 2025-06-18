@@ -22,7 +22,7 @@ class User extends BaseModel implements AuthenticatableContract, JWTSubject
     protected $table = 'users';
 
     protected $default = [
-    'xid', 'name', 'employee_number', 'joining_date',
+    'id','xid', 'name', 'employee_number', 'joining_date',
     'probation_end_date', 'probation_start_date', 'profile_image',
     'notice_end_date', 'notice_start_date', 'address', 'end_date', 'dob',
     'profile_image_url', 'location_id','employee_type_id','designation_id', 'department_id',
@@ -39,7 +39,7 @@ class User extends BaseModel implements AuthenticatableContract, JWTSubject
 
     protected $dates = ['last_active_on'];
 
-    protected $hidden = ['id', 'role_id', 'employee_status_id', 'password', 'remember_token', 'department_id', 'designation_id', 'shift_id', 'location_id', 'salary_group_id'];
+    protected $hidden = [ 'role_id', 'employee_status_id', 'password', 'remember_token', 'department_id', 'designation_id', 'shift_id', 'location_id', 'salary_group_id'];
 
     protected $appends = ['xid', 'x_company_id', 'x_employee_status_id', 'x_role_id', 'x_salary_group_id', 'x_report_to', 'profile_image_url', 'x_department_id', 'x_designation_id', 'x_shift_id', 'x_location_id', 'x_employee_type_id' , 'duration'];
 

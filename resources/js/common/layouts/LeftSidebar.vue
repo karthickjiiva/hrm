@@ -158,11 +158,11 @@
                                 () => {
                                     menuSelected();
                                     $router.push({
-                                        name: 'admin.employee_leave_master.index',
+                                        name: 'admin.employee_types.index',
                                     });
                                 }
                             "
-                            key="employee_leave_master"
+                            key="employee_type"
                         >
                             <!-- <span>{{ $t("menu.staff_members") }}</span> -->
                             <span>Employee Type</span>
@@ -262,11 +262,11 @@
                                 () => {
                                     menuSelected();
                                     $router.push({
-                                        name: 'admin.employee_types.index',
+                                        name: 'admin.employee_leave_master.index',
                                     });
                                 }
                             "
-                            key="employee_type"
+                            key="employee_leave_master"
                         >
                             <!-- <span>{{ $t("menu.staff_members") }}</span> -->
                             <span>Employee Leave Master</span>
