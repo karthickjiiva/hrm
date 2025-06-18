@@ -158,11 +158,11 @@
                                 () => {
                                     menuSelected();
                                     $router.push({
-                                        name: 'admin.employee_types.index',
+                                        name: 'admin.employee_leave_master.index',
                                     });
                                 }
                             "
-                            key="employee_type"
+                            key="employee_leave_master"
                         >
                             <!-- <span>{{ $t("menu.staff_members") }}</span> -->
                             <span>Employee Type</span>
@@ -234,6 +234,42 @@
                             key="shifts"
                         >
                             <span>{{ $t("menu.shifts") }}</span>
+                        </a-menu-item>
+                        <a-menu-item
+                            v-if="
+                                permsArray.includes('users_view') ||
+                                permsArray.includes('admin')
+                            "
+                            @click="
+                                () => {
+                                    menuSelected();
+                                    $router.push({
+                                        name: 'admin.bank_master.index',
+                                    });
+                                }
+                            "
+                            key="bank_master"
+                        >
+                            <!-- <span>{{ $t("menu.staff_members") }}</span> -->
+                            <span>Bank Master</span>
+                        </a-menu-item>
+                        <a-menu-item
+                            v-if="
+                                permsArray.includes('users_view') ||
+                                permsArray.includes('admin')
+                            "
+                            @click="
+                                () => {
+                                    menuSelected();
+                                    $router.push({
+                                        name: 'admin.employee_types.index',
+                                    });
+                                }
+                            "
+                            key="employee_type"
+                        >
+                            <!-- <span>{{ $t("menu.staff_members") }}</span> -->
+                            <span>Employee Leave Master</span>
                         </a-menu-item>
                     </a-sub-menu>
                     <a-sub-menu

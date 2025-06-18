@@ -75,6 +75,30 @@ export default [
                     permission: "users_view",
                 },
             },
+            {
+                path: "/admin/employee_leave_master",
+                component: () =>
+                    import("../views/staff-members/employee_leave_master/index.vue"),
+                name: "admin.employee_leave_master.index",
+                meta: {
+                    requireAuth: true,
+                    menuParent: "staff",
+                    menuKey: "employee_leave_master",
+                    permission: "users_view",
+                },
+            },
+            {
+                path: "/admin/bank_master",
+                component: () =>
+                    import("../views/staff-members/bank_master/index.vue"),
+                name: "admin.bank_master.index",
+                meta: {
+                    requireAuth: true,
+                    menuParent: "staff",
+                    menuKey: "bank_master",
+                    permission: "users_view",
+                },
+            },
         ],
     },
 ];
