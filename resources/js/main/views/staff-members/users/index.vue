@@ -62,7 +62,9 @@
                             show-search
                             style="width: 100%"
                             :placeholder="
-                                $t('common.select_default_text', [$t('user.shift_id')])
+                                $t('common.select_default_text', [
+                                    $t('user.shift_id'),
+                                ])
                             "
                             :allowClear="true"
                         >
@@ -83,7 +85,9 @@
                             show-search
                             style="width: 100%"
                             :placeholder="
-                                $t('common.select_default_text', [$t('user.location_id')])
+                                $t('common.select_default_text', [
+                                    $t('user.location_id'),
+                                ])
                             "
                             :allowClear="true"
                         >
@@ -180,10 +184,16 @@
 
         <a-row>
             <a-col :span="24">
-                <a-tabs v-model:activeKey="extraFilters.status" @change="setUrlData">
+                <a-tabs
+                    v-model:activeKey="extraFilters.status"
+                    @change="setUrlData"
+                >
                     <a-tab-pane key="all" :tab="`${$t('common.all')}`" />
                     <a-tab-pane key="active" :tab="`${$t('common.active')}`" />
-                    <a-tab-pane key="inactive" :tab="`${$t('common.inactive')}`" />
+                    <a-tab-pane
+                        key="inactive"
+                        :tab="`${$t('common.inactive')}`"
+                    />
                 </a-tabs>
             </a-col>
         </a-row>
@@ -211,18 +221,29 @@
                     >
                         <template #bodyCell="{ column, text, record }">
                             <template v-if="column.dataIndex === 'name'">
-                                <a-button type="link" @click="openUserView(record)">
+                                <a-button
+                                    type="link"
+                                    @click="openUserView(record)"
+                                >
                                     <user-info :user="record" />
                                 </a-button>
                             </template>
                             <template v-if="column.dataIndex === 'report_to'">
-                                {{ record.reporter ? record.reporter.name : "-" }}
+                                {{
+                                    record.reporter ? record.reporter.name : "-"
+                                }}
                             </template>
                             <template v-if="column.dataIndex === 'location_id'">
-                                {{ record.location ? record.location.name : "-" }}
+                                {{
+                                    record.location ? record.location.name : "-"
+                                }}
                             </template>
                             <template v-if="column.dataIndex === 'department'">
-                                {{ record.department ? record.department.name : "-" }}
+                                {{
+                                    record.department
+                                        ? record.department.name
+                                        : "-"
+                                }}
                             </template>
                             <template v-if="column.dataIndex === 'duration'">
                                 {{ record.duration ? record.duration : "-" }}
@@ -267,7 +288,9 @@
                                     @click="showDeleteConfirm(record.xid)"
                                     style="margin-left: 4px"
                                 >
-                                    <template #icon><DeleteOutlined /></template>
+                                    <template #icon
+                                        ><DeleteOutlined
+                                    /></template>
                                 </a-button>
                             </template>
                         </template>
@@ -277,7 +300,11 @@
         </a-row>
     </admin-page-table-content>
     <user-view-page :visible="userOpen" :userId="userId" @closed="closeUser" />
-    <ViewVue :user="viewData" :visible="detailsVisible" @closed="onCloseDetails" />
+    <ViewVue
+        :user="viewData"
+        :visible="detailsVisible"
+        @closed="onCloseDetails"
+    />
     <AddQuick
         :visible="detailsVisibles"
         @closed="detailsVisibles = false"
@@ -339,15 +366,18 @@ export default {
             department: undefined,
             designation: undefined,
             shift: undefined,
+            employee_type_id: undefined,
         });
         const departments = ref([]);
         const designations = ref([]);
         const locations = ref([]);
         const shifts = ref([]);
+        const employeeType = ref([]);
         const shiftUrl = "shifts?limit=10000";
         const departmentUrl = "departments?limit=10000";
         const designationUrl = "designations?limit=10000";
         const locationUrl = "locations?limit=10000";
+        const employeeTypeUrl = "employee_types?limit=10000";
         const detailsVisibles = ref(false);
         const userOpen = ref(false);
         const userId = ref(undefined);
@@ -365,6 +395,7 @@ export default {
         onMounted(() => {
             setUrlData();
             const locationPromise = axiosAdmin.get(locationUrl);
+            const employeeTypePromise = axiosAdmin.get(employeeTypeUrl);
             const departmentsPromise = axiosAdmin.get(departmentUrl);
             const designationsPromise = axiosAdmin.get(designationUrl);
             const shiftsPromise = axiosAdmin.get(shiftUrl);
@@ -373,17 +404,20 @@ export default {
                 departmentsPromise,
                 designationsPromise,
                 locationPromise,
+                employeeTypePromise,
                 shiftsPromise,
             ]).then(
                 ([
                     departmentsResponse,
                     designationsResponse,
                     locationResponse,
+                    employeeTypeResponse,
                     shiftsResponse,
                 ]) => {
                     departments.value = departmentsResponse.data;
                     designations.value = designationsResponse.data;
                     locations.value = locationResponse.data;
+                    employeeType.value = employeeTypeResponse.data;
                     shifts.value = shiftsResponse.data;
                 }
             );

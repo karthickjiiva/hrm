@@ -38,7 +38,7 @@ class UsersController extends ApiBaseController
 
         $id = $this->getIdFromHash($request->id);
 
-        $data[] = StaffMember::where('id', '=', $id)->with('location', 'shift', 'department', 'designation', 'reporter', 'appreciation', 'appreciation.award', 'leaves.leaveType', 'assets.location', 'assets_type')->first();
+        $data[] = StaffMember::where('id', '=', $id)->with('location','employeeType', 'shift', 'department', 'designation', 'reporter', 'appreciation', 'appreciation.award', 'leaves.leaveType', 'assets.location', 'assets_type')->first();
         return ApiResponse::make('Success', $data);
     }
 }

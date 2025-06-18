@@ -13,6 +13,7 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Hash as FacadesHash;
 use Illuminate\Database\Eloquent\Builder;
+use App\Models\EmployeeType;
 
 class User extends BaseModel implements AuthenticatableContract, JWTSubject
 {
@@ -21,12 +22,16 @@ class User extends BaseModel implements AuthenticatableContract, JWTSubject
     protected $table = 'users';
 
     protected $default = [
-        'xid', 'name', 'employee_number', 'joining_date',
-        'probation_end_date', 'probation_start_date', 'profile_image',
-        'notice_end_date', 'notice_start_date', 'address', 'end_date', 'dob',
-        'profile_image_url', 'location_id', 'designation_id', 'department_id',
-        'is_manager', 'hra', 'performance_pay', 'allowance'
-    ];
+    'xid', 'name', 'employee_number', 'joining_date',
+    'probation_end_date', 'probation_start_date', 'profile_image',
+    'notice_end_date', 'notice_start_date', 'address', 'end_date', 'dob',
+    'profile_image_url', 'location_id','employee_type_id','designation_id', 'department_id',
+    'is_manager', 'hra', 'performance_pay', 'allowance','employeeType',
+    'uan_number', 'pf_number', 'esi_number', 'pan_number', 'aadhar_number',
+    'emergency_contact_name','emergency_contact_number','alternate_phone',
+    'has_resigned','resignation_date','resignation_reason','has_rejoined','rejoining_date','rejoining_reason',
+];
+
 
 
 
@@ -36,7 +41,7 @@ class User extends BaseModel implements AuthenticatableContract, JWTSubject
 
     protected $hidden = ['id', 'role_id', 'employee_status_id', 'password', 'remember_token', 'department_id', 'designation_id', 'shift_id', 'location_id', 'salary_group_id'];
 
-    protected $appends = ['xid', 'x_company_id', 'x_employee_status_id', 'x_role_id', 'x_salary_group_id', 'x_report_to', 'profile_image_url', 'x_department_id', 'x_designation_id', 'x_shift_id', 'x_location_id', 'duration'];
+    protected $appends = ['xid', 'x_company_id', 'x_employee_status_id', 'x_role_id', 'x_salary_group_id', 'x_report_to', 'profile_image_url', 'x_department_id', 'x_designation_id', 'x_shift_id', 'x_location_id', 'x_employee_type_id' , 'duration'];
 
     protected $filterable = ['name', 'user_type', 'email', 'status', 'phone', 'shift_id'];
 
@@ -47,6 +52,7 @@ class User extends BaseModel implements AuthenticatableContract, JWTSubject
         'getXDesignationIdAttribute' => 'designation_id',
         'getXShiftIdAttribute' => 'shift_id',
         'getXLocationIdAttribute' => 'location_id',
+        'getXEmployeeTypeIdAttribute' => 'employee_type_id',
         'getXReportToAttribute' => 'report_to',
         'getXSalaryGroupIdAttribute' => 'salary_group_id',
         'getXEmployeeStatusIdAttribute' => 'employee_status_id'
@@ -61,6 +67,7 @@ class User extends BaseModel implements AuthenticatableContract, JWTSubject
         'department_id' => Hash::class . ':hash',
         'designation_id' => Hash::class . ':hash',
         'location_id' => Hash::class . ':hash',
+        'employee_type_id' => Hash::class . ':hash',
         'shift_id' => Hash::class . ':hash',
         'is_married' => 'integer',
         'is_manager' => 'integer',
@@ -75,6 +82,21 @@ class User extends BaseModel implements AuthenticatableContract, JWTSubject
         'hra' => 'double',
         'performance_pay' => 'double',
         'allowance' => 'double',
+        'aadhar_number' => 'string',
+        'uan_number' => 'string',
+        'pf_number' => 'string',
+        'esi_number' => 'string',
+        'pan_number' => 'string',
+        'emergency_contact_name' => 'string',
+        'emergency_contact_number' => 'string',
+        'alternate_phone' => 'string',
+        'has_resigned' => 'boolean',
+    'resignation_date' => 'date',
+    'resignation_reason' => 'string',
+    'has_rejoined' => 'boolean',
+    'rejoining_date' => 'date',
+    'rejoining_reason' => 'string',
+
     ];
 
     protected $permissions = ['salary_settings', 'leaves_view', 'assets_view', 'leave_types_view'];
@@ -91,6 +113,12 @@ class User extends BaseModel implements AuthenticatableContract, JWTSubject
     public function location()
     {
         return $this->belongsTo(Location::class, 'location_id', 'id');
+    }
+
+    public function employeeType()
+    {
+        // return $this->belongsTo(EmployeeType::class, 'employee_type_id', 'id');
+        return $this->belongsTo(EmployeeType::class, 'employee_type_id', 'id');
     }
 
     public function employeeWorkStatus()

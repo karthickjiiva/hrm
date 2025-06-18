@@ -10,13 +10,16 @@ class EmployeeType extends BaseModel
 {
     protected $table = 'employee_types';
 
-    protected $default = ['xid', 'type'];
+    protected $default =  ['id',
+    'xid',
+    'type',
+];
 
     protected $guarded = ['id', 'created_at', 'updated_at'];
 
     protected $hidden = ['id', 'created_by'];
 
-    protected $appends = ['xid', 'x_created_by', 'employee_count'];
+    protected $appends = ['xid'];
 
     protected $filterable = ['type', 'status'];
 
@@ -80,4 +83,9 @@ class EmployeeType extends BaseModel
             'employee_count' => StaffMember::where('employee_type_id', $this->id)->count(),
         ];
     }
+
+    // public function getXidAttribute()
+    // {
+    //     return Hashids::encode($this->id);
+    // }
 }
