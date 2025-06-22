@@ -506,7 +506,7 @@
                             <span>{{ $t("menu.unpaid_leaves") }}</span>
                         </a-menu-item>
                     </a-sub-menu>
-                    <a-sub-menu
+                    <!-- <a-sub-menu
                         key="attendances"
                         v-if="
                             permsArray.includes('attendances_view') ||
@@ -558,7 +558,7 @@
                         >
                             <span>{{ $t("menu.attendances") }}</span>
                         </a-menu-item>
-                    </a-sub-menu>
+                    </a-sub-menu> -->
                     <a-menu-item
                         v-if="
                             permsArray.includes('news_view') ||
@@ -644,10 +644,7 @@
                             <span>{{ $t("menu.payrolls") }}</span>
                         </a-menu-item>
                         <a-menu-item
-                            v-if="
-                                permsArray.includes('salary_settings') ||
-                                permsArray.includes('admin')
-                            "
+                            v-if="permsArray.includes('admin')"
                             @click="
                                 () => {
                                     menuSelected();
@@ -1207,7 +1204,7 @@
                             <span>{{ $t("menu.unpaid_leaves") }}</span>
                         </a-menu-item>
                     </a-sub-menu>
-                    <a-sub-menu key="attendances">
+                    <!-- <a-sub-menu key="attendances">
                         <template #title>
                             <span>
                                 <ProfileOutlined />
@@ -1240,7 +1237,7 @@
                         >
                             <span>{{ $t("menu.attendance_summary") }}</span>
                         </a-menu-item>
-                    </a-sub-menu>
+                    </a-sub-menu> -->
                     <a-menu-item
                         @click="
                             () => {
