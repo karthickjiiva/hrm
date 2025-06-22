@@ -1005,13 +1005,11 @@
                         @updateSalaryData="updateSalaryData"
                     />
                 </a-tab-pane>
-                <a-tab-pane
+                <!-- <a-tab-pane
                     key="joining_history"
                     tab="Joining History"
-                    force-render
-                >
+                    force-render >
                     <a-form layout="vertical">
-                        <!-- Resignation Section -->
                         <a-form-item label="Resignation">
                             <a-switch v-model:checked="formData.has_resigned" />
                         </a-form-item>
@@ -1051,7 +1049,6 @@
                             </a-col>
                         </a-row>
 
-                        <!-- Rejoining Section -->
                         <a-form-item label="Rejoining">
                             <a-switch v-model:checked="formData.has_rejoined" />
                         </a-form-item>
@@ -1089,7 +1086,7 @@
                             </a-col>
                         </a-row>
                     </a-form>
-                </a-tab-pane>
+                </a-tab-pane> -->
             </a-tabs>
         </a-form>
         <template #footer>
