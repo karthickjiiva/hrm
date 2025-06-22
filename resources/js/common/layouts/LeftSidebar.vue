@@ -731,6 +731,20 @@
                             <span>{{ $t("menu.resignations") }}</span>
                         </a-menu-item>
                         <a-menu-item
+                            v-if="permsArray.includes('admin')"
+                            @click="
+                                () => {
+                                    menuSelected();
+                                    $router.push({
+                                        name: 'admin.rejoining.index',
+                                    });
+                                }
+                            "
+                            key="rejoining"
+                        >
+                            <span>Rejoinee</span>
+                        </a-menu-item>
+                        <a-menu-item
                             v-if="
                                 permsArray.includes('terminations_view') ||
                                 permsArray.includes('admin')
