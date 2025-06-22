@@ -118,6 +118,7 @@ ApiRoute::group(['namespace' => 'App\Http\Controllers\Api'], function () {
         ApiRoute::resource('deposits', 'DepositController', $options);
         ApiRoute::resource('warnings', 'WarningController', $options);
         ApiRoute::resource('resignations', 'ResignationController', $options);
+        ApiRoute::resource('rejoining', 'RejoinController', $options);
         ApiRoute::resource('terminations', 'TerminationController', $options);
         ApiRoute::resource('indicators', 'IndicatorController', $options);
         ApiRoute::resource('salary-components', 'SalaryComponentController', $options);
