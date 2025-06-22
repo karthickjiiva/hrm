@@ -174,59 +174,6 @@ class LeaveController extends ApiBaseController
         return ApiResponse::make('Success', []);
     }
 
-
-    // public function remainingLeaves(RemainingLeavesRequest $request)
-    // {
-    //     // Check if user have permssion to view all leaves
-    //     $loggedUser = user();
-    //     $userId = $loggedUser->ability('admin', 'leaves_edit') && $request->has('user_id') ? $this->getIdFromHash($request->user_id) : $loggedUser->id;
-
-    //     if (!$loggedUser->ability('admin', 'leaves_view')) {
-    //         throw new ApiException("Not have valid permission");
-    //     }
-
-    //     $allLeaveTypes = LeaveType::select('id', 'name', 'total_leaves', 'is_paid')->get();
-    //     $year = $request->year;
-
-    //     // If request year is same as current year
-    //     $fincialDates = CommonHrm::getFincialYearStartEndDate($year);
-    //     $startDate = $fincialDates['startDate'];
-    //     $endDate = $fincialDates['endDate'];
-
-    //     foreach ($allLeaveTypes as $allLeaveType) {
-    //         $totalFullDayLeavesCount = Attendance::where('attendances.is_leave', 1)
-    //             ->where('is_holiday', 0)
-    //             ->whereBetween('attendances.date', [$startDate, $endDate])
-    //             ->where('attendances.leave_type_id', $allLeaveType->id)
-    //             ->where('attendances.user_id', $userId)
-    //             ->where('attendances.is_half_day', 0);
-
-    //         if ($allLeaveType->is_paid == 1) {
-    //             $totalFullDayLeavesCount = $totalFullDayLeavesCount->where('attendances.is_paid', 1);
-    //         }
-    //         $totalFullDayLeavesCount = $totalFullDayLeavesCount->count();
-
-    //         $totalHalfDayLeavesCount = Attendance::where('attendances.is_leave', 1)
-    //             ->where('is_holiday', 0)
-    //             ->whereBetween('attendances.date', [$startDate, $endDate])
-    //             ->where('attendances.leave_type_id', $allLeaveType->id)
-    //             ->where('attendances.user_id', $userId)
-    //             ->where('attendances.is_half_day', 1);
-
-    //         if ($allLeaveType->is_paid == 1) {
-    //             $totalHalfDayLeavesCount = $totalHalfDayLeavesCount->where('attendances.is_paid', 1);
-    //         }
-    //         $totalHalfDayLeavesCount = $totalHalfDayLeavesCount->count();
-
-    //         $totalLeaves = ($totalHalfDayLeavesCount / 2) + $totalFullDayLeavesCount;
-    //         $allLeaveType->remaining_leaves = $allLeaveType->total_leaves - $totalLeaves;
-    //     }
-
-    //     return ApiResponse::make('Data fetched', [
-    //         'data' => $allLeaveTypes
-    //     ]);
-    // }
-
     public function remainingLeaves(RemainingLeavesRequest $request)
 {
     $loggedUser = user();

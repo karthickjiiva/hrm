@@ -1,5 +1,5 @@
 <template>
-	<a-row
+    <!-- <a-row
 		class="mt-20"
 		v-if="
 			appSetting.update_app_notification &&
@@ -30,54 +30,57 @@
 				</template>
 			</a-alert>
 		</a-col>
-	</a-row>
+	</a-row> -->
 </template>
 
 <script>
-import { watch, onMounted, computed, ref, defineComponent } from "vue";
-import { SyncOutlined, CloudDownloadOutlined } from "@ant-design/icons-vue";
-import axios from "axios";
-import common from "../../common/composable/common";
-import { getUrlByAppType } from "../../common/scripts/functions";
+// import { watch, onMounted, computed, ref, defineComponent } from "vue";
+// import { SyncOutlined, CloudDownloadOutlined } from "@ant-design/icons-vue";
+// import axios from "axios";
+// import common from "../../common/composable/common";
+// import { getUrlByAppType } from "../../common/scripts/functions";
 
-export default defineComponent({
-	components: {
-		SyncOutlined,
-		CloudDownloadOutlined,
-	},
-	setup() {
-		const { appSetting, appType } = common();
-		const appVersion = window.config.app_version;
-		const productStatus = ref("fetching");
-		const product = ref([]);
+// export default defineComponent({
+//     components: {
+//         SyncOutlined,
+//         CloudDownloadOutlined,
+//     },
+//     setup() {
+//         const { appSetting, appType } = common();
+//         const appVersion = window.config.app_version;
+//         const productStatus = ref("fetching");
+//         const product = ref([]);
 
-		onMounted(() => {
-			if (appSetting.value.update_app_notification && appType == "non-saas") {
-				axiosAdmin(getUrlByAppType("update-app")).then((response) => {
-					axios
-						.post("https://envato.codeifly.com/product", {
-							verified_name: window.config.product_name,
-							domain: window.location.host,
-						})
-						.then((res) => {
-							product.value = res.data;
+//         onMounted(() => {
+//             if (
+//                 appSetting.value.update_app_notification &&
+//                 appType == "non-saas"
+//             ) {
+//                 axiosAdmin(getUrlByAppType("update-app")).then((response) => {
+//                     axios
+//                         .post("https://envato.codeifly.com/product", {
+//                             verified_name: window.config.product_name,
+//                             domain: window.location.host,
+//                         })
+//                         .then((res) => {
+//                             product.value = res.data;
 
-							if (product.value.product.version != appVersion) {
-								productStatus.value = "update_available";
-							} else {
-								productStatus.value = "success";
-							}
-						});
-				});
-			}
-		});
+//                             if (product.value.product.version != appVersion) {
+//                                 productStatus.value = "update_available";
+//                             } else {
+//                                 productStatus.value = "success";
+//                             }
+//                         });
+//                 });
+//             }
+//         });
 
-		return {
-			appSetting,
-			productStatus,
-			product,
-			appType,
-		};
-	},
-});
+//         return {
+//             appSetting,
+//             productStatus,
+//             product,
+//             appType,
+//         };
+//     },
+// });
 </script>
