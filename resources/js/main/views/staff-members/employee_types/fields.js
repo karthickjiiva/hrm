@@ -4,7 +4,7 @@ import common from "@/common/composable/common";
 const fields = () => {
     const { user } = common();
     const { t } = useI18n();
-    const url = "employee_types?fields=id,xid,type,basic_percent,hra_percent,allowance_percent,food_allowance_percent,pf_enabled,pf_percentage,pf_limit,esi_enabled,esi_percentage,esi_limit,prof_tax_enabled,prof_tax_percentage,prof_tax_limit,tds_enabled,tds_percentage,tds_limit,status";
+    const url = "employee_types?fields=id,xid,type,basic_percent,hra_percent,allowance_percent,food_allowance_percent,pf_enabled,pf_percentage,pf_limit,esi_enabled,esi_percentage,esi_limit,prof_tax_enabled,prof_tax_percentage,prof_tax_limit,tds_enabled,tds_percentage,tds_limit,status,pf_pension_scheme";
 
     const addEditUrl = "employee_types";
     const hashableColumns = [
@@ -19,6 +19,7 @@ const fields = () => {
             pf_enabled: false,
             pf_percentage: 0,
             pf_limit: 0,
+            pf_pension_scheme: 0,
             esi_enabled: false,
             esi_percentage: 0,
             esi_limit: 0,

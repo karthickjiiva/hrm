@@ -188,6 +188,22 @@
                                     />
                                 </a-form-item>
                             </a-col>
+                            <a-col :xs="24" :sm="24" :md="8" :lg="8">
+                                <a-form-item
+                                    label="PF Pension Scheme"
+                                    name="pf_pension_scheme"
+                                >
+                                    <a-checkbox
+                                        v-model:checked="
+                                            formData.pf_pension_scheme
+                                        "
+                                        :checkedValue="true"
+                                        :unCheckedValue="false"
+                                    >
+                                        Enable Pension Scheme
+                                    </a-checkbox>
+                                </a-form-item>
+                            </a-col>
                         </template>
                     </a-row>
 

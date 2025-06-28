@@ -537,7 +537,7 @@
                 >
                     <a-row :gutter="16">
                         <!-- New: Employee Type -->
-                        <a-col :xs="24" :sm="24" :md="12" :lg="12">
+                        <!-- <a-col :xs="24" :sm="24" :md="12" :lg="12">
                             <a-form-item
                                 label="Employee Type"
                                 name="employee_type_id"
@@ -575,7 +575,7 @@
                                     />
                                 </span>
                             </a-form-item>
-                        </a-col>
+                        </a-col> -->
 
                         <!-- Existing: Report To -->
                         <a-col :xs="24" :sm="24" :md="12" :lg="6">
