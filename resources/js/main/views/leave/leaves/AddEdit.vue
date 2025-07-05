@@ -62,6 +62,7 @@
                 <a-col :xs="24" :sm="24" :md="24" :lg="24">
                     <a-form-item label="Select Multiple Dates (Same Month)">
                         <div
+                            @click="handleDatePickerClick"
                             style="
                                 border: 1px solid #d9d9d9;
                                 padding: 12px;
@@ -71,11 +72,31 @@
                         >
                             <a-date-picker
                                 v-model:value="tempDate"
+                                :open="isPickerOpen"
                                 :disabledDate="disableCrossMonthDates"
+                                :dateRender="customCellRender"
                                 @change="onAddDate"
+                                @openChange="handleOpenChange"
                                 style="width: 100%"
-                            />
-
+                            >
+                                <template #renderExtraFooter>
+                                    <div style="text-align: right">
+                                        <a-button
+                                            size="small"
+                                            type="primary"
+                                            @click="closePicker"
+                                            >OK</a-button
+                                        >
+                                        <a-button
+                                            size="small"
+                                            style="margin-left: 8px"
+                                            @click="cancelPicker"
+                                        >
+                                            Cancel
+                                        </a-button>
+                                    </div>
+                                </template>
+                            </a-date-picker>
                             <div style="margin-top: 12px">
                                 <a-tag
                                     v-for="(d, index) in selectedDates"
@@ -87,6 +108,16 @@
                                     {{ d.date }}
                                 </a-tag>
                             </div>
+                            <!-- <div style="margin-top: 12px">
+                                <a-button type="primary" @click="closePicker"
+                                    >OK</a-button
+                                >
+                                <a-button
+                                    style="margin-left: 8px"
+                                    @click="cancelPicker"
+                                    >Cancel</a-button
+                                >
+                            </div> -->
 
                             <!-- <div style="margin-top: 12px; text-align: right">
                                 <a-button
@@ -139,7 +170,7 @@
                     >
                         <template #bodyCell="{ column, record }">
                             <template v-if="column.key === 'leave_type_id'">
-                                <a-select
+                                <!-- <a-select
                                     v-model:value="record.leave_type_id"
                                     placeholder="Leave Type"
                                     style="width: 100%"
@@ -151,7 +182,7 @@
                                     >
                                         {{ item.name }}
                                     </a-select-option>
-                                </a-select>
+                                </a-select> -->
                             </template>
 
                             <template v-else-if="column.key === 'is_half_day'">
@@ -187,28 +218,6 @@
                                         >
                                     </a-radio-group>
                                 </template>
-                            </template>
-
-                            <template v-else-if="column.key === 'reason'">
-                                <a-form-item
-                                    :validateStatus="
-                                        !record.reason || !record.reason.trim()
-                                            ? 'error'
-                                            : ''
-                                    "
-                                    :help="
-                                        !record.reason || !record.reason.trim()
-                                            ? 'Reason is required'
-                                            : ''
-                                    "
-                                    style="margin-bottom: 0"
-                                >
-                                    <a-textarea
-                                        v-model:value="record.reason"
-                                        placeholder="Enter reason"
-                                        :rows="2"
-                                    />
-                                </a-form-item>
                             </template>
 
                             <template v-else-if="column.key === 'actions'">
@@ -251,7 +260,15 @@
     </a-drawer>
 </template>
 <script>
-import { defineComponent, onMounted, ref, watch } from "vue";
+import {
+    defineComponent,
+    ref,
+    reactive,
+    onMounted,
+    nextTick,
+    watch,
+} from "vue";
+import dayjs from "dayjs";
 import {
     PlusOutlined,
     LoadingOutlined,
@@ -264,6 +281,7 @@ import UploadFile from "../../../../common/core/ui/file/UploadFile.vue";
 import LeaveTypeAddButton from "../leave-types/AddButton.vue";
 import DateRangePicker from "../../../../common/components/common/calendar/DateRangePicker.vue";
 import UserListDisplay from "../../../../common/components/user/UserListDisplay.vue";
+import { h } from "vue";
 
 export default defineComponent({
     props: [
@@ -331,16 +349,19 @@ export default defineComponent({
             }
 
             for (const entry of selectedDates.value) {
+                if (entry.is_half_day === undefined) {
+                    entry.is_half_day = 0;
+                }
                 const payload = {
                     user_id: props.formData.user_id,
-                    leave_type_id: entry.leave_type_id,
+                    leave_type_id: 1,
                     start_date: entry.date,
                     end_date: entry.date,
                     leave_date: entry.date,
                     is_half_day: entry.is_half_day,
                     half_day_type: entry.is_half_day ? entry.half_day_type : "",
                     date: [entry.date, entry.date],
-                    reason: entry.reason || "",
+                    reason: "Default value dont consider",
                     status: "pending",
                 };
 
@@ -406,14 +427,16 @@ export default defineComponent({
         const dateDropdownVisible = ref(false);
         const selectedMonth = ref(null);
 
+        const isPickerOpen = ref();
         const selectedDates = ref([]);
+
         const leaveColumns = [
             { title: "Date", dataIndex: "date", key: "date" },
-            {
-                title: "Leave Type",
-                dataIndex: "leave_type_id",
-                key: "leave_type_id",
-            },
+            // {
+            //     title: "Leave Type",
+            //     dataIndex: "leave_type_id",
+            //     key: "leave_type_id",
+            // },
             {
                 title: "Is Half Day",
                 dataIndex: "is_half_day",
@@ -424,52 +447,124 @@ export default defineComponent({
                 dataIndex: "half_day_type",
                 key: "half_day_type",
             },
-            { title: "Reason", dataIndex: "reason", key: "reason" },
+            // { title: "Reason", dataIndex: "reason", key: "reason" },
             { title: "Actions", key: "actions" },
         ];
 
         // Add date only if in same month
+        // const onAddDate = (date) => {
+        //     const formattedDate = dayjs(date).format("YYYY-MM-DD");
+        //     const month = dayjs(date).format("YYYY-MM");
+
+        //     if (!selectedMonth.value) {
+        //         selectedMonth.value = month;
+        //     }
+
+        //     if (selectedMonth.value !== month) {
+        //         message.warning("Please select dates within the same month");
+        //         return;
+        //     }
+
+        //     const exists = selectedDates.value.find(
+        //         (d) => d.date === formattedDate
+        //     );
+        //     if (!exists) {
+        //         selectedDates.value.push({
+        //             date: formattedDate,
+        //             start_date: formattedDate,
+        //             end_date: formattedDate,
+        //             leave_type_id: null,
+        //             is_half_day: 0,
+        //             half_day_type: null,
+        //             reason: "",
+        //         });
+        //     }
+        // };
+        // const disableCrossMonthDates = (current) => {
+        //     if (!selectedMonth.value) return false;
+        //     return dayjs(current).format("YYYY-MM") !== selectedMonth.value;
+        // };
+
+        // const removeDateRow = (date) => {
+        //     selectedDates.value = selectedDates.value.filter(
+        //         (d) => d.date !== date
+        //     );
+        //     if (selectedDates.value.length === 0) {
+        //         selectedMonth.value = null;
+        //     }
+        // };
+
         const onAddDate = (date) => {
-            const formattedDate = dayjs(date).format("YYYY-MM-DD");
-            const month = dayjs(date).format("YYYY-MM");
-
-            if (!selectedMonth.value) {
-                selectedMonth.value = month;
-            }
-
-            if (selectedMonth.value !== month) {
-                message.warning("Please select dates within the same month");
-                return;
-            }
-
-            const exists = selectedDates.value.find(
-                (d) => d.date === formattedDate
+            const dateStr = date.format("YYYY-MM-DD");
+            const index = selectedDates.value.findIndex(
+                (d) => d.date === dateStr
             );
-            if (!exists) {
-                selectedDates.value.push({
-                    date: formattedDate,
-                    start_date: formattedDate,
-                    end_date: formattedDate,
-                    leave_type_id: null,
-                    is_half_day: 0,
-                    half_day_type: null,
-                    reason: "",
-                });
+
+            if (index !== -1) {
+                // remove if already exists
+                selectedDates.value.splice(index, 1);
+            } else {
+                // add new
+                selectedDates.value.push({ date: dateStr });
             }
-        };
-        const disableCrossMonthDates = (current) => {
-            if (!selectedMonth.value) return false;
-            return dayjs(current).format("YYYY-MM") !== selectedMonth.value;
+
+            tempDate.value = null;
+            nextTick(() => {
+                isPickerOpen.value = true; // keep calendar open
+            });
         };
 
-        const removeDateRow = (date) => {
+        const handleDatePickerClick = () => {
+            // Only open if currently closed
+            if (!isPickerOpen.value) {
+                isPickerOpen.value = true;
+            }
+        };
+        const removeDateRow = (dateStr) => {
             selectedDates.value = selectedDates.value.filter(
-                (d) => d.date !== date
+                (d) => d.date !== dateStr
             );
-            if (selectedDates.value.length === 0) {
-                selectedMonth.value = null;
-            }
         };
+
+        const closePicker = () => {
+            isPickerOpen.value = false;
+        };
+
+        const cancelPicker = () => {
+            isPickerOpen.value = false;
+        };
+
+        const disableCrossMonthDates = (current) => {
+            // Your logic here, or always allow all dates:
+            return false;
+        };
+
+        const customCellRender = ({ current }) => {
+            const dateStr = current.format("YYYY-MM-DD");
+            const isSelected = selectedDates.value.some(
+                (d) => d.date === dateStr
+            );
+
+            return h(
+                "div",
+                {
+                    style: {
+                        width: "100%",
+                        height: "100%",
+                        background: isSelected ? "#1890ff" : undefined,
+                        // border: "2px solid gray",
+                        // boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)", // subtle shadow
+                        // borderRadius: "8px", // rounded corners (you can adjust this value)
+                        color: isSelected ? "white" : undefined,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                    },
+                },
+                current.date().toString()
+            );
+        };
+
         const onHalfDayChange = (record) => {
             if (record.is_half_day === 1) {
                 record.half_day_type = record.half_day_type || "morning";
@@ -482,13 +577,13 @@ export default defineComponent({
             return selectedDates.value.map((entry) => {
                 return {
                     user_id: formData.user_id,
-                    leave_type_id: entry.leave_type_id,
+                    leave_type_id: 1,
                     start_date: entry.date,
                     end_date: entry.date,
                     leave_date: entry.date,
                     is_half_day: entry.is_half_day,
                     half_day_type: entry.is_half_day ? entry.half_day_type : "",
-                    reason: entry.reason || "",
+                    reason: "Default value dont consider",
                     status: "pending",
                 };
             });
@@ -511,10 +606,17 @@ export default defineComponent({
             selectedMonth,
             leaveColumns,
             onAddDate,
+            isPickerOpen,
             disableCrossMonthDates,
             removeDateRow,
             // prepareLeaveRequest,
             drawerWidth: window.innerWidth <= 991 ? "70%" : "65%",
+            tempDate,
+            closePicker,
+            cancelPicker,
+            customCellRender,
+            onSubmit,
+            handleDatePickerClick,
         };
     },
 });

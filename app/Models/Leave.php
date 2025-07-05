@@ -29,13 +29,13 @@ class Leave extends BaseModel
     
     protected $hidden = ['id', 'user_id', 'leave_type_id'];
     
-    protected $appends = ['xid', 'x_user_id', 'x_leave_type_id'];
+    protected $appends = ['xid', 'x_user_id'];
     
     protected $filterable = ['status', 'leave_type', 'is_paid', 'is_half_day'];
     
     protected $hashableGetterFunctions = [
         'getXUserIdAttribute' => 'user_id',
-        'getXLeaveTypeIdAttribute' => 'leave_type_id',
+        // 'getXLeaveTypeIdAttribute' => 'leave_type_id',
     ];
     
     protected $casts = [
@@ -43,7 +43,7 @@ class Leave extends BaseModel
         'is_half_day' => 'integer',
         'leave_type' => 'integer',
         'user_id' => Hash::class . ':hash',
-        'leave_type_id' => Hash::class . ':hash',
+        'leave_type_id' => 'integer',
         'start_date' => 'date',
         'end_date' => 'date',
         'leave_date' => 'date',
@@ -198,7 +198,7 @@ class Leave extends BaseModel
             'leave_date' => 'nullable|date',
             'leave_type_id' => 'nullable|exists:leave_types,id',
             'leave_type' => 'nullable|integer|in:1,2,3',
-            'is_half_day' => 'required|integer|in:0,1',
+            'is_half_day' => 'nullable|integer|in:0,1',
             'half_day_type' => 'required_if:is_half_day,1|in:morning,evening',
             'is_paid' => 'required|integer|in:0,1',
             'reason' => 'nullable|string|max:500',
