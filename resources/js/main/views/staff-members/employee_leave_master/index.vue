@@ -30,18 +30,17 @@
                         "
                     >
                         <a-space>
-                            <a-button type="primary" @click="addItem">
+                            <!-- <a-button type="primary" @click="addItem">
                                 <PlusOutlined />
-                                <!-- {{ $t("user.add") }} -->
                                 Add Employee Leave Master
-                            </a-button>
+                            </a-button> -->
                             <!-- <a-button type="primary" @click="addItems">
                                 <PlusOutlined />
                                 {{ $t("user.quick_add") }}
                             </a-button> -->
                         </a-space>
                     </template>
-                    <a-button
+                    <!-- <a-button
                         v-if="
                             table.selectedRowKeys.length > 0 &&
                             (permsArray.includes(`${userType}_delete`) ||
@@ -53,7 +52,7 @@
                     >
                         <template #icon><DeleteOutlined /></template>
                         {{ $t("common.delete") }}
-                    </a-button>
+                    </a-button> -->
                 </a-space>
             </a-col>
             <a-col :xs="24" :sm="24" :md="12" :lg="18" :xl="18">
@@ -95,12 +94,12 @@
                     v-model:activeKey="extraFilters.status"
                     @change="setUrlData"
                 >
-                    <a-tab-pane key="all" :tab="`${$t('common.all')}`" />
+                    <!-- <a-tab-pane key="all" :tab="`${$t('common.all')}`" /> -->
                     <a-tab-pane key="active" :tab="`${$t('common.active')}`" />
-                    <a-tab-pane
+                    <!-- <a-tab-pane
                         key="inactive"
                         :tab="`${$t('common.inactive')}`"
-                    />
+                    /> -->
                 </a-tabs>
             </a-col>
         </a-row>

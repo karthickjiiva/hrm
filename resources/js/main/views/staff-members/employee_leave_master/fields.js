@@ -39,10 +39,10 @@ const fields = () => {
             dataIndex: 'el',
             key: 'el',
         },
-        {
-            title: t("common.action"),
-            dataIndex: "action",
-        }
+        // {
+        //     title: t("common.action"),
+        //     dataIndex: "action",
+        // }
     ];
 
     const filterableColumns = [
