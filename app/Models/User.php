@@ -30,6 +30,12 @@ class User extends BaseModel implements AuthenticatableContract, JWTSubject
     'uan_number', 'pf_number', 'esi_number', 'pan_number', 'aadhar_number',
     'emergency_contact_name','emergency_contact_number','alternate_phone',
     'has_resigned','resignation_date','resignation_reason','has_rejoined','rejoining_date','rejoining_reason',
+    'esi_enabled', 'esi_percentage', 'monthly_esi', 'annual_esi',
+        'prof_tax_enabled', 'prof_tax_percentage', 'monthly_prof_tax', 'annual_prof_tax',
+        'tds_enabled', 'tds_percentage', 'monthly_tds', 'annual_tds',
+        'hra_percent_monthly', 'monthly_hra_percent_monthly', 'annual_hra_percent_monthly',
+        'allowance_percent', 'monthly_allowance_percent', 'annual_allowance_percent',
+        'food_allowance_percent', 'monthly_food_allowance_percent', 'annual_food_allowance_percent'
 ];
 
 
@@ -96,6 +102,27 @@ class User extends BaseModel implements AuthenticatableContract, JWTSubject
     'has_rejoined' => 'boolean',
     'rejoining_date' => 'date',
     'rejoining_reason' => 'string',
+    'esi_enabled' => 'boolean',
+        'prof_tax_enabled' => 'boolean',
+        'tds_enabled' => 'boolean',
+        'esi_percentage' => 'float',
+        'prof_tax_percentage' => 'float',
+        'tds_percentage' => 'float',
+        'monthly_esi' => 'float',
+        'annual_esi' => 'float',
+        'monthly_prof_tax' => 'float',
+        'annual_prof_tax' => 'float',
+        'monthly_tds' => 'float',
+        'annual_tds' => 'float',
+        'hra_percent_monthly' => 'float',
+        'monthly_hra_percent_monthly' => 'float',
+        'annual_hra_percent_monthly' => 'float',
+        'allowance_percent' => 'float',
+        'monthly_allowance_percent' => 'float',
+        'annual_allowance_percent' => 'float',
+        'food_allowance_percent' => 'float',
+        'monthly_food_allowance_percent' => 'float',
+        'annual_food_allowance_percent' => 'float'
 
     ];
 

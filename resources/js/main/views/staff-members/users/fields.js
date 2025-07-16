@@ -95,10 +95,10 @@ const fields = () => {
             key: "employee_type",
             customRender: ({ record }) => record.employee_type?.type || "-",
             },
-        {
-            title: t("user.duration"),
-            dataIndex: "duration",
-        },
+        // {
+        //     title: t("user.duration"),
+        //     dataIndex: "duration",
+        // },
         {
             title: t("user.status"),
             dataIndex: "status",
