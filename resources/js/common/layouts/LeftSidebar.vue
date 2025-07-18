@@ -591,7 +591,7 @@
                                 <span>{{ $t("menu.payrolls") }}</span>
                             </span>
                         </template>
-                        <a-menu-item
+                        <!-- <a-menu-item
                             v-if="
                                 permsArray.includes('pre_payments_view') ||
                                 permsArray.includes('admin')
@@ -656,6 +656,21 @@
                             key="basic_salaries"
                         >
                             <span>{{ $t("menu.basic_salaries") }}</span>
+                        </a-menu-item>
+                    </a-sub-menu> -->
+                        <a-menu-item
+                            v-if="permsArray.includes('admin')"
+                            @click="
+                                () => {
+                                    menuSelected();
+                                    $router.push({
+                                        name: 'admin.basic_salaries.generate_payroll',
+                                    });
+                                }
+                            "
+                            key="basic_salaries"
+                        >
+                            <span>Generate Payroll</span>
                         </a-menu-item>
                     </a-sub-menu>
                     <a-menu-item
@@ -1334,7 +1349,7 @@
                                 <span>{{ $t("menu.payrolls") }}</span>
                             </span>
                         </template>
-                        <a-menu-item
+                        <!-- <a-menu-item
                             @click="
                                 () => {
                                     menuSelected();
@@ -1346,8 +1361,8 @@
                             key="pre_payments"
                         >
                             <span>{{ $t("menu.pre_payments") }}</span>
-                        </a-menu-item>
-                        <a-menu-item
+                        </a-menu-item> -->
+                        <!-- <a-menu-item
                             @click="
                                 () => {
                                     menuSelected();
@@ -1359,7 +1374,20 @@
                             key="increments_promotions"
                         >
                             <span>{{ $t("menu.increments_promotions") }}</span>
-                        </a-menu-item>
+                        </a-menu-item> -->
+                        <!-- <a-menu-item
+                            @click="
+                                () => {
+                                    menuSelected();
+                                    $router.push({
+                                        name: 'admin.self.payrolls.index',
+                                    });
+                                }
+                            "
+                            key="payrolls"
+                        >
+                            <span>{{ $t("menu.payrolls") }}</span>
+                        </a-menu-item> -->
                         <a-menu-item
                             @click="
                                 () => {

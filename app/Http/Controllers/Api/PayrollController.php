@@ -15,6 +15,7 @@ use Examyou\RestAPI\ApiResponse;
 use App\Classes\CommonHrm;
 use App\Classes\Payrolls;
 use App\Models\PayrollComponent;
+use App\Models\PayrollNew;
 
 class PayrollController extends ApiBaseController
 {
@@ -182,4 +183,28 @@ class PayrollController extends ApiBaseController
         // this is call when status change like paid,generated
         Payrolls::updatePayrollStatus($updateStatusRequest->account_id, $updateStatusRequest->payrolls, $updateStatusRequest->payroll_status, $updateStatusRequest->payment_date);
     }
+
+    public function checkPayrollExists(Request $request)
+{
+    $request->validate([
+        'month' => 'required|integer|between:1,12',
+        'year' => 'required|integer|min:2000|max:2100',
+        'employee_id' => 'nullable|exists:staff_members,id'
+    ]);
+
+    $query = PayrollNew::where('month', $request->month)
+        ->where('year', $request->year);
+
+    if ($request->has('employee_id')) {
+        $query->where('employee_id', $request->employee_id);
+    }
+
+    $exists = $query->exists();
+
+    return response()->json([
+        'exists' => $exists,
+        'message' => $exists ? 'Payroll exists for this period' : 'No payroll found for this period',
+        'count' => $exists ? $query->count() : 0
+    ]);
+}
 }

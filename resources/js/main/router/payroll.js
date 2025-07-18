@@ -38,11 +38,23 @@ export default [
                     permission: "payrolls_view",
                 },
             },
+            // {
+            //     path: "basic-salaries",
+            //     component: () =>
+            //         import("../views/payrolls/basic-salary/index.vue"),
+            //     name: "admin.basic_salaries.index",
+            //     meta: {
+            //         requireAuth: true,
+            //         menuParent: "payrolls",
+            //         menuKey: (route) => "basic_salaries",
+            //         permission: "salary_settings",
+            //     },
+            // },
             {
                 path: "basic-salaries",
                 component: () =>
-                    import("../views/payrolls/basic-salary/index.vue"),
-                name: "admin.basic_salaries.index",
+                    import("../views/payrolls/basic-salary/generate_payroll.vue"),
+                name: "admin.basic_salaries.generate_payroll",
                 meta: {
                     requireAuth: true,
                     menuParent: "payrolls",

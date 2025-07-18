@@ -15,7 +15,8 @@ ApiRoute::group(['namespace' => 'App\Http\Controllers\Api'], function () {
     ApiRoute::post('account-csv', ['as' => 'api.extra.account-csv', 'uses' => 'PdfController@exportAccountEntries']);
     ApiRoute::post('account-xlsx', ['as' => 'api.extra.account-xlsx', 'uses' => 'PdfController@downloadAccountEntriesExcel']);
     ApiRoute::post('payroll-pdf/{xid}', ['as' => 'api.extra.payroll-pdf', 'uses' => 'PdfController@payrollPdf']);
-
+    ApiRoute::get('payroll-check-exists',  ['as' => 'api.payroll-check-exists', 'uses' => 'PayrollNewController@checkPayrollExists']);
+    ApiRoute::post('payroll-generate',  ['as' => 'api.payroll-generate', 'uses' => 'PayrollNewController@generatePayroll']);
     // Check visibility of module according to subscription plan
     ApiRoute::post('check-subscription-module-visibility', ['as' => 'api.extra.check-subscription-module-visibility', 'uses' => 'AuthController@checkSubscriptionModuleVisibility']);
     ApiRoute::post('visible-subscription-modules', ['as' => 'api.extra.visible-subscription-modules', 'uses' => 'AuthController@visibleSubscriptionModules']);
@@ -47,6 +48,7 @@ ApiRoute::group(['namespace' => 'App\Http\Controllers\Api'], function () {
         ApiRoute::get('leaves/remaining-leaves', ['as' => 'api.leaves.remaining-leaves', 'uses' => 'LeaveController@remainingLeaves']);
         ApiRoute::get('leaves/unpaid-leaves', ['as' => 'api.leaves.unpaid-leaves', 'uses' => 'LeaveController@unpaidLeaves']);
         ApiRoute::resource('leaves', 'LeaveController', ['as' => 'api']);
+        
     });
 
     // Routes Accessable to thouse user who have permissions realted to route
@@ -80,6 +82,9 @@ ApiRoute::group(['namespace' => 'App\Http\Controllers\Api'], function () {
 
         ApiRoute::resource('shifts', 'ShiftController', $options);
         ApiRoute::resource('employee_types', 'EmployeeTypeController', $options);
+        // ApiRoute::post('/generate-payroll', [PayrollNewController::class, 'generatePayroll']);
+        // ApiRoute::post('/revert-payroll', [PayrollNewController::class, 'revertPayroll']);
+        
         ApiRoute::resource('bank_masters', 'BankMasterController', $options);
         ApiRoute::resource('employee_leave_masters', 'EmployeeLeaveMasterController', $options);
         ApiRoute::resource('departments', 'DepartmentController', $options);
