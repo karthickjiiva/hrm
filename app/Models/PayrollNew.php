@@ -45,6 +45,7 @@ class PayrollNew extends BaseModel
         'tds' => 'float',
         'total_taxes_deductions' => 'float',
         'net_salary' => 'float',
+        'per_day_salary'=>'float',
     ];
 
     protected static function boot()

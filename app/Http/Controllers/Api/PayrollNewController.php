@@ -12,6 +12,7 @@ use Carbon\CarbonTimeZone;
 use App\Models\Holiday;
 use App\Models\Leave;
 
+
 class PayrollNewController extends ApiBaseController
 {
     protected $model = PayrollNew::class;
@@ -23,14 +24,6 @@ class PayrollNewController extends ApiBaseController
 
         $month = $request->month;
         $year = $request->year;
-        // $employeeId = $request->employee_id;
-
-        // if ($employeeId) {
-        //     // Single employee processing
-        //     return $this->processSingleEmployee($employeeId, $month, $year);
-        // }
-
-        // Process all active employees
         return $this->processAllEmployees($month, $year);
     }
 
@@ -133,9 +126,6 @@ protected function makeErrorResponse($message, $code = 400, $errors = [])
         ]);
     }
 
-    /**
-     * Revert payroll for single employee
-     */
     protected function revertSingleEmployee($employeeId, $month, $year)
     {
         $payroll = PayrollNew::where('month', $month)
@@ -147,10 +137,6 @@ protected function makeErrorResponse($message, $code = 400, $errors = [])
 
         return $this->makeSuccessResponse('Payroll reverted successfully for employee');
     }
-
-    /**
-     * Revert payroll for all employees in period
-     */
     protected function revertAllEmployees($month, $year)
     {
         $payrolls = PayrollNew::where('month', $month)
@@ -179,9 +165,32 @@ protected function makeErrorResponse($message, $code = 400, $errors = [])
         ]);
     }
 
-    /**
-     * Core payroll generation logic for single employee
-     */
+protected function calculateWorkingDays($month, $year)
+{
+    $date = Carbon::create($year, $month, 1);
+    $daysInMonth = $date->daysInMonth;
+    // $workingDays = 0;
+    
+    // // Get all holidays for this month
+    // $holidays = Holiday::where('month', $month)
+    //     ->where('year', $year)
+    //     ->pluck('date')
+    //     ->map(function ($date) {
+    //         return Carbon::parse($date)->format('Y-m-d');
+    //     })
+    //     ->toArray();
+
+    // for ($day = 1; $day <= $daysInMonth; $day++) {
+    //     $currentDate = $date->copy()->day($day);
+        
+    //     // Check if it's a working day (not weekend and not holiday)
+    //     if (!$currentDate->isWeekend() && !in_array($currentDate->format('Y-m-d'), $holidays)) {
+    //         $workingDays++;
+    //     }
+    // }
+
+    return $daysInMonth;
+}
     protected function generateEmployeePayroll($employee, $month, $year)
 {
     // Calculate total working days in month
@@ -191,82 +200,217 @@ protected function makeErrorResponse($message, $code = 400, $errors = [])
     $leaveStatus = $this->checkEmployeeLeaveStatus($employee->id, $month, $year);
     
     if ($leaveStatus['has_leave']) {
+       
         // Employee has taken leave - use detailed calculation
-        $payableDays = $this->calculateDaysWithLeave(
+        $leaveDayss = $this->calculateLossOfPay(
             $employee->id, 
             $month, 
-            $year, 
-            $workingDays,
-            $leaveStatus['leave_type']
+            $year
         );
-        $lossOfPayDays = $result['loss_of_pay'];
-        $payableDays = $result['payable_days'];
-        $leaveDeductions = $result['leave_deductions'];
-        
+        // print_r($leaveDayss['loss_of_pay_days']);exit;
+        $actual_payable_days = $workingDays;
+        $getLeavededuct_lossPay = $this->decreaseLeaveCredits($employee->id , $leaveDayss['loss_of_pay_days']);
+        $payableDays = $workingDays - $getLeavededuct_lossPay['remainder'];
+        $lossOfPayDays = $getLeavededuct_lossPay['remainder'];
+
         // Update employee leave balances
-        $this->updateLeaveBalances($employee->id, $leaveDeductions);
     } else {
-        // No leaves taken - full month calculation
+        // No leaves taken 
+        $actual_payable_days = $workingDays;
         $payableDays = $workingDays;
-        $lossOfPayDays = $workingDays - $payableDays;
+        $lossOfPayDays = 0;
     }
+    
+        $days_payable = $workingDays;
+        $totalEarnings = (float)$employee->basic_salary + (float)$employee->monthly_hra_percent_monthly + (float)$employee->monthly_allowance_percent + (float)$employee->monthly_food_allowance_percent;
+        $per_day_salary = $this->calculatePerDaySalary($employee, $employee->monthly_allowance_percent , $employee->monthly_food_allowance_percent, $workingDays);
+        if($lossOfPayDays > 0){
+            $lossofpayAmount = $per_day_salary * $lossOfPayDays;
+            $totalEarnings =  $totalEarnings - (float)$lossofpayAmount;
+        }
     $payrollData = [
         'employee_id' => $employee->id,
         'month' => $month,
         'year' => $year,
         'total_working_days' => $workingDays,
         'loss_of_pay_days' => $lossOfPayDays,
-        'days_payable' => $payableDays,
-        'basic' => $this->calculateDailyAmountWithDeductions(
-        $employee->basic_salary, 
-        $workingDays, 
-        $payableDays
-        ),
-    
-    'hra' => $this->calculateDailyAmountWithDeductions(
-        $employee->monthly_hra_percent_monthly, 
-        $workingDays, 
-        $payableDays
-    ),
-    
-    'allowance' => $this->calculateDailyAmountWithDeductions(
-        $employee->monthly_allowance_percent, 
-        $workingDays, 
-        $payableDays
-    ),
-    
-    'foodAllowance' => $this->calculateDailyAmountWithDeductions(
-        $employee->monthly_food_allowance_percent, 
-        $workingDays, 
-        $payableDays
-    ),
-
-    // Calculate totals
-    $totalEarnings = $basic + $hra + $allowance + $foodAllowance
+        'actual_payable_days' => $payableDays,
+        'days_payable' => $days_payable,
+        'basic' =>  $employee->basic_salary,
+        'hra' =>  $employee->monthly_hra_percent_monthly,  
+        'allowance' =>  $employee->monthly_allowance_percent,   
+        'food_allowance' =>  $employee->monthly_food_allowance_percent,    // Calculate totals
+        'totalEarnings' => $totalEarnings,
+        'per_day_salary'=> $per_day_salary,
+        'pf_employee'=>0.00,
+        'esi_employee'=>0.00,
+        'professional_tax'=>0.00,
+        'tds'=>0.00,
     ];
-    $pfAmount = $employee->monthly_pf ?? 0;
-        $payrollData['pf_employee'] = $pfAmount;
-    $esiAmount = $employee->monthly_esi ?? 0;
-        $payrollData['esi_employee'] = $esiAmount;
-
-    // Calculate totals
+    $payrollData['pf_employee'] = $employee->pf_enabled ? $employee->monthly_pf : 0;
+    $payrollData['esi_employee'] = $employee->esi_enabled ? $employee->monthly_esi : 0;
+    $payrollData['professional_tax'] = $employee->prof_tax_enabled ? $employee->monthly_prof_tax : 0;
+    $payrollData['tds'] = $employee->tds_enabled ? $employee->monthly_tds : 0;
     $payrollData['total_earnings'] = $totalEarnings;
-    $payrollData['total_contributions'] = $this->calculateContributions($payrollData, $employee);
-    $payrollData['total_taxes_deductions'] = $this->calculateTaxes($payrollData, $employee);
-    $payrollData['net_salary'] = $payrollData['total_earnings'] 
-                               - $payrollData['total_contributions'] 
-                               - $payrollData['total_taxes_deductions'];
     
 
+    $payrollData['total_contributions'] = $payrollData['pf_employee'] + $payrollData['esi_employee'];
+    $payrollData['total_taxes_deductions'] = $payrollData['tds'] +  $payrollData['professional_tax'];
+    $payrollData['net_salary'] = round($payrollData['total_earnings'] 
+                               - $payrollData['total_contributions'] 
+                               - $payrollData['total_taxes_deductions'],2);
+    
+   
     // Create payroll record
     $payroll = PayrollNew::create($payrollData);
+    //  print_r($employee);exit;
 
-    // Process leave adjustments
-    $this->processLeaveAdjustments($payroll, $leaveStatus);
+    $this->updateLeaveCredits($employee->id, $payableDays);
 
     return $payroll;
 }
-protected function calculateDaysWithLeave($employeeId, $month, $year, $totalWorkingDays, $leaveType)
+
+function calculatePerDaySalary($employee, $allowance = null, $foodAllowance = null, $workingDays) {
+    // Initialize total earnings with basic salary (mandatory)
+    $totalEarnings = (float)$employee->basic_salary;
+    
+    if (!empty($employee->monthly_hra_percent_monthly)) {
+        $totalEarnings += (float)$employee->monthly_hra_percent_monthly;
+    }
+    
+    if (!empty($allowance)) {
+        $totalEarnings += (float)$allowance;
+    }
+    
+    if (!empty($foodAllowance)) {
+        $totalEarnings += (float)$foodAllowance;
+    }
+    
+    // Determine the divisor based on how many additional components are present
+    $divisor = $workingDays; // Basic (1) + additional components
+    
+    // Calculate per day salary
+    $perDay = $totalEarnings / $divisor;
+    
+    return round($perDay, 2);
+}
+
+public function updateLeaveCredits($employeeId, $workingDays, $createdBy = null)
+{
+    $leaveRecord = \App\Models\EmployeeLeaveMaster::firstOrNew([
+        'employee_id' => $employeeId
+    ]);
+    $workingDays = 25;
+    if (!$leaveRecord->exists) {
+        $leaveRecord->cl = 0;
+        $leaveRecord->sl = 0;
+        $leaveRecord->el = 0;
+        
+        if ($createdBy) {
+            $leaveRecord->created_by = $createdBy;
+        }
+    }
+    $clIncrement = 0;
+    $slIncrement = 0;
+    $elIncrement = 0;
+    
+    if ($workingDays > 25) {
+        $clIncrement = 1;
+        $slIncrement = 1;
+        $elIncrement = 1;
+    } elseif ($workingDays > 17) {
+        $clIncrement = 1;
+        $slIncrement = 1;
+    } elseif ($workingDays > 10) {
+        $clIncrement = 1;
+    }
+    
+    $leaveRecord->cl += $clIncrement;
+    $leaveRecord->sl += $slIncrement;
+    $leaveRecord->el += $elIncrement;
+    
+    // Set updated_by if provided
+    if ($createdBy) {
+        $leaveRecord->updated_by = $createdBy;
+    }
+    
+    // Save the record (will create if new)
+    $leaveRecord->save();
+    return $leaveRecord;
+}
+public function decreaseLeaveCredits($employeeId, $lossPayDays, $createdBy = null)
+{
+    $leaveRecord = \App\Models\EmployeeLeaveMaster::where('employee_id', $employeeId)->first();
+
+    if (!$leaveRecord) {
+        return [
+            'remainder' => $lossPayDays,
+            'message' => 'No leave record found for this employee'
+        ];
+    }
+
+    $originalLossPayDays = $lossPayDays;
+    $remainingDays = $lossPayDays;
+    
+    // Define leave caps (minimum balance to maintain for each type)
+    $caps = [
+        'cl' => 0,  // Maintain at least 3 CL
+        'sl' => 0,  // Maintain at least 2 SL
+        'el' => 0   // No cap for EL
+    ];
+    
+    // Track deductions
+    $deductions = [
+        'cl' => 0,
+        'sl' => 0,
+        'el' => 0
+    ];
+
+    // Deduction logic for each leave type in order
+    $leaveTypes = ['cl', 'sl', 'el'];
+    
+    foreach ($leaveTypes as $type) {
+        if ($remainingDays <= 0) break;
+        
+        $available = $leaveRecord->$type - $caps[$type];
+        
+        if ($available > 0) {
+            // Can deduct up to the available amount (including fractions)
+            $deducted = min($available, $remainingDays);
+            
+            $leaveRecord->$type -= $deducted;
+            $deductions[$type] += $deducted;
+            $remainingDays -= $deducted;
+        }
+    }
+
+    // Set updated_by if provided
+    if ($createdBy) {
+        $leaveRecord->updated_by = $createdBy;
+    }
+    
+    // Save the record
+    $leaveRecord->save();
+
+    return [
+        'original_loss_pay_days' => $originalLossPayDays,
+        'cl_deducted' => $deductions['cl'],
+        'sl_deducted' => $deductions['sl'],
+        'el_deducted' => $deductions['el'],
+        'remainder' => $remainingDays,
+        'new_balances' => [
+            'cl' => $leaveRecord->cl,
+            'sl' => $leaveRecord->sl,
+            'el' => $leaveRecord->el
+        ],
+        'message' => $remainingDays > 0 
+            ? 'Partially deducted (insufficient leave credits)' 
+            : 'Leave credits fully deducted'
+    ];
+}
+
+
+public function calculateLossOfPay($employeeId, $month, $year)
 {
     $startDate = Carbon::create($year, $month, 1)->startOfMonth();
     $endDate = Carbon::create($year, $month, 1)->endOfMonth();
@@ -277,9 +421,617 @@ protected function calculateDaysWithLeave($employeeId, $month, $year, $totalWork
         ->orderBy('leave_date')
         ->get();
 
-    // Count total leave days (excluding weekends/holidays)
     $totalLeaveDays = $this->countValidLeaveDays($leaves, $startDate, $endDate);
+    // $leaves = Leave::where('user_id', $employeeId)
+    // ->whereBetween('leave_date', [$startDate, $endDate])
+    // ->orderBy('leave_date')
+    // ->get()
+    // ->toArray();
+    $lossOfPayDays = $this->calculateExtendedLossOfPay($leaves, $startDate, $endDate);
+    return [
+        'loss_of_pay_days' => $lossOfPayDays,
+        'total_leave_days' => $totalLeaveDays
+    ];
+}
+// use Carbon\Carbon;
 
+/**
+ * Calculate Loss of Pay (LOP) days.
+ * - Morning half-day is always 0.5, does NOT trigger block weekend/holiday bridging.
+ * - Weekends/holidays are only absorbed if part of a consecutive leave block (no working day break).
+ */
+protected function calculateExtendedLossOfPay($leaves, $startDate, $endDate)
+{
+    $processedDates = [];
+    $lossOfPayDays = 0;
+    $leaveMap = [];
+
+    // Create a map of all leave days
+    foreach ($leaves as $leave) {
+        $leaveDate = Carbon::parse($leave->leave_date);
+        $dateString = $leaveDate->toDateString();
+        
+        if (!$leaveDate->isWeekend() && !$this->isHoliday($leaveDate)) {
+            $leaveMap[$dateString] = [
+                'is_half_day' => $leave->is_half_day,
+                'half_day_type' => $leave->half_day_type ?? null,
+                'date' => $leaveDate
+            ];
+        }
+    }
+
+    // Sort leaves by date
+    ksort($leaveMap);
+
+    foreach ($leaveMap as $dateString => $leave) {
+        if (isset($processedDates[$dateString])) continue;
+
+        $currentDate = $leave['date'];
+        $isHalfDay = $leave['is_half_day'];
+        $isEvening = $isHalfDay && $leave['half_day_type'] === 'evening';
+        $isMorning = $isHalfDay && $leave['half_day_type'] === 'morning';
+
+        if ($isMorning) {
+            // Case 2 & 3: Morning half-day - count only 0.5
+            $lossOfPayDays += 0.5;
+            $processedDates[$dateString] = true;
+            continue;
+        }
+
+        // Initialize range
+        $rangeStart = $currentDate;
+        $rangeEnd = $currentDate;
+        $hasEvening = $isEvening;
+        $currentCount = $isHalfDay ? 0.5 : 1;
+        $processedDates[$dateString] = true;
+
+        // Process forward from current leave
+        $nextDate = $currentDate->copy()->addDay();
+        $tempHolidaysWeekends = 0;
+
+        while ($nextDate->lte($endDate)) {
+            $nextString = $nextDate->toDateString();
+            
+            if (isset($processedDates[$nextString])) {
+                $nextDate->addDay();
+                continue;
+            }
+
+            // Check if non-working day
+            if ($nextDate->isWeekend() || $this->isHoliday($nextDate)) {
+                $tempHolidaysWeekends++;
+                $processedDates[$nextString] = true;
+                $nextDate->addDay();
+                continue;
+            }
+
+            // Check if next working day has leave
+            if (!isset($leaveMap[$nextString])) break;
+            
+            $nextLeave = $leaveMap[$nextString];
+            $nextIsHalfDay = $nextLeave['is_half_day'];
+            $nextIsEvening = $nextIsHalfDay && $nextLeave['half_day_type'] === 'evening';
+            $nextIsMorning = $nextIsHalfDay && $nextLeave['half_day_type'] === 'morning';
+
+            // Case 1 & 4: Evening half-day followed by full day
+            if ($hasEvening && $nextIsMorning) {
+                $currentCount += $tempHolidaysWeekends + 0.5;
+                $tempHolidaysWeekends = 0;
+                $processedDates[$nextString] = true;
+                $rangeEnd = $nextDate;
+                break;
+            }
+            // Case 1: Full day in sequence
+            elseif (!$nextIsHalfDay) {
+                $currentCount += $tempHolidaysWeekends + 1;
+                $tempHolidaysWeekends = 0;
+                $processedDates[$nextString] = true;
+                $rangeEnd = $nextDate;
+                $hasEvening = $nextIsEvening;
+                $nextDate->addDay();
+            }
+            // Case 4: Evening half-day followed by another evening
+            elseif ($nextIsEvening) {
+                $currentCount += $tempHolidaysWeekends + 0.5;
+                $tempHolidaysWeekends = 0;
+                $processedDates[$nextString] = true;
+                $rangeEnd = $nextDate;
+                $hasEvening = true;
+                $nextDate->addDay();
+            }
+            else {
+                break;
+            }
+        }
+
+        // Add remaining buffer if we have evening half-day
+        if ($hasEvening) {
+            $currentCount += $tempHolidaysWeekends;
+        }
+
+        $lossOfPayDays += $currentCount;
+    }
+
+    return $lossOfPayDays;
+}
+
+    /**
+     * Helper to check holidays.
+     * Replace or extend this method according to your actual holidays.
+     * 
+     * @param Carbon $date
+     * @return bool
+     */
+
+protected function calculateRangeLoss($startDate, $endDate, $hasEvening)
+{
+    $count = 0;
+    
+    // Count all working days in range
+    $current = $startDate->copy();
+    while ($current->lte($endDate)) {
+        if (!$current->isWeekend() && !$this->isHoliday($current)) {
+            $count += 1;
+        }
+        $current->addDay();
+    }
+    
+    // For ranges starting with evening half-day, count next holidays/weekends
+    if ($hasEvening) {
+        $current = $endDate->copy()->addDay();
+        while ($current->isWeekend() || $this->isHoliday($current)) {
+            $count += 1;
+            $current->addDay();
+        }
+    }
+    
+    // For full day ranges, count adjacent holidays/weekends
+    if (!$hasEvening) {
+        // Before range
+        $current = $startDate->copy()->subDay();
+        while ($current->isWeekend() || $this->isHoliday($current)) {
+            $count += 1;
+            $current->subDay();
+        }
+        
+        // After range
+        $current = $endDate->copy()->addDay();
+        while ($current->isWeekend() || $this->isHoliday($current)) {
+            $count += 1;
+            $current->addDay();
+        }
+    }
+    
+    return $count;
+}
+
+protected function checkNextExtendedDays(Carbon $date, $userId)
+{
+    $current = $date->copy()->addDay();
+    $count = 0;
+    $processedDates = [];
+    $lastWorkingDayWithLeave = null;
+
+    while (true) {
+        $dateString = $current->toDateString();
+
+        // Skip if already processed
+        if (isset($processedDates[$dateString])) {
+            $current->addDay();
+            continue;
+        }
+
+        // If working day
+        if (!$current->isWeekend() && !$this->isHoliday($current)) {
+            if ($this->hasLeave($userId, $current)) {
+                $count += 1;
+                $lastWorkingDayWithLeave = $current;
+                $processedDates[$dateString] = true;
+                $current->addDay();
+            } else {
+                break;
+            }
+        }
+        // If holiday/weekend
+        else {
+            // Only count if it's between two leave days
+            if ($lastWorkingDayWithLeave || $this->hasAdjacentLeave($current, $userId, 'next')) {
+                $count += 1;
+            }
+            $processedDates[$dateString] = true;
+            $current->addDay();
+        }
+    }
+
+    return [
+        'count' => $count,
+        'processed_dates' => $processedDates
+    ];
+}
+
+protected function checkPreviousExtendedDays(Carbon $date, $userId)
+{
+    $current = $date->copy()->subDay();
+    $count = 0;
+    $processedDates = [];
+    $lastWorkingDayWithLeave = null;
+
+    while (true) {
+        $dateString = $current->toDateString();
+
+        // Skip if already processed
+        if (isset($processedDates[$dateString])) {
+            $current->subDay();
+            continue;
+        }
+
+        // If working day
+        if (!$current->isWeekend() && !$this->isHoliday($current)) {
+            if ($this->hasLeave($userId, $current)) {
+                $count += 1;
+                $lastWorkingDayWithLeave = $current;
+                $processedDates[$dateString] = true;
+                $current->subDay();
+            } else {
+                break;
+            }
+        }
+        // If holiday/weekend
+        else {
+            // Only count if it's between two leave days
+            if ($lastWorkingDayWithLeave || $this->hasAdjacentLeave($current, $userId, 'previous')) {
+                $count += 1;
+            }
+            $processedDates[$dateString] = true;
+            $current->subDay();
+        }
+    }
+
+    return [
+        'count' => $count,
+        'processed_dates' => $processedDates
+    ];
+}
+protected function hasAdjacentLeave(Carbon $date, $userId, $direction)
+{
+    if ($direction === 'next') {
+        $checkDate = $date->copy()->addDay();
+        while ($checkDate->isWeekend() || $this->isHoliday($checkDate)) {
+            $checkDate->addDay();
+        }
+        return $this->hasLeave($userId, $checkDate);
+    } else {
+        $checkDate = $date->copy()->subDay();
+        while ($checkDate->isWeekend() || $this->isHoliday($checkDate)) {
+            $checkDate->subDay();
+        }
+        return $this->hasLeave($userId, $checkDate);
+    }
+}
+protected function getLeaveType($userId, Carbon $date)
+{
+    // Implement your leave type checking
+    $leave = Leave::where('user_id', $userId)
+        ->whereDate('leave_date', $date)
+        ->first();
+
+    return $leave ? ($leave->is_half_day ? $leave->half_day_type : 'full') : null;
+}
+
+protected function isHoliday(Carbon $date)
+{
+    // Implement your holiday checking
+    return Holiday::whereDate('date', $date)->exists();
+}
+
+protected function checkPreviousDaysWithAttendance(Carbon $date, array &$processedDates, $userId)
+{
+    $current = $date->copy()->subDay();
+    $count = 0;
+    
+    while (true) {
+        $dateString = $current->toDateString();
+        
+        // Stop if we hit a processed date or non-leave working day
+        if(isset($processedDates[$dateString])) {
+            break;
+        }
+        
+        // For working days only
+        if (!$current->isWeekend() && !$this->isHoliday($current)) {
+            if ($this->hasLeave($userId, $current)) {
+                // Mark this date as processed
+                $processedDates[$dateString] = true;
+                $count++;
+            } else {
+                // Found working day without leave - stop counting
+                break;
+            }
+        }
+        
+        $current->subDay();
+    }
+    
+    return $count;
+}
+
+protected function checkNextDaysWithAttendance(Carbon $date, array &$processedDates, $userId,$typrrr)
+{
+    $current = $date->copy()->addDay();
+    $count = 0;
+    $lastLeaveDate = null;
+    
+    while (true) {
+        $dateString = $current->toDateString();
+        
+        // Stop if we hit a non-leave working day
+        if (!$current->isWeekend() && !$this->isHoliday($current)) {
+            if (!$this->hasLeave($userId, $current)) {
+                break;
+            }
+            $lastLeaveDate = $current->copy();
+        }
+        
+        // Skip if already processed (but continue checking beyond)
+        if (isset($processedDates[$dateString])) {
+            $current->addDay();
+            continue;
+        }
+        
+        // For working days only
+        if (!$current->isWeekend() && !$this->isHoliday($current)) {
+            $processedDates[$dateString] = true;
+            $count++;
+        }
+        
+        $current->addDay();
+    }
+    $totalCount = $count;
+    if ($typrrr == 0.5) {
+        $totalCount += 0.5;
+    } else {
+        $totalCount += $typrrr;
+    }
+    
+    return [
+        'count' => $totalCount,
+        'end_date' => $lastLeaveDate ? $lastLeaveDate->copy() : null
+    ];
+}
+
+protected function processLeaveRange($userId, Carbon $startDate, Carbon $endDate, array &$processedDates)
+{
+    $current = $startDate->copy();
+    $count = 0;
+    
+    while ($current->lte($endDate)) {
+        $dateString = $current->toDateString();
+        
+        // Only count working days that aren't already processed
+        if (!isset($processedDates[$dateString]) && 
+            !$current->isWeekend() && 
+            !$this->isHoliday($current)) {
+            
+            if ($this->hasLeave($userId, $current)) {
+                $processedDates[$dateString] = true;
+                $count++;
+            }
+        }
+        
+        $current->addDay();
+    }
+    
+    return $count;
+}
+
+
+protected function hasLeave($userId, Carbon $date)
+{
+    return Leave::where('user_id', $userId)
+        ->whereDate('leave_date', $date)
+        ->exists();
+}
+
+protected function findLastWorkingDayBefore(Carbon $date, $userId)
+{
+    $current = $date->copy()->subDay();
+    
+    while ($current >= $date->copy()->subMonth()) {
+        if (!$current->isWeekend() && !$this->isHoliday($current)) {
+            return $current;
+        }
+        $current->subDay();
+    }
+    
+    return null;
+}
+
+protected function findNextWorkingDayAfter(Carbon $date, $userId)
+{
+    $current = $date->copy()->addDay();
+    
+    while ($current <= $date->copy()->addMonth()) {
+        if (!$current->isWeekend() && !$this->isHoliday($current)) {
+            return $current;
+        }
+        $current->addDay();
+    }
+    
+    return null;
+}
+
+protected function countNonWorkingDaysBetween(Carbon $start, Carbon $end)
+{
+    $count = 0;
+    $current = $start->copy();
+    
+    while ($current <= $end) {
+        if ($current->isWeekend() || $this->isHoliday($current)) {
+            // Weekend counts as 2 days if it's Saturday
+            if ($current->isWeekend() && $current->isSaturday()) {
+                $count += 2;
+                $current->addDay(); // Skip Sunday
+            } else {
+                $count += 1;
+            }
+        }
+        $current->addDay();
+    }
+    
+    return $count;
+}
+
+protected function hasAttendance($userId, Carbon $date)
+{
+    // If it's a weekend or holiday, automatically consider no attendance
+    if ($date->isWeekend() || $this->isHoliday($date)) {
+        return false;
+    }
+
+    // Check if there's any leave record for this day (regardless of status)
+    $hasLeave = Leave::where('user_id', $userId)
+        ->whereDate('leave_date', $date)
+        ->exists();
+
+    // If leave record exists, employee was absent
+    // If no leave record exists, employee was present
+    return !$hasLeave;
+}
+
+// protected function calculateExtendedLossOfPay($leaves, $startDate, $endDate)
+// {
+//     $lossOfPayDays = 0;
+//     $processedDates = [];
+
+//     foreach ($leaves as $leave) {
+//         $leaveDate = Carbon::parse($leave->leave_date);
+        
+//         // Skip if already processed or invalid
+//         if (isset($processedDates[$leaveDate->toDateString()]) || 
+//             $leaveDate->isWeekend() || 
+//             $this->isHoliday($leaveDate)) {
+//             continue;
+//         }
+
+//         $baseValue = $leave->is_half_day ? 0.5 : 1;
+//         $extendedDays = 0;
+
+//         // Check adjacent days based on half-day type
+//         if ($leave->is_half_day) {
+//             if ($leave->half_day_type === 'morning') {
+//                 // For morning half-day, only check previous day
+//                 $extendedDays += $this->checkPreviousDays($leaveDate, $processedDates);
+//             } elseif ($leave->half_day_type === 'evening') {
+//                 // For evening half-day, only check next day
+//                 $extendedDays += $this->checkNextDays($leaveDate, $processedDates);
+//             }
+//         } else {
+//             // For full day leaves, check both sides
+//             $extendedDays += $this->checkPreviousDays($leaveDate, $processedDates);
+//             $extendedDays += $this->checkNextDays($leaveDate, $processedDates);
+//         }
+
+//         $lossOfPayDays += $baseValue + $extendedDays;
+//         $processedDates[$leaveDate->toDateString()] = true;
+//     }
+
+//     return $lossOfPayDays;
+// }
+
+/**
+ * Check previous consecutive days for weekends/holidays
+ */
+protected function checkPreviousDays(Carbon $date, array &$processedDates)
+{
+    $current = $date->copy()->subDay();
+    $count = 0;
+    
+    while (true) {
+        $dateString = $current->toDateString();
+        
+        // Stop if we hit a working day or processed date
+        if (!$current->isWeekend() && !$this->isHoliday($current) || 
+            isset($processedDates[$dateString])) {
+            break;
+        }
+        
+        // Weekend counts as 2 days (Saturday and Sunday)
+        if ($current->isWeekend() && $current->isSunday()) {
+            $count += 2;
+            $processedDates[$dateString] = true;
+            $processedDates[$current->copy()->addDay()->toDateString()] = true;
+            $current->subDay(); // Skip Sunday since we counted both
+        } 
+        // Single holiday or Sunday
+        else {
+            $count += 1;
+            $processedDates[$dateString] = true;
+        }
+        
+        $current->subDay();
+    }
+    
+    return $count;
+}
+
+/**
+ * Check next consecutive days for weekends/holidays
+ */
+protected function checkNextDays(Carbon $date, array &$processedDates)
+{
+    $current = $date->copy()->addDay();
+    $count = 0;
+    
+    while (true) {
+        $dateString = $current->toDateString();
+        
+        // Stop if we hit a working day or processed date
+        if (!$current->isWeekend() && !$this->isHoliday($current) || 
+            isset($processedDates[$dateString])) {
+            break;
+        }
+        
+        // Weekend counts as 2 days (Saturday and Sunday)
+        if ($current->isWeekend() && $current->isSaturday()) {
+            $count += 2;
+            $processedDates[$dateString] = true;
+            $processedDates[$current->copy()->addDay()->toDateString()] = true;
+            $current->addDay(); // Skip Sunday since we counted both
+        } 
+        // Single holiday or Sunday
+        else {
+            $count += 1;
+            $processedDates[$dateString] = true;
+        }
+        
+        $current->addDay();
+    }
+    
+    return $count;
+}
+
+/**
+ * Check if a date is a holiday (you need to implement your holiday check logic)
+ */
+// protected function isHoliday(Carbon $date)
+// {
+//     // Implement your holiday checking logic here
+//     // Example: return Holiday::where('date', $date->toDateString())->exists();
+//     return false;
+// }
+protected function calculateDaysWithLeave($employeeId, $month, $year, $totalWorkingDays, $leaveType)
+{
+    $startDate = Carbon::create($year, $month, 1)->startOfMonth();
+    $endDate = Carbon::create($year, $month, 1)->endOfMonth();
+
+    // Get all leaves for the month
+    $leaves = Leave::where('user_id', $employeeId)
+        ->whereBetween('leave_date', [$startDate, $endDate])
+        ->orderBy('leave_date')
+        ->get();
+    
+    $totalLeaveDays = $this->countValidLeaveDays($leaves, $startDate, $endDate);
+    
     // Calculate deductions using the new rules (max 2 per type)
     $deductionResult = $this->calculateLeaveDeductions($employeeId, $month, $year, $totalLeaveDays);
 
@@ -380,10 +1132,6 @@ protected function isWorkingDay($date)
     return !$date->isWeekend() && !$this->isHoliday($date);
 }
 
-protected function isHoliday($date)
-{
-    return Holiday::where('date', $date->format('Y-m-d'))->exists();
-}
 
 // New helper function to count valid leave days
 protected function countValidLeaveDays($leaves, $startDate, $endDate)
@@ -451,11 +1199,11 @@ protected function isSandwichLeave($leaveDate, $allLeaves, $monthStart, $monthEn
 
 
 
-protected function isHolidayOrWeekend($date, $employeeId)
-{
-    return $date->isWeekend() || 
-           Holiday::where('date', $date->format('Y-m-d'))->exists();
-}
+// protected function isHolidayOrWeekend($date, $employeeId)
+// {
+//     return $date->isWeekend() || 
+//            Holiday::where('date', $date->format('Y-m-d'))->exists();
+// }
 
 protected function getLeaveTypeCode($leaveType)
 {
