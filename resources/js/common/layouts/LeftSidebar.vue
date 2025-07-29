@@ -670,6 +670,20 @@
                             "
                             key="basic_salaries"
                         >
+                            <span>Payroll Generate</span>
+                        </a-menu-item>
+                         <a-menu-item
+                            v-if="permsArray.includes('admin')"
+                            @click="
+                                () => {
+                                    menuSelected();
+                                    $router.push({
+                                        name: 'admin.basic_salaries.payroll_reportexcel',
+                                    });
+                                }
+                            "
+                            key="payroll_reportexcel"
+                        >
                             <span>Payroll Report</span>
                         </a-menu-item>
                         <a-menu-item

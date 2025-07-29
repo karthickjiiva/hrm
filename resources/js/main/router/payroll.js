@@ -62,6 +62,18 @@ export default [
                     permission: "salary_settings",
                 },
             },
+              {
+                path: "payroll_reportexcel",
+                component: () =>
+                    import("../views/payrolls/basic-salary/payroll_reportexcel.vue"),
+                name: "admin.basic_salaries.payroll_reportexcel",
+                meta: {
+                    requireAuth: true,
+                    menuParent: "payrolls",
+                    menuKey: (route) => "payroll_reportexcel",
+                    permission: "salary_settings",
+                },
+            },
             {
                 path: "payroll_report",
                 component: () =>

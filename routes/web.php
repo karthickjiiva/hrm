@@ -18,6 +18,8 @@ ApiRoute::group(['namespace' => 'App\Http\Controllers\Api'], function () {
     ApiRoute::get('payroll-check-exists',  ['as' => 'api.payroll-check-exists', 'uses' => 'PayrollNewController@checkPayrollExists']);
     ApiRoute::post('payroll-generate',  ['as' => 'api.payroll-generate', 'uses' => 'PayrollNewController@generatePayroll']);
     ApiRoute::get('payroll_new/{xid}/download', 'PayrollNewController@downloadPayslip');
+    ApiRoute::get('payroll/export', 'PayrollNewController@export');
+
     // Check visibility of module according to subscription plan
     ApiRoute::post('check-subscription-module-visibility', ['as' => 'api.extra.check-subscription-module-visibility', 'uses' => 'AuthController@checkSubscriptionModuleVisibility']);
     ApiRoute::post('visible-subscription-modules', ['as' => 'api.extra.visible-subscription-modules', 'uses' => 'AuthController@visibleSubscriptionModules']);

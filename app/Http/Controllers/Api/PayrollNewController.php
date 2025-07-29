@@ -16,6 +16,8 @@ use Carbon\Carbon;
 use Carbon\CarbonTimeZone;
 use App\Models\Holiday;
 use App\Models\Leave;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\PayrollExport;
 
 
 class PayrollNewController extends ApiBaseController
@@ -60,7 +62,7 @@ public function index()
 
     public function downloadPayslip($xid)
     {
-          $decoded = Hashids::decode($xid);
+        $decoded = Hashids::decode($xid);
 
         if (empty($decoded)) {
             abort(404, 'Invalid XID');
@@ -70,7 +72,7 @@ public function index()
         if (!$id) {
             abort(404, 'Payroll record not found');
         }
- 
+
         $payroll = PayrollNew::with([
             'employee.designation',
             'employee.department',
@@ -78,6 +80,19 @@ public function index()
 
         $pdf = Pdf::loadView('pdf.payslip', compact('payroll'));
         return $pdf->download("payslip-{$payroll->employee->name}.pdf");
+    }
+
+    public function export(Request $request)
+    {
+        $month = $request->get('month');
+        $year = $request->get('year');
+
+        if (!$month || !$year) {
+            return response()->json(['message' => 'Month and Year are required.'], 422);
+        }
+        
+        $filename = "Payroll_{$month}_{$year}.xlsx";
+        return Excel::download(new PayrollExport($month, $year), $filename);
     }
 
     public function generatePayroll(Request $request){
