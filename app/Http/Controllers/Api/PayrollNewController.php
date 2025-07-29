@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\ApiBaseController;
+use App\Http\Requests\Api\PayrollNew\IndexRequest;
 use App\Models\PayrollNew;
 use App\Models\LeaveAdjustment;
 use App\Models\StaffMember;
@@ -16,7 +17,42 @@ use App\Models\Leave;
 class PayrollNewController extends ApiBaseController
 {
     protected $model = PayrollNew::class;
-
+public function index(IndexRequest $request)
+{
+    // $this->authorize();
+    // $request = request(); // Get the request object
+    
+    $query = PayrollNew::with('employee')
+        ->select('payroll_new.*');
+    
+    // Apply month filter if provided
+    if ($request->has('month')) {
+        $query->where('month', $request->month);
+    }
+    
+    // Apply year filter if provided
+    if ($request->has('year')) {
+        $query->where('year', $request->year);
+    }
+    
+    // Apply employee filter if provided
+    if ($request->has('employee_id')) {
+        $query->where('employee_id', $request->employee_id);
+    }
+    
+    // Get paginated results
+    $payrolls = $query->paginate($request->get('limit', 10));
+    
+    return ApiResponse::make(null, $payrolls->items(), [
+        'pagination' => [
+            'total' => $payrolls->total(),
+            'count' => $payrolls->count(),
+            'per_page' => $payrolls->perPage(),
+            'current_page' => $payrolls->currentPage(),
+            'total_pages' => $payrolls->lastPage()
+        ]
+    ]);
+}
     /**
      * Generate payroll - handles both single employee and all employees
      */
@@ -1195,16 +1231,6 @@ protected function isSandwichLeave($leaveDate, $allLeaves, $monthStart, $monthEn
 }
 
 
-
-
-
-
-// protected function isHolidayOrWeekend($date, $employeeId)
-// {
-//     return $date->isWeekend() || 
-//            Holiday::where('date', $date->format('Y-m-d'))->exists();
-// }
-
 protected function getLeaveTypeCode($leaveType)
 {
     // Map your leave types to codes (sl/cl/el)
@@ -1298,14 +1324,6 @@ protected function updateLeaveMaster($employeeId, $deductions, $month, $year)
     }
 }
 
-/**
- * Check if a date is a holiday
- */
-
-
-/**
- * Check if employee has leave records for the month
- */
 protected function checkEmployeeLeaveStatus($employeeId, $month, $year)
 {
     $startDate = Carbon::create($year, $month, 1)->startOfMonth();
@@ -1328,14 +1346,6 @@ protected function checkEmployeeLeaveStatus($employeeId, $month, $year)
    ];
 }
 
-/**
- * Calculate payable days when employee has taken leave
- */
-
-
-/**
- * Process leave adjustments for payroll
- */
 protected function processLeaveAdjustments($payroll, $leaveStatus)
 {
     if ($leaveStatus['has_leave']) {
