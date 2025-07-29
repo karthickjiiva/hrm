@@ -4,8 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\ApiBaseController;
 use App\Http\Requests\Api\PayrollNew\IndexRequest;
+use Examyou\RestAPI\ApiResponse;
 use App\Models\PayrollNew;
 use App\Models\LeaveAdjustment;
+use Barryvdh\DomPDF\Facade\Pdf; 
+use Illuminate\Support\Facades\Log;
+use Vinkla\Hashids\Facades\Hashids;
 use App\Models\StaffMember;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -17,14 +21,13 @@ use App\Models\Leave;
 class PayrollNewController extends ApiBaseController
 {
     protected $model = PayrollNew::class;
-public function index(IndexRequest $request)
+
+public function index()
 {
-    // $this->authorize();
-    // $request = request(); // Get the request object
-    
+    $request = request();
     $query = PayrollNew::with('employee')
         ->select('payroll_new.*');
-    
+ 
     // Apply month filter if provided
     if ($request->has('month')) {
         $query->where('month', $request->month);
@@ -35,14 +38,14 @@ public function index(IndexRequest $request)
         $query->where('year', $request->year);
     }
     
-    // Apply employee filter if provided
-    if ($request->has('employee_id')) {
-        $query->where('employee_id', $request->employee_id);
-    }
+ 
     
     // Get paginated results
     $payrolls = $query->paginate($request->get('limit', 10));
     
+    // \Log::info($query->toSql());
+    // \Log::info($query->getBindings());
+
     return ApiResponse::make(null, $payrolls->items(), [
         'pagination' => [
             'total' => $payrolls->total(),
@@ -53,9 +56,30 @@ public function index(IndexRequest $request)
         ]
     ]);
 }
-    /**
-     * Generate payroll - handles both single employee and all employees
-     */
+
+
+    public function downloadPayslip($xid)
+    {
+          $decoded = Hashids::decode($xid);
+
+        if (empty($decoded)) {
+            abort(404, 'Invalid XID');
+        }
+
+        $id = $decoded[0]; 
+        if (!$id) {
+            abort(404, 'Payroll record not found');
+        }
+ 
+        $payroll = PayrollNew::with([
+            'employee.designation',
+            'employee.department',
+        ])->findOrFail($id);       
+
+        $pdf = Pdf::loadView('pdf.payslip', compact('payroll'));
+        return $pdf->download("payslip-{$payroll->employee->name}.pdf");
+    }
+
     public function generatePayroll(Request $request){
 
         $month = $request->month;
