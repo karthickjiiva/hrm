@@ -18,6 +18,7 @@ ApiRoute::group(['namespace' => 'App\Http\Controllers\Api'], function () {
     ApiRoute::get('payroll-check-exists',  ['as' => 'api.payroll-check-exists', 'uses' => 'PayrollNewController@checkPayrollExists']);
     ApiRoute::post('payroll-generate',  ['as' => 'api.payroll-generate', 'uses' => 'PayrollNewController@generatePayroll']);
     // Check visibility of module according to subscription plan
+    ApiRoute::get('payroll_new/{xid}/download', 'PayrollNewController@downloadPayslip');
     ApiRoute::post('check-subscription-module-visibility', ['as' => 'api.extra.check-subscription-module-visibility', 'uses' => 'AuthController@checkSubscriptionModuleVisibility']);
     ApiRoute::post('visible-subscription-modules', ['as' => 'api.extra.visible-subscription-modules', 'uses' => 'AuthController@visibleSubscriptionModules']);
 
@@ -88,7 +89,8 @@ ApiRoute::group(['namespace' => 'App\Http\Controllers\Api'], function () {
         ApiRoute::resource('bank_masters', 'BankMasterController', $options);
         ApiRoute::resource('employee_leave_masters', 'EmployeeLeaveMasterController', $options);
         ApiRoute::resource('departments', 'DepartmentController', $options);
-        ApiRoute::resource('payroll_new', 'PayrollNewController', $options);
+        // ApiRoute::resource('payroll_new', 'PayrollNewController', $options);
+        ApiRoute::resource('payroll_new', 'PayrollNewController', $options);     
         ApiRoute::resource('designations', 'DesignationController', $options);
         ApiRoute::resource('leave-types', 'LeaveTypeController', $options);
         ApiRoute::resource('awards', 'AwardController', $options);

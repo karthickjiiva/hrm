@@ -88,6 +88,9 @@
                         size="middle"
                     >
                         <template #bodyCell="{ column, record }">
+                            <template v-if="column.dataIndex === 'id'">
+                                {{ record.employee.id }}
+                            </template>
                             <template v-if="column.dataIndex === 'employee'">
                                 {{ record.employee?.name }}
                             </template>
@@ -95,7 +98,7 @@
                                 {{ getMonthName(record.month) }}
                                 {{ record.year }}
                             </template>
-                            <template v-if="column.dataIndex === 'earnings'">
+                            <!-- <template v-if="column.dataIndex === 'earnings'">
                                 <div>
                                     Basic: {{ formatCurrency(record.basic) }}
                                 </div>
@@ -132,7 +135,7 @@
                                 <div class="text-sm text-gray-500">
                                     {{ record.net_salary_in_words }}
                                 </div>
-                            </template>
+                            </template> -->
                             <template v-if="column.dataIndex === 'action'">
                                 <a-button
                                     type="primary"
@@ -177,28 +180,33 @@ export default {
 
         const columns = ref([
             {
-                title: t("employee.name"),
+                title: t("ID"),
+                dataIndex: "id",
+                width: 200,
+            },
+            {
+                title: t("Employee Name"),
                 dataIndex: "employee",
                 width: 200,
             },
             {
-                title: t("payroll.period"),
+                title: t("Payroll Period"),
                 dataIndex: "period",
                 width: 150,
             },
-            {
-                title: t("payroll.earnings"),
-                dataIndex: "earnings",
-            },
-            {
-                title: t("payroll.deductions"),
-                dataIndex: "deductions",
-            },
-            {
-                title: t("payroll.net_pay"),
-                dataIndex: "net_pay",
-                width: 180,
-            },
+            // {
+            //     title: t("payroll.earnings"),
+            //     dataIndex: "earnings",
+            // },
+            // {
+            //     title: t("payroll.deductions"),
+            //     dataIndex: "deductions",
+            // },
+            // {
+            //     title: t("payroll.net_pay"),
+            //     dataIndex: "net_pay",
+            //     width: 180,
+            // },
             {
                 title: t("common.action"),
                 dataIndex: "action",
@@ -222,6 +230,7 @@ export default {
         const fetchPayrollData = async () => {
             try {
                 loading.value = true;
+                const token = localStorage.getItem("auth_token");
                 const params = {
                     month: filters.value.month,
                     year: filters.value.year,
@@ -235,10 +244,14 @@ export default {
                 };
                 const response = await axios.get("/api/v1/payroll_new", {
                     params,
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 });
                 // const response = await get("payroll_new", params);
-                payrollData.value = response.data;
-                pagination.value.total = response?.meta?.total;
+                payrollData.value = response.data.data;
+                pagination.value.total =
+                    response.data.meta?.pagination?.total || 0;
             } catch (error) {
                 console.error("Error fetching payroll data:", error);
             } finally {
@@ -247,10 +260,34 @@ export default {
         };
 
         const downloadPayslip = async (record) => {
+            const token = localStorage.getItem("auth_token");
             try {
-                await download(`payroll_new/${record.xid}/download`, {
-                    responseType: "blob",
+                const response = await axios.get(
+                    `/api/v1/payroll_new/${record.xid}/download`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                        responseType: "blob",
+                    }
+                );
+
+                const blob = new Blob([response.data], {
+                    type: "application/pdf",
                 });
+                const url = window.URL.createObjectURL(blob);
+
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute(
+                    "download",
+                    `payslip-${record.employee.name}.pdf`
+                );
+                document.body.appendChild(link);
+                link.click();
+
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(link);
             } catch (error) {
                 console.error("Error downloading payslip:", error);
             }

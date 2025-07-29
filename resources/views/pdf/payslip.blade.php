@@ -21,14 +21,13 @@ use App\Models\Leave;
 class PayrollNewController extends ApiBaseController
 {
     protected $model = PayrollNew::class;
+
 public function index()
 {
-    // $this->authorize();
-    $request = request(); // Get the request object
-    
+    $request = request();
     $query = PayrollNew::with('employee')
         ->select('payroll_new.*');
-    
+ 
     // Apply month filter if provided
     if ($request->has('month')) {
         $query->where('month', $request->month);
@@ -39,10 +38,7 @@ public function index()
         $query->where('year', $request->year);
     }
     
-    // Apply employee filter if provided
-    if ($request->has('employee_id')) {
-        $query->where('employee_id', $request->employee_id);
-    }
+ 
     
     // Get paginated results
     $payrolls = $query->paginate($request->get('limit', 10));
