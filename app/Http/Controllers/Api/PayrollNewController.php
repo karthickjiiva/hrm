@@ -17,10 +17,10 @@ use App\Models\Leave;
 class PayrollNewController extends ApiBaseController
 {
     protected $model = PayrollNew::class;
-public function index(IndexRequest $request)
+public function index()
 {
     // $this->authorize();
-    // $request = request(); // Get the request object
+    $request = request(); // Get the request object
     
     $query = PayrollNew::with('employee')
         ->select('payroll_new.*');
