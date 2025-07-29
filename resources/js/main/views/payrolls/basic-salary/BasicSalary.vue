@@ -515,7 +515,12 @@
                 <div>PF</div>
             </a-col>
             <a-col :xs="24" :sm="24" :md="6" :lg="6" class="column-text">
-                <div>{{ formData?.pf_percentage }}%</div>
+                <div>
+                    <span v-if="formData?.pf_fix_amount">
+                        Fixed: {{ formData?.pf_percentage }}
+                    </span>
+                    <span v-else> {{ formData?.pf_percentage }}% </span>
+                </div>
             </a-col>
             <a-col :xs="24" :sm="24" :md="6" :lg="6" class="column-text">
                 <span style="display: inline-block; width: 100%">
@@ -539,7 +544,12 @@
                 <div>ESI</div>
             </a-col>
             <a-col :xs="24" :sm="24" :md="6" :lg="6" class="column-text">
-                <div>{{ formData?.esi_percentage }}%</div>
+                <div>
+                    <span v-if="formData?.esi_fix_amount">
+                        Fixed: {{ formData?.esi_percentage }}
+                    </span>
+                    <span v-else> {{ formData?.esi_percentage }}% </span>
+                </div>
             </a-col>
             <a-col :xs="24" :sm="24" :md="6" :lg="6" class="column-text">
                 <span style="display: inline-block; width: 100%">
@@ -563,7 +573,12 @@
                 <div>Proffesional Tax</div>
             </a-col>
             <a-col :xs="24" :sm="24" :md="6" :lg="6" class="column-text">
-                <div>{{ formData?.prof_tax_percentage }}%</div>
+                <div>
+                    <span v-if="formData?.prof_tax_fix_amount">
+                        Fixed: {{ formData?.prof_tax_percentage }}
+                    </span>
+                    <span v-else> {{ formData?.prof_tax_percentage }}% </span>
+                </div>
             </a-col>
             <a-col :xs="24" :sm="24" :md="6" :lg="6" class="column-text">
                 <span style="display: inline-block; width: 100%">
@@ -587,7 +602,12 @@
                 <div>TDS</div>
             </a-col>
             <a-col :xs="24" :sm="24" :md="6" :lg="6" class="column-text">
-                <div>{{ formData?.tds_percentage }}%</div>
+                <div>
+                    <span v-if="formData?.tds_fix_amount">
+                        Fixed: {{ formData?.tds_percentage }}
+                    </span>
+                    <span v-else> {{ formData?.tds_percentage }}% </span>
+                </div>
             </a-col>
             <a-col :xs="24" :sm="24" :md="6" :lg="6" class="column-text">
                 <span style="display: inline-block; width: 100%">
@@ -767,10 +787,10 @@ export default defineComponent({
         const salaryGroups = ref([]);
         const employeeTypeGroups = ref([]);
         const salaryGroupUrl =
-            "employee_types?fields=id,xid,type,basic_percent,hra_percent,allowance_percent,food_allowance_percent,pf_enabled,pf_percentage,pf_limit,esi_enabled,esi_percentage,esi_limit,prof_tax_enabled,prof_tax_percentage,prof_tax_limit,tds_enabled,tds_percentage,tds_limit,status&limit=1000";
+            "employee_types?fields=id,xid,type,basic_percent,hra_percent,allowance_percent,food_allowance_percent,pf_enabled,pf_percentage,pf_limit,esi_enabled,esi_percentage,esi_limit,prof_tax_enabled,prof_tax_percentage,prof_tax_limit,tds_enabled,tds_percentage,tds_limit,status,pf_fix_amount,esi_fix_amount,tds_fix_amount,prof_tax_fix_amount&limit=1000";
 
         const employeeTypeGroupUrl =
-            "employee_types?fields=id,xid,type,basic_percent,hra_percent,allowance_percent,food_allowance_percent,pf_enabled,pf_percentage,pf_limit,esi_enabled,esi_percentage,esi_limit,prof_tax_enabled,prof_tax_percentage,prof_tax_limit,tds_enabled,tds_percentage,tds_limit,status&limit=1000";
+            "employee_types?fields=id,xid,type,basic_percent,hra_percent,allowance_percent,food_allowance_percent,pf_enabled,pf_percentage,pf_limit,esi_enabled,esi_percentage,esi_limit,prof_tax_enabled,prof_tax_percentage,prof_tax_limit,tds_enabled,tds_percentage,tds_limit,status,pf_fix_amount,esi_fix_amount,tds_fix_amount,prof_tax_fix_amount&limit=1000";
 
         const salaryGroupComponentProps = ref([]);
         const employeeTypeComponentProps = ref([]);
@@ -814,13 +834,6 @@ export default defineComponent({
 
             setTimeout(() => {
                 const allSalaryGroups = employeeTypeGroups.value;
-
-                // const selectedGroup = allSalaryGroups.find((group) => {
-                //     if (group.xid === employeTypeGroupId) {
-                //         return true;
-                //     }
-                //     return false;
-                // });
                 console.log("Checking Group:", allSalaryGroups);
                 const selectedGroup = allSalaryGroups.find((group) => {
                     console.log("Checking Group:", group);
@@ -840,6 +853,12 @@ export default defineComponent({
                             group.prof_tax_percentage;
                         formData.value.tds_enabled = group.tds_enabled;
                         formData.value.tds_percentage = group.tds_percentage;
+
+                        formData.value.pf_fix_amount = group.pf_fix_amount;
+                        formData.value.esi_fix_amount = group.esi_fix_amount;
+                        formData.value.tds_fix_amount = group.tds_fix_amount;
+                        formData.value.prof_tax_fix_amount =
+                            group.prof_tax_fix_amount;
 
                         formData.value.ctc_value = group.basic_percent;
                         return true;
@@ -982,16 +1001,24 @@ export default defineComponent({
 
             const { calculation_type, ctc_value, monthly_ctc } = formData.value;
             if (formData.value.pf_enabled) {
-                formData.value.monthly_pf = (
-                    (monthly_ctc * formData.value.pf_percentage) /
-                    100
-                ).toFixed(2);
-                formData.value.annual_pf =
-                    12 *
-                    (
+                if (formData.value.pf_fix_amount) {
+                    formData.value.monthly_pf =
+                        formData.value.pf_amount.toFixed(2);
+                    formData.value.annual_pf = (
+                        12 * formData.value.pf_amount
+                    ).toFixed(2);
+                } else {
+                    formData.value.monthly_pf = (
                         (monthly_ctc * formData.value.pf_percentage) /
                         100
                     ).toFixed(2);
+                    formData.value.annual_pf =
+                        12 *
+                        (
+                            (monthly_ctc * formData.value.pf_percentage) /
+                            100
+                        ).toFixed(2);
+                }
             }
             if (formData.value.hra_percent_monthly) {
                 formData.value.monthly_hra_percent_monthly = (
@@ -1034,45 +1061,69 @@ export default defineComponent({
             }
 
             if (formData.value.esi_enabled) {
-                formData.value.monthly_esi = (
-                    (monthly_ctc * formData.value.esi_percentage) /
-                    100
-                ).toFixed(2);
-
-                formData.value.annual_esi =
-                    12 *
-                    (
+                if (formData.value.esi_fix_amount) {
+                    formData.value.monthly_esi =
+                        formData.value.esi_percentage.toFixed(2);
+                    formData.value.annual_esi = (
+                        12 * formData.value.esi_percentage
+                    ).toFixed(2);
+                } else {
+                    formData.value.monthly_esi = (
                         (monthly_ctc * formData.value.esi_percentage) /
                         100
                     ).toFixed(2);
+
+                    formData.value.annual_esi =
+                        12 *
+                        (
+                            (monthly_ctc * formData.value.esi_percentage) /
+                            100
+                        ).toFixed(2);
+                }
             }
 
             if (formData.value.prof_tax_enabled) {
-                formData.value.monthly_prof_tax = (
-                    (monthly_ctc * formData.value.prof_tax_percentage) /
-                    100
-                ).toFixed(2);
-
-                formData.value.annual_prof_tax =
-                    12 *
-                    (
+                if (formData.value.prof_tax_fix_amount) {
+                    formData.value.monthly_prof_tax =
+                        formData.value.prof_tax_percentage;
+                    formData.value.annual_prof_tax = (
+                        12 * formData.value.prof_tax_percentage
+                    ).toFixed(2);
+                } else {
+                    formData.value.monthly_prof_tax = (
                         (monthly_ctc * formData.value.prof_tax_percentage) /
                         100
                     ).toFixed(2);
+
+                    formData.value.annual_prof_tax =
+                        12 *
+                        (
+                            (monthly_ctc * formData.value.prof_tax_percentage) /
+                            100
+                        ).toFixed(2);
+                }
             }
 
             if (formData.value.tds_enabled) {
-                formData.value.monthly_tds = (
-                    (monthly_ctc * formData.value.tds_percentage) /
-                    100
-                ).toFixed(2);
-
-                formData.value.annual_tds =
-                    12 *
-                    (
+                if (formData.value.tds_fix_amount) {
+                    formData.value.monthly_tds =
+                        formData.value.tds_percentage.toFixed(2);
+                    formData.value.annual_tds = (
+                        12 * formData.value.tds_percentage
+                    ).toFixed(2);
+                } else {
+                    formData.value.monthly_tds = (
                         (monthly_ctc * formData.value.tds_percentage) /
                         100
                     ).toFixed(2);
+
+                    formData.value.annual_tds =
+                        12 *
+                        (
+                            (monthly_ctc * formData.value.tds_percentage) /
+                            100
+                        ).toFixed(2);
+                }
             }
             let ded =
                 parseFloat(formData.value.monthly_prof_tax) +
@@ -1207,6 +1258,10 @@ export default defineComponent({
                         food_allowance_percent: 0,
                         monthly_food_allowance_percent: 0,
                         annual_food_allowance_percent: 0,
+                        pf_fix_amount: 0,
+                        esi_fix_amount: 0,
+                        tds_fix_amount: 0,
+                        prof_tax_fix_amount: 0,
                     };
 
                     if (

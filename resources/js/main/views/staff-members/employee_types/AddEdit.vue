@@ -152,241 +152,349 @@
                     tab="Deduction (Contribution)"
                     force-render
                 >
-                <a-row :gutter="16">
-    <!-- Provident Fund (PF) -->
-    <a-col :xs="24" :sm="24" :md="8" :lg="4">
-        <a-form-item label="Enable PF" name="pf_enabled">
-            <a-switch
-                v-model:checked="formData.pf_enabled"
-                :checkedValue="true"
-                :unCheckedValue="false"
-            />
-        </a-form-item>
-    </a-col>
+                    <a-row :gutter="16">
+                        <!-- Provident Fund (PF) -->
+                        <a-col :xs="24" :sm="24" :md="8" :lg="4">
+                            <a-form-item label="Enable PF" name="pf_enabled">
+                                <a-switch
+                                    v-model:checked="formData.pf_enabled"
+                                    :checkedValue="true"
+                                    :unCheckedValue="false"
+                                />
+                            </a-form-item>
+                        </a-col>
 
-    <template v-if="formData.pf_enabled">
-        <!-- Fix Amount Toggle -->
-        <a-col :xs="24" :sm="24" :md="8" :lg="4">
-            <a-form-item label="Fix Amount" name="pf_fix_amount">
-                <a-switch
-                    v-model:checked="formData.pf_fix_amount"
-                    :checkedValue="true"
-                    :unCheckedValue="false"
-                />
-            </a-form-item>
-        </a-col>
+                        <template v-if="formData.pf_enabled">
+                            <!-- Fix Amount Toggle -->
+                            <a-col :xs="24" :sm="24" :md="8" :lg="4">
+                                <a-form-item
+                                    label="Fix Amount"
+                                    name="pf_fix_amount"
+                                >
+                                    <a-switch
+                                        v-model:checked="formData.pf_fix_amount"
+                                        :checkedValue="true"
+                                        :unCheckedValue="false"
+                                    />
+                                </a-form-item>
+                            </a-col>
 
-        <!-- Conditional Input: Percentage OR Amount -->
- <a-col :xs="24" :sm="24" :md="8" :lg="8">
-    <a-form-item
-        :label="formData.pf_fix_amount ? 'PF Amount' : 'PF Percentage'"
-        name="pf_percentage"
-    >
-        <a-input-number
-            :key="formData.pf_fix_amount ? 'pf-amount' : 'pf-percentage'"
-            v-model:value="formData.pf_percentage"
-            :min="0"
-            :max="formData.pf_fix_amount ? undefined : 100"
-            :formatter="formData.pf_fix_amount ? undefined : (v => `${v}%`)"
-            :parser="formData.pf_fix_amount ? undefined : (v => v.replace('%', ''))"
-            style="width: 100%"
-        />
-    </a-form-item>
-</a-col>
+                            <!-- Conditional Input: Percentage OR Amount -->
+                            <a-col :xs="24" :sm="24" :md="8" :lg="8">
+                                <a-form-item
+                                    :label="
+                                        formData.pf_fix_amount
+                                            ? 'PF Amount'
+                                            : 'PF Percentage'
+                                    "
+                                    name="pf_percentage"
+                                >
+                                    <a-input-number
+                                        :key="
+                                            formData.pf_fix_amount
+                                                ? 'pf-amount'
+                                                : 'pf-percentage'
+                                        "
+                                        v-model:value="formData.pf_percentage"
+                                        :min="0"
+                                        :max="
+                                            formData.pf_fix_amount
+                                                ? undefined
+                                                : 100
+                                        "
+                                        :formatter="
+                                            formData.pf_fix_amount
+                                                ? undefined
+                                                : (v) => `${v}%`
+                                        "
+                                        :parser="
+                                            formData.pf_fix_amount
+                                                ? undefined
+                                                : (v) => v.replace('%', '')
+                                        "
+                                        style="width: 100%"
+                                    />
+                                </a-form-item>
+                            </a-col>
 
+                            <!-- PF Limit -->
+                            <a-col :xs="24" :sm="24" :md="8" :lg="8">
+                                <a-form-item label="PF Limit" name="pf_limit">
+                                    <a-input-number
+                                        v-model:value="formData.pf_limit"
+                                        :min="0"
+                                        style="width: 100%"
+                                    />
+                                </a-form-item>
+                            </a-col>
 
-        <!-- PF Limit -->
-        <a-col :xs="24" :sm="24" :md="8" :lg="8">
-            <a-form-item label="PF Limit" name="pf_limit">
-                <a-input-number
-                    v-model:value="formData.pf_limit"
-                    :min="0"
-                    style="width: 100%"
-                />
-            </a-form-item>
-        </a-col>
+                            <!-- PF Pension Scheme -->
+                            <a-col :xs="24" :sm="24" :md="8" :lg="8">
+                                <a-form-item
+                                    label="PF Pension Scheme"
+                                    name="pf_pension_scheme"
+                                >
+                                    <a-checkbox
+                                        v-model:checked="
+                                            formData.pf_pension_scheme
+                                        "
+                                        :checkedValue="true"
+                                        :unCheckedValue="false"
+                                    >
+                                        Enable Pension Scheme
+                                    </a-checkbox>
+                                </a-form-item>
+                            </a-col>
+                        </template>
+                    </a-row>
 
-        <!-- PF Pension Scheme -->
-        <a-col :xs="24" :sm="24" :md="8" :lg="8">
-            <a-form-item label="PF Pension Scheme" name="pf_pension_scheme">
-                <a-checkbox
-                    v-model:checked="formData.pf_pension_scheme"
-                    :checkedValue="true"
-                    :unCheckedValue="false"
-                >
-                    Enable Pension Scheme
-                </a-checkbox>
-            </a-form-item>
-        </a-col>
-    </template>
-</a-row>
+                    <!-- ESI -->
+                    <a-row :gutter="16">
+                        <a-col :xs="24" :sm="24" :md="8" :lg="4">
+                            <a-form-item label="Enable ESI" name="esi_enabled">
+                                <a-switch
+                                    v-model:checked="formData.esi_enabled"
+                                    :checkedValue="true"
+                                    :unCheckedValue="false"
+                                />
+                            </a-form-item>
+                        </a-col>
 
+                        <template v-if="formData.esi_enabled">
+                            <!-- ESI Fix Amount Toggle -->
+                            <a-col :xs="24" :sm="24" :md="8" :lg="4">
+                                <a-form-item
+                                    label="Fix Amount"
+                                    name="esi_fix_amount"
+                                >
+                                    <a-switch
+                                        v-model:checked="
+                                            formData.esi_fix_amount
+                                        "
+                                        :checkedValue="true"
+                                        :unCheckedValue="false"
+                                    />
+                                </a-form-item>
+                            </a-col>
 
-                <!-- ESI -->
-<a-row :gutter="16">
-    <a-col :xs="24" :sm="24" :md="8" :lg="4">
-        <a-form-item label="Enable ESI" name="esi_enabled">
-            <a-switch
-                v-model:checked="formData.esi_enabled"
-                :checkedValue="true"
-                :unCheckedValue="false"
-            />
-        </a-form-item>
-    </a-col>
+                            <!-- ESI Percentage or Amount -->
+                            <a-col :xs="24" :sm="24" :md="8" :lg="8">
+                                <a-form-item
+                                    :label="
+                                        formData.esi_fix_amount
+                                            ? 'ESI Amount'
+                                            : 'ESI Percentage'
+                                    "
+                                    name="esi_percentage"
+                                >
+                                    <a-input-number
+                                        :key="
+                                            formData.esi_fix_amount
+                                                ? 'esi-amount'
+                                                : 'esi-percentage'
+                                        "
+                                        v-model:value="formData.esi_percentage"
+                                        :min="0"
+                                        :max="
+                                            formData.esi_fix_amount
+                                                ? undefined
+                                                : 100
+                                        "
+                                        :formatter="
+                                            formData.esi_fix_amount
+                                                ? undefined
+                                                : (v) => `${v}%`
+                                        "
+                                        :parser="
+                                            formData.esi_fix_amount
+                                                ? undefined
+                                                : (v) => v.replace('%', '')
+                                        "
+                                        style="width: 100%"
+                                    />
+                                </a-form-item>
+                            </a-col>
 
-    <template v-if="formData.esi_enabled">
-        <!-- ESI Fix Amount Toggle -->
-        <a-col :xs="24" :sm="24" :md="8" :lg="4">
-            <a-form-item label="Fix Amount" name="esi_fix_amount">
-                <a-switch
-                    v-model:checked="formData.esi_fix_amount"
-                    :checkedValue="true"
-                    :unCheckedValue="false"
-                />
-            </a-form-item>
-        </a-col>
-
-        <!-- ESI Percentage or Amount -->
-        <a-col :xs="24" :sm="24" :md="8" :lg="8">
-            <a-form-item
-                :label="formData.esi_fix_amount ? 'ESI Amount' : 'ESI Percentage'"
-                name="esi_percentage"
-            >
-                <a-input-number
-                    :key="formData.esi_fix_amount ? 'esi-amount' : 'esi-percentage'"
-                    v-model:value="formData.esi_percentage"
-                    :min="0"
-                    :max="formData.esi_fix_amount ? undefined : 100"
-                    :formatter="formData.esi_fix_amount ? undefined : (v => `${v}%`)"
-                    :parser="formData.esi_fix_amount ? undefined : (v => v.replace('%', ''))"
-                    style="width: 100%"
-                />
-            </a-form-item>
-        </a-col>
-
-        <!-- ESI Limit -->
-        <a-col :xs="24" :sm="24" :md="8" :lg="8">
-            <a-form-item label="ESI Limit" name="esi_limit">
-                <a-input-number
-                    v-model:value="formData.esi_limit"
-                    :min="0"
-                    style="width: 100%"
-                />
-            </a-form-item>
-        </a-col>
-    </template>
-</a-row>
+                            <!-- ESI Limit -->
+                            <a-col :xs="24" :sm="24" :md="8" :lg="8">
+                                <a-form-item label="ESI Limit" name="esi_limit">
+                                    <a-input-number
+                                        v-model:value="formData.esi_limit"
+                                        :min="0"
+                                        style="width: 100%"
+                                    />
+                                </a-form-item>
+                            </a-col>
+                        </template>
+                    </a-row>
 
                     <!-- TDS -->
-<a-row :gutter="16">
-    <a-col :xs="24" :sm="24" :md="8" :lg="4">
-        <a-form-item label="Enable TDS" name="tds_enabled">
-            <a-switch
-                v-model:checked="formData.tds_enabled"
-                :checkedValue="true"
-                :unCheckedValue="false"
-            />
-        </a-form-item>
-    </a-col>
+                    <a-row :gutter="16">
+                        <a-col :xs="24" :sm="24" :md="8" :lg="4">
+                            <a-form-item label="Enable TDS" name="tds_enabled">
+                                <a-switch
+                                    v-model:checked="formData.tds_enabled"
+                                    :checkedValue="true"
+                                    :unCheckedValue="false"
+                                />
+                            </a-form-item>
+                        </a-col>
 
-    <template v-if="formData.tds_enabled">
-        <!-- TDS Fix Amount Toggle -->
-        <a-col :xs="24" :sm="24" :md="8" :lg="4">
-            <a-form-item label="Fix Amount" name="tds_fix_amount">
-                <a-switch
-                    v-model:checked="formData.tds_fix_amount"
-                    :checkedValue="true"
-                    :unCheckedValue="false"
-                />
-            </a-form-item>
-        </a-col>
+                        <template v-if="formData.tds_enabled">
+                            <!-- TDS Fix Amount Toggle -->
+                            <a-col :xs="24" :sm="24" :md="8" :lg="4">
+                                <a-form-item
+                                    label="Fix Amount"
+                                    name="tds_fix_amount"
+                                >
+                                    <a-switch
+                                        v-model:checked="
+                                            formData.tds_fix_amount
+                                        "
+                                        :checkedValue="true"
+                                        :unCheckedValue="false"
+                                    />
+                                </a-form-item>
+                            </a-col>
 
-        <!-- TDS Percentage or Amount -->
-        <a-col :xs="24" :sm="24" :md="8" :lg="8">
-            <a-form-item
-                :label="formData.tds_fix_amount ? 'TDS Amount' : 'TDS Percentage'"
-                name="tds_percentage"
-            >
-                <a-input-number
-                    :key="formData.tds_fix_amount ? 'tds-amount' : 'tds-percentage'"
-                    v-model:value="formData.tds_percentage"
-                    :min="0"
-                    :max="formData.tds_fix_amount ? undefined : 100"
-                    :formatter="formData.tds_fix_amount ? undefined : (v => `${v}%`)"
-                    :parser="formData.tds_fix_amount ? undefined : (v => v.replace('%', ''))"
-                    style="width: 100%"
-                />
-            </a-form-item>
-        </a-col>
+                            <!-- TDS Percentage or Amount -->
+                            <a-col :xs="24" :sm="24" :md="8" :lg="8">
+                                <a-form-item
+                                    :label="
+                                        formData.tds_fix_amount
+                                            ? 'TDS Amount'
+                                            : 'TDS Percentage'
+                                    "
+                                    name="tds_percentage"
+                                >
+                                    <a-input-number
+                                        :key="
+                                            formData.tds_fix_amount
+                                                ? 'tds-amount'
+                                                : 'tds-percentage'
+                                        "
+                                        v-model:value="formData.tds_percentage"
+                                        :min="0"
+                                        :max="
+                                            formData.tds_fix_amount
+                                                ? undefined
+                                                : 100
+                                        "
+                                        :formatter="
+                                            formData.tds_fix_amount
+                                                ? undefined
+                                                : (v) => `${v}%`
+                                        "
+                                        :parser="
+                                            formData.tds_fix_amount
+                                                ? undefined
+                                                : (v) => v.replace('%', '')
+                                        "
+                                        style="width: 100%"
+                                    />
+                                </a-form-item>
+                            </a-col>
 
-        <!-- TDS Limit -->
-        <a-col :xs="24" :sm="24" :md="8" :lg="8">
-            <a-form-item label="TDS Limit" name="tds_limit">
-                <a-input-number
-                    v-model:value="formData.tds_limit"
-                    :min="0"
-                    style="width: 100%"
-                />
-            </a-form-item>
-        </a-col>
-    </template>
-</a-row>
+                            <!-- TDS Limit -->
+                            <a-col :xs="24" :sm="24" :md="8" :lg="8">
+                                <a-form-item label="TDS Limit" name="tds_limit">
+                                    <a-input-number
+                                        v-model:value="formData.tds_limit"
+                                        :min="0"
+                                        style="width: 100%"
+                                    />
+                                </a-form-item>
+                            </a-col>
+                        </template>
+                    </a-row>
 
-                  
-<!-- Professional Tax -->
-<a-row :gutter="16">
-    <a-col :xs="24" :sm="24" :md="8" :lg="4">
-        <a-form-item label="Enable Prof. Tax" name="prof_tax_enabled">
-            <a-switch
-                v-model:checked="formData.prof_tax_enabled"
-                :checkedValue="true"
-                :unCheckedValue="false"
-            />
-        </a-form-item>
-    </a-col>
+                    <!-- Professional Tax -->
+                    <a-row :gutter="16">
+                        <a-col :xs="24" :sm="24" :md="8" :lg="4">
+                            <a-form-item
+                                label="Enable Prof. Tax"
+                                name="prof_tax_enabled"
+                            >
+                                <a-switch
+                                    v-model:checked="formData.prof_tax_enabled"
+                                    :checkedValue="true"
+                                    :unCheckedValue="false"
+                                />
+                            </a-form-item>
+                        </a-col>
 
-    <template v-if="formData.prof_tax_enabled">
-        <!-- Prof. Tax Fix Amount Toggle -->
-        <a-col :xs="24" :sm="24" :md="8" :lg="4">
-            <a-form-item label="Fix Amount" name="prof_tax_fix_amount">
-                <a-switch
-                    v-model:checked="formData.prof_tax_fix_amount"
-                    :checkedValue="true"
-                    :unCheckedValue="false"
-                />
-            </a-form-item>
-        </a-col>
+                        <template v-if="formData.prof_tax_enabled">
+                            <!-- Prof. Tax Fix Amount Toggle -->
+                            <a-col :xs="24" :sm="24" :md="8" :lg="4">
+                                <a-form-item
+                                    label="Fix Amount"
+                                    name="prof_tax_fix_amount"
+                                >
+                                    <a-switch
+                                        v-model:checked="
+                                            formData.prof_tax_fix_amount
+                                        "
+                                        :checkedValue="true"
+                                        :unCheckedValue="false"
+                                    />
+                                </a-form-item>
+                            </a-col>
 
-        <!-- Prof. Tax Percentage or Amount -->
-        <a-col :xs="24" :sm="24" :md="8" :lg="8">
-            <a-form-item
-                :label="formData.prof_tax_fix_amount ? 'Prof. Tax Amount' : 'Prof. Tax Percentage'"
-                name="prof_tax_percentage"
-            >
-                <a-input-number
-                    :key="formData.prof_tax_fix_amount ? 'prof-tax-amount' : 'prof-tax-percentage'"
-                    v-model:value="formData.prof_tax_percentage"
-                    :min="0"
-                    :max="formData.prof_tax_fix_amount ? undefined : 100"
-                    :formatter="formData.prof_tax_fix_amount ? undefined : (v => `${v}%`)"
-                    :parser="formData.prof_tax_fix_amount ? undefined : (v => v.replace('%', ''))"
-                    style="width: 100%"
-                />
-            </a-form-item>
-        </a-col>
+                            <!-- Prof. Tax Percentage or Amount -->
+                            <a-col :xs="24" :sm="24" :md="8" :lg="8">
+                                <a-form-item
+                                    :label="
+                                        formData.prof_tax_fix_amount
+                                            ? 'Prof. Tax Amount'
+                                            : 'Prof. Tax Percentage'
+                                    "
+                                    name="prof_tax_percentage"
+                                >
+                                    <a-input-number
+                                        :key="
+                                            formData.prof_tax_fix_amount
+                                                ? 'prof-tax-amount'
+                                                : 'prof-tax-percentage'
+                                        "
+                                        v-model:value="
+                                            formData.prof_tax_percentage
+                                        "
+                                        :min="0"
+                                        :max="
+                                            formData.prof_tax_fix_amount
+                                                ? undefined
+                                                : 100
+                                        "
+                                        :formatter="
+                                            formData.prof_tax_fix_amount
+                                                ? undefined
+                                                : (v) => `${v}%`
+                                        "
+                                        :parser="
+                                            formData.prof_tax_fix_amount
+                                                ? undefined
+                                                : (v) => v.replace('%', '')
+                                        "
+                                        style="width: 100%"
+                                    />
+                                </a-form-item>
+                            </a-col>
 
-        <!-- Prof. Tax Limit -->
-        <a-col :xs="24" :sm="24" :md="8" :lg="8">
-            <a-form-item label="Prof. Tax Limit" name="prof_tax_limit">
-                <a-input-number
-                    v-model:value="formData.prof_tax_limit"
-                    :min="0"
-                    style="width: 100%"
-                />
-            </a-form-item>
-        </a-col>
-    </template>
-</a-row>
+                            <!-- Prof. Tax Limit -->
+                            <a-col :xs="24" :sm="24" :md="8" :lg="8">
+                                <a-form-item
+                                    label="Prof. Tax Limit"
+                                    name="prof_tax_limit"
+                                >
+                                    <a-input-number
+                                        v-model:value="formData.prof_tax_limit"
+                                        :min="0"
+                                        style="width: 100%"
+                                    />
+                                </a-form-item>
+                            </a-col>
+                        </template>
+                    </a-row>
                 </a-tab-pane>
             </a-tabs>
         </a-form>
@@ -524,7 +632,6 @@ export default defineComponent({
                 "-" +
                 appSetting.value.employee_id_start;
         });
-        
 
         const onSubmit = () => {
             var newFormData = {
