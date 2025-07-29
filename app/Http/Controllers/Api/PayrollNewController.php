@@ -177,7 +177,7 @@ protected function makeErrorResponse($message, $code = 400, $errors = [])
         // Check if any payroll exists for this period
 
         $employees = StaffMember::where('status', 'active')
-                ->where('id', 7)
+                // ->where('id', 7)
                 ->get();
         $generated = [];
         $errors = [];
@@ -515,120 +515,212 @@ public function calculateLossOfPay($employeeId, $month, $year)
  * - Morning half-day is always 0.5, does NOT trigger block weekend/holiday bridging.
  * - Weekends/holidays are only absorbed if part of a consecutive leave block (no working day break).
  */
+protected function isNonWorkingDay($date)
+{
+    return $date->dayOfWeek == Carbon::SUNDAY || $this->isHoliday($date);
+}
+
+/**
+ * leaves: array of objects/rows {leave_date, is_half_day, half_day_type}
+ * startDate, endDate: Carbon|string
+ */
 protected function calculateExtendedLossOfPay($leaves, $startDate, $endDate)
 {
-    $processedDates = [];
-    $lossOfPayDays = 0;
     $leaveMap = [];
-
-    // Create a map of all leave days
     foreach ($leaves as $leave) {
-        $leaveDate = Carbon::parse($leave->leave_date);
-        $dateString = $leaveDate->toDateString();
-        
-        if (!$leaveDate->isWeekend() && !$this->isHoliday($leaveDate)) {
-            $leaveMap[$dateString] = [
-                'is_half_day' => $leave->is_half_day,
-                'half_day_type' => $leave->half_day_type ?? null,
-                'date' => $leaveDate
-            ];
+        $leaveMap[Carbon::parse($leave->leave_date)->toDateString()] = [
+            'is_half_day' => $leave->is_half_day,
+            'half_day_type' => $leave->half_day_type ?? null
+        ];
+    }
+
+    // Step 1: Build full dateMap for the period
+    $dateMap = [];
+    $current = Carbon::parse($startDate)->copy();
+    $end = Carbon::parse($endDate);
+    while ($current->lte($end)) {
+        $str = $current->toDateString();
+        $dateMap[$str] = [
+            'is_holiday' => $this->isNonWorkingDay($current),
+            'is_leave'   => isset($leaveMap[$str]),
+            'is_half_day'=> $leaveMap[$str]['is_half_day'] ?? false,
+            'half_day_type' => $leaveMap[$str]['half_day_type'] ?? null
+        ];
+        $current->addDay();
+    }
+
+    $lossOfPay = 0;
+
+    $dates = array_keys($dateMap);
+    $total = count($dates);
+
+    for ($i = 0; $i < $total; $i++) {
+        $today = $dates[$i];
+        $info = $dateMap[$today];
+
+        if ($info['is_leave']) {
+            if ($info['is_half_day']) {
+                // Morning half: always LOP
+                if ($info['half_day_type'] == 'morning') {
+                    $lossOfPay += 0.5;
+                }
+                // Evening half: LOP if next working day also leave (see below)
+                else if ($info['half_day_type'] == 'evening') {
+                    // Find the next working day (skip holiday/sundays)
+                    $j = $i + 1;
+                    while ($j < $total && $dateMap[$dates[$j]]['is_holiday']) { $j++; }
+                    if ($j < $total && $dateMap[$dates[$j]]['is_leave']) {
+                        $lossOfPay += 0.5;
+                    }
+                }
+            } else {
+                // Full day leave
+                $lossOfPay += 1.0;
+            }
+        }
+
+        // Now, check if today is a holiday and should be sandwiched count for LOP
+        if ($info['is_holiday']) {
+            // Find previous working day with leave
+            $k = $i - 1;
+            while ($k >= 0 && $dateMap[$dates[$k]]['is_holiday']) $k--;
+            // Find next working day with leave
+            $j = $i + 1;
+            while ($j < $total && $dateMap[$dates[$j]]['is_holiday']) $j++;
+
+            $hasLeavePrev = $k >= 0 && $dateMap[$dates[$k]]['is_leave'] &&
+                    (
+                        !$dateMap[$dates[$k]]['is_half_day'] || // full day
+                        $dateMap[$dates[$k]]['half_day_type'] == 'evening' // evening half
+                    );
+            $hasLeaveNext = $j < $total && $dateMap[$dates[$j]]['is_leave'] &&
+                    (
+                        !$dateMap[$dates[$j]]['is_half_day'] || // full day
+                        $dateMap[$dates[$j]]['half_day_type'] == 'morning' // morning half
+                    );
+            if ($hasLeavePrev && $hasLeaveNext) {
+                $lossOfPay += 1.0;
+                $dateMap[$today]['holiday_LOP_counted'] = true; // So we don't count again if multiple passes
+            }
         }
     }
 
-    // Sort leaves by date
-    ksort($leaveMap);
-
-    foreach ($leaveMap as $dateString => $leave) {
-        if (isset($processedDates[$dateString])) continue;
-
-        $currentDate = $leave['date'];
-        $isHalfDay = $leave['is_half_day'];
-        $isEvening = $isHalfDay && $leave['half_day_type'] === 'evening';
-        $isMorning = $isHalfDay && $leave['half_day_type'] === 'morning';
-
-        if ($isMorning) {
-            // Case 2 & 3: Morning half-day - count only 0.5
-            $lossOfPayDays += 0.5;
-            $processedDates[$dateString] = true;
-            continue;
-        }
-
-        // Initialize range
-        $rangeStart = $currentDate;
-        $rangeEnd = $currentDate;
-        $hasEvening = $isEvening;
-        $currentCount = $isHalfDay ? 0.5 : 1;
-        $processedDates[$dateString] = true;
-
-        // Process forward from current leave
-        $nextDate = $currentDate->copy()->addDay();
-        $tempHolidaysWeekends = 0;
-
-        while ($nextDate->lte($endDate)) {
-            $nextString = $nextDate->toDateString();
-            
-            if (isset($processedDates[$nextString])) {
-                $nextDate->addDay();
-                continue;
-            }
-
-            // Check if non-working day
-            if ($nextDate->isWeekend() || $this->isHoliday($nextDate)) {
-                $tempHolidaysWeekends++;
-                $processedDates[$nextString] = true;
-                $nextDate->addDay();
-                continue;
-            }
-
-            // Check if next working day has leave
-            if (!isset($leaveMap[$nextString])) break;
-            
-            $nextLeave = $leaveMap[$nextString];
-            $nextIsHalfDay = $nextLeave['is_half_day'];
-            $nextIsEvening = $nextIsHalfDay && $nextLeave['half_day_type'] === 'evening';
-            $nextIsMorning = $nextIsHalfDay && $nextLeave['half_day_type'] === 'morning';
-
-            // Case 1 & 4: Evening half-day followed by full day
-            if ($hasEvening && $nextIsMorning) {
-                $currentCount += $tempHolidaysWeekends + 0.5;
-                $tempHolidaysWeekends = 0;
-                $processedDates[$nextString] = true;
-                $rangeEnd = $nextDate;
-                break;
-            }
-            // Case 1: Full day in sequence
-            elseif (!$nextIsHalfDay) {
-                $currentCount += $tempHolidaysWeekends + 1;
-                $tempHolidaysWeekends = 0;
-                $processedDates[$nextString] = true;
-                $rangeEnd = $nextDate;
-                $hasEvening = $nextIsEvening;
-                $nextDate->addDay();
-            }
-            // Case 4: Evening half-day followed by another evening
-            elseif ($nextIsEvening) {
-                $currentCount += $tempHolidaysWeekends + 0.5;
-                $tempHolidaysWeekends = 0;
-                $processedDates[$nextString] = true;
-                $rangeEnd = $nextDate;
-                $hasEvening = true;
-                $nextDate->addDay();
-            }
-            else {
-                break;
-            }
-        }
-
-        // Add remaining buffer if we have evening half-day
-        if ($hasEvening) {
-            $currentCount += $tempHolidaysWeekends;
-        }
-
-        $lossOfPayDays += $currentCount;
-    }
-
-    return $lossOfPayDays;
+    return $lossOfPay;
 }
+// protected function calculateExtendedLossOfPay($leaves, $startDate, $endDate)
+// {
+//     $processedDates = [];
+//     $lossOfPayDays = 0;
+//     $leaveMap = [];
+
+//     // Create a map of all leave days
+//     foreach ($leaves as $leave) {
+//         $leaveDate = Carbon::parse($leave->leave_date);
+//         $dateString = $leaveDate->toDateString();
+        
+//         if (!$leaveDate->isWeekend() && !$this->isHoliday($leaveDate)) {
+//             $leaveMap[$dateString] = [
+//                 'is_half_day' => $leave->is_half_day,
+//                 'half_day_type' => $leave->half_day_type ?? null,
+//                 'date' => $leaveDate
+//             ];
+//         }
+//     }
+
+//     // Sort leaves by date
+//     ksort($leaveMap);
+
+//     foreach ($leaveMap as $dateString => $leave) {
+//         if (isset($processedDates[$dateString])) continue;
+
+//         $currentDate = $leave['date'];
+//         $isHalfDay = $leave['is_half_day'];
+//         $isEvening = $isHalfDay && $leave['half_day_type'] === 'evening';
+//         $isMorning = $isHalfDay && $leave['half_day_type'] === 'morning';
+
+//         if ($isMorning) {
+//             // Case 2 & 3: Morning half-day - count only 0.5
+//             $lossOfPayDays += 0.5;
+//             $processedDates[$dateString] = true;
+//             continue;
+//         }
+
+//         // Initialize range
+//         $rangeStart = $currentDate;
+//         $rangeEnd = $currentDate;
+//         $hasEvening = $isEvening;
+//         $currentCount = $isHalfDay ? 0.5 : 1;
+//         $processedDates[$dateString] = true;
+
+//         // Process forward from current leave
+//         $nextDate = $currentDate->copy()->addDay();
+//         $tempHolidaysWeekends = 0;
+
+//         while ($nextDate->lte($endDate)) {
+//             $nextString = $nextDate->toDateString();
+            
+//             if (isset($processedDates[$nextString])) {
+//                 $nextDate->addDay();
+//                 continue;
+//             }
+
+//             // Check if non-working day
+//             if ($nextDate->isWeekend() || $this->isHoliday($nextDate)) {
+//                 $tempHolidaysWeekends++;
+//                 $processedDates[$nextString] = true;
+//                 $nextDate->addDay();
+//                 continue;
+//             }
+
+//             // Check if next working day has leave
+//             if (!isset($leaveMap[$nextString])) break;
+            
+//             $nextLeave = $leaveMap[$nextString];
+//             $nextIsHalfDay = $nextLeave['is_half_day'];
+//             $nextIsEvening = $nextIsHalfDay && $nextLeave['half_day_type'] === 'evening';
+//             $nextIsMorning = $nextIsHalfDay && $nextLeave['half_day_type'] === 'morning';
+
+//             // Case 1 & 4: Evening half-day followed by full day
+//             if ($hasEvening && $nextIsMorning) {
+//                 $currentCount += $tempHolidaysWeekends + 0.5;
+//                 $tempHolidaysWeekends = 0;
+//                 $processedDates[$nextString] = true;
+//                 $rangeEnd = $nextDate;
+//                 break;
+//             }
+//             // Case 1: Full day in sequence
+//             elseif (!$nextIsHalfDay) {
+//                 $currentCount += $tempHolidaysWeekends + 1;
+//                 $tempHolidaysWeekends = 0;
+//                 $processedDates[$nextString] = true;
+//                 $rangeEnd = $nextDate;
+//                 $hasEvening = $nextIsEvening;
+//                 $nextDate->addDay();
+//             }
+//             // Case 4: Evening half-day followed by another evening
+//             elseif ($nextIsEvening) {
+//                 $currentCount += $tempHolidaysWeekends + 0.5;
+//                 $tempHolidaysWeekends = 0;
+//                 $processedDates[$nextString] = true;
+//                 $rangeEnd = $nextDate;
+//                 $hasEvening = true;
+//                 $nextDate->addDay();
+//             }
+//             else {
+//                 break;
+//             }
+//         }
+
+//         // Add remaining buffer if we have evening half-day
+//         if ($hasEvening) {
+//             $currentCount += $tempHolidaysWeekends;
+//         }
+
+//         $lossOfPayDays += $currentCount;
+//     }
+
+//     return $lossOfPayDays;
+// }
 
     /**
      * Helper to check holidays.
@@ -1179,28 +1271,28 @@ protected function isSandwichPattern($leaveDate, $leaves, $startDate, $endDate)
            ($this->isWorkingDay($leaveDate) && $nextCondition);
 }
 
-protected function isNonWorkingDay($date, $leaves, $startDate, $endDate)
-{
-    // Check if date is within our month range
-    if ($date->lt($startDate) || $date->gt($endDate)) {
-        return false;
-    }
+// protected function isNonWorkingDay($date, $leaves, $startDate, $endDate)
+// {
+//     // Check if date is within our month range
+//     if ($date->lt($startDate) || $date->gt($endDate)) {
+//         return false;
+//     }
 
-    // Check if it's a weekend or holiday
-    if ($date->isWeekend() || $this->isHoliday($date)) {
-        return true;
-    }
+//     // Check if it's a weekend or holiday
+//     if ($date->isWeekend() || $this->isHoliday($date)) {
+//         return true;
+//     }
 
-    // Check if there's an approved leave on this date
-    foreach ($leaves as $leave) {
-        $leaveDate = Carbon::parse($leave->leave_date);
-        if ($leaveDate->format('Y-m-d') === $date->format('Y-m-d')) {
-            return true;
-        }
-    }
+//     // Check if there's an approved leave on this date
+//     foreach ($leaves as $leave) {
+//         $leaveDate = Carbon::parse($leave->leave_date);
+//         if ($leaveDate->format('Y-m-d') === $date->format('Y-m-d')) {
+//             return true;
+//         }
+//     }
 
-    return false;
-}
+//     return false;
+// }
 
 protected function isWorkingDay($date)
 {
