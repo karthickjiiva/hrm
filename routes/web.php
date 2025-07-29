@@ -88,6 +88,7 @@ ApiRoute::group(['namespace' => 'App\Http\Controllers\Api'], function () {
         ApiRoute::resource('bank_masters', 'BankMasterController', $options);
         ApiRoute::resource('employee_leave_masters', 'EmployeeLeaveMasterController', $options);
         ApiRoute::resource('departments', 'DepartmentController', $options);
+        ApiRoute::resource('payroll_new', 'PayrollNewController', $options);
         ApiRoute::resource('designations', 'DesignationController', $options);
         ApiRoute::resource('leave-types', 'LeaveTypeController', $options);
         ApiRoute::resource('awards', 'AwardController', $options);
