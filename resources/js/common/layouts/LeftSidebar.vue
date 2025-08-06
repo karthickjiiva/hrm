@@ -218,7 +218,7 @@
                         >
                             <span>{{ $t("menu.designations") }}</span>
                         </a-menu-item>
-                        <a-menu-item
+                        <!-- <a-menu-item
                             v-if="
                                 permsArray.includes('shifts_view') ||
                                 permsArray.includes('admin')
@@ -234,7 +234,7 @@
                             key="shifts"
                         >
                             <span>{{ $t("menu.shifts") }}</span>
-                        </a-menu-item>
+                        </a-menu-item> -->
                         <a-menu-item
                             v-if="
                                 permsArray.includes('users_view') ||
@@ -347,7 +347,7 @@
                         >
                             <span>{{ $t("menu.holidays") }}</span>
                         </a-menu-item>
-                        <a-menu-item
+                        <!-- <a-menu-item
                             @click="
                                 () => {
                                     menuSelected();
@@ -359,7 +359,7 @@
                             key="weekends"
                         >
                             <span>{{ $t("menu.weekends") }}</span>
-                        </a-menu-item>
+                        </a-menu-item> -->
                         <a-menu-item
                             @click="
                                 () => {
@@ -454,7 +454,7 @@
                         >
                             <span>{{ $t("menu.leaves") }}</span>
                         </a-menu-item>
-                        <a-menu-item
+                        <!-- <a-menu-item
                             v-if="
                                 permsArray.includes('leave_types_view') ||
                                 permsArray.includes('admin')
@@ -470,7 +470,7 @@
                             key="leave_types"
                         >
                             <span>{{ $t("menu.leave_types") }}</span>
-                        </a-menu-item>
+                        </a-menu-item> -->
                         <a-menu-item
                             v-if="
                                 permsArray.includes('leaves_view') ||

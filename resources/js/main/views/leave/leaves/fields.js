@@ -11,11 +11,11 @@ const fields = () => {
         user_id: undefined,
         leave_type_id: undefined,
         start_date: undefined,
-        end_date: undefined,
+        // end_date: undefined,
         is_half_day: 0,
         reason: "",
         date: undefined,
-        status: "pending",
+        // status: "pending",
     };
 
     const columns = [
@@ -28,21 +28,21 @@ const fields = () => {
             dataIndex: "leave_type_id",
         },
         {
-            title: t("leave.start_date"),
+            title: ("Date"),
             dataIndex: "start_date",
         },
-        {
-            title: t("leave.end_date"),
-            dataIndex: "end_date",
-        },
+        // {
+        //     title: t("leave.end_date"),
+        //     dataIndex: "end_date",
+        // },
         {
             title: t("leave.is_half_day"),
             dataIndex: "is_half_day",
         },
-        {
-            title: t("leave.status"),
-            dataIndex: "status",
-        },
+        // {
+        //     title: t("leave.status"),
+        //     dataIndex: "status",
+        // },
         {
             title: t("common.action"),
             dataIndex: "action",

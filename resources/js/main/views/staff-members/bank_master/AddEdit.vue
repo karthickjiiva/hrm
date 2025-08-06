@@ -8,6 +8,31 @@
     >
         <a-form layout="vertical">
             <a-row :gutter="16">
+                   <!-- Employee -->
+                <a-col :xs="24">
+                    <a-form-item
+                        label="Employee"
+                        name="employee_id"
+                        :help="
+                            rules.employee_id ? rules.employee_id.message : null
+                        "
+                        :validateStatus="rules.employee_id ? 'error' : null"
+                        class="required"
+                    >
+                        <a-select
+                            v-model:value="formData.employee_id"
+                            placeholder="Select Employee"
+                            :options="
+                                users.map((user) => ({
+                                    label: user.name,
+                                    value: user.id,
+                                }))
+                            "
+                            show-search
+                            option-filter-prop="label"
+                        />
+                    </a-form-item>
+                </a-col>
                 <!-- Account Number -->
                 <a-col :xs="24">
                     <a-form-item
@@ -75,31 +100,7 @@
                     </a-form-item>
                 </a-col>
 
-                <!-- Employee -->
-                <a-col :xs="24">
-                    <a-form-item
-                        label="Employee"
-                        name="employee_id"
-                        :help="
-                            rules.employee_id ? rules.employee_id.message : null
-                        "
-                        :validateStatus="rules.employee_id ? 'error' : null"
-                        class="required"
-                    >
-                        <a-select
-                            v-model:value="formData.employee_id"
-                            placeholder="Select Employee"
-                            :options="
-                                users.map((user) => ({
-                                    label: user.name,
-                                    value: user.id,
-                                }))
-                            "
-                            show-search
-                            option-filter-prop="label"
-                        />
-                    </a-form-item>
-                </a-col>
+             
             </a-row>
         </a-form>
 

@@ -51,10 +51,10 @@
                         </a-button>
 
                         <MarkHoliday v-else @onSuccess="setUrlData" />
-                        <a-button type="primary" @click="addItems">
+                        <!-- <a-button type="primary" @click="addItems">
                             <PlusOutlined />
                             {{ $t("user.quick_add") }}
-                        </a-button>
+                        </a-button> -->
                     </template>
                     <template v-if="holidayType === 'holiday'">
                         <PdfDownload

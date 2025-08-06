@@ -34,7 +34,7 @@
 
                     <div class="text-center mt-3">
                         <a-button type="primary" :loading="loading" @click="handleExportToExcel">
-                            Generate Payroll
+                           Download Payroll Report                           
                         </a-button>
                     </div>
                 </a-col>

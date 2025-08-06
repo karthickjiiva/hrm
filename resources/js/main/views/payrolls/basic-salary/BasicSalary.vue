@@ -41,90 +41,49 @@
                 </a-form-item> -->
             </a-col>
             <a-col :xs="24" :sm="24" :md="12" :lg="12">
-                <a-form-item
-                    label="Employee Type"
-                    name="employee_type_id"
-                    :help="
-                        rules.employee_type_id
-                            ? rules.employee_type_id.message
-                            : null
-                    "
-                    :validateStatus="rules.employee_type_id ? 'error' : null"
-                    class="required"
-                >
+                <a-form-item label="Employee Type" name="employee_type_id" :help="rules.employee_type_id
+                        ? rules.employee_type_id.message
+                        : null
+                    " :validateStatus="rules.employee_type_id ? 'error' : null" class="required">
                     <span style="display: flex">
-                        <a-select
-                            v-model:value="formData.employee_type_id"
-                            placeholder="Please select the employee type"
-                            :allowClear="false"
-                            optionFilterProp="title"
-                            show-search
-                            @change="
+                        <a-select v-model:value="formData.employee_type_id"
+                            placeholder="Please select the employee type" :allowClear="false" optionFilterProp="title"
+                            show-search @change="
                                 fetch_employee_type_components(
                                     formData.employee_type_id
                                 )
-                            "
-                        >
-                            <a-select-option
-                                v-for="type in employeeTypeGroups"
-                                :key="type.xid"
-                                :value="type.xid"
-                                :title="type.type"
-                            >
+                                ">
+                            <a-select-option v-for="type in employeeTypeGroups" :key="type.xid" :value="type.xid"
+                                :title="type.type">
                                 {{ type.type }}
                             </a-select-option>
                         </a-select>
-                        <EmployeeTypeAddButton
-                            @onAddSuccess="employeeTypeAdded"
-                        />
+                        <EmployeeTypeAddButton @onAddSuccess="employeeTypeAdded" />
                     </span>
                 </a-form-item>
             </a-col>
         </a-row>
         <a-row :gutter="16" v-if="inputVisible">
             <a-col :xs="24" :sm="24" :md="24" :lg="24">
-                <UserInfo :user="user"
-            /></a-col>
+                <UserInfo :user="user" />
+            </a-col>
         </a-row>
-        <a-row
-            :gutter="16"
-            :style="{ marginTop: inputVisible ? '0px' : '18px' }"
-        >
+        <a-row :gutter="16" :style="{ marginTop: inputVisible ? '0px' : '18px' }">
             <a-col :xs="24" :sm="24" :md="24" :lg="24">
                 <!-- Monthly CTC Input -->
-                <a-form-item
-                    label="Monthly CTC"
-                    name="monthly_ctc"
-                    :labelCol="{ span: 6 }"
-                    :wrapperCol="{ span: 10 }"
-                    labelAlign="left"
-                >
-                    <a-input
-                        v-model:value="formData.monthly_ctc"
-                        @change="calculateSalary"
-                        :addonBefore="appSetting.currency.symbol"
-                    />
+                <a-form-item label="Monthly CTC" name="monthly_ctc" :labelCol="{ span: 6 }" :wrapperCol="{ span: 10 }"
+                    labelAlign="left">
+                    <a-input v-model:value="formData.monthly_ctc" @change="calculateSalary"
+                        :addonBefore="appSetting.currency.symbol" />
                 </a-form-item>
             </a-col>
         </a-row>
-        <a-row
-            :gutter="16"
-            :style="{ marginTop: inputVisible ? '0px' : '18px' }"
-        >
+        <a-row :gutter="16" :style="{ marginTop: inputVisible ? '0px' : '18px' }">
             <a-col :xs="24" :sm="24" :md="24" :lg="24">
                 <!-- Annual CTC Display (calculated, readonly) -->
-                <a-form-item
-                    v-show="false"
-                    :label="$t('basic_salary.annual_ctc')"
-                    name="annual_ctc"
-                    :labelCol="{ span: 6 }"
-                    :wrapperCol="{ span: 10 }"
-                    labelAlign="left"
-                >
-                    <a-input
-                        v-model:value="formData.annual_ctc"
-                        :addonBefore="appSetting.currency.symbol"
-                    />
+                <a-form-item v-show="false" :label="$t('basic_salary.annual_ctc')" name="annual_ctc"
+                    :labelCol="{ span: 6 }" :wrapperCol="{ span: 10 }" labelAlign="left">
+                    <a-input v-model:value="formData.annual_ctc" :addonBefore="appSetting.currency.symbol" />
                 </a-form-item>
             </a-col>
 
@@ -134,64 +93,34 @@
             </div>
         </a-row>
 
-        <a-row
-            :gutter="16"
-            style="
+        <a-row :gutter="16" style="
                 margin-top: 20px;
                 margin-bottom: 20px;
                 border-bottom: 1px solid #d9d9d9;
                 padding-bottom: 8px;
                 display: flex;
                 align-items: left;
-            "
-        >
-            <a-col
-                :xs="24"
-                :sm="12"
-                :md="6"
-                :lg="6"
-                :class="['column-text', 'new-class']"
-            >
+            ">
+            <a-col :xs="24" :sm="12" :md="6" :lg="6" :class="['column-text', 'new-class']">
                 {{ $t("basic_salary.salary_component") }}
             </a-col>
-            <a-col
-                :xs="24"
-                :sm="12"
-                :md="6"
-                :lg="6"
-                :class="['column-text', 'new-class']"
-            >
+            <a-col :xs="24" :sm="12" :md="6" :lg="6" :class="['column-text', 'new-class']">
                 {{ $t("basic_salary.calculation_type") }}
             </a-col>
-            <a-col
-                :xs="24"
-                :sm="12"
-                :md="6"
-                :lg="6"
-                :class="['column-text', 'new-class']"
-            >
+            <a-col :xs="24" :sm="12" :md="6" :lg="6" :class="['column-text', 'new-class']">
                 {{ $t("basic_salary.monthly_amount") }}
             </a-col>
-            <a-col
-                :xs="24"
-                :sm="12"
-                :md="6"
-                :lg="6"
-                :class="['column-text', 'new-class']"
-            >
+            <a-col :xs="24" :sm="12" :md="6" :lg="6" :class="['column-text', 'new-class']">
                 {{ $t("basic_salary.annual_amount") }}
             </a-col>
         </a-row>
 
-        <a-row
-            :gutter="16"
-            style="
+        <a-row :gutter="16" style="
                 margin-top: 20px;
                 padding-bottom: 8px;
                 display: flex;
                 align-items: left;
-            "
-        >
+            ">
             <!-- Salary Component -->
             <a-col :xs="24" :sm="12" :md="6" :lg="6" class="column-text">
                 {{ $t("basic_salary.basic_salary") }}
@@ -199,40 +128,25 @@
 
             <!-- Calculation Type -->
             <a-col :xs="24" :sm="12" :md="6" :lg="6" class="column-text">
-                <a-form-item
-                    name="ctc_value"
-                    :help="rules.ctc_value ? rules.ctc_value.message : null"
-                    :validateStatus="rules.ctc_value ? 'error' : null"
-                    class="required"
-                >
-                    <a-input-number
-                        v-model:value="formData.ctc_value"
-                        disabled
-                        :placeholder="
-                            $t('common.placeholder_default_text', [
-                                $t('basic_salary.ctc_value'),
-                            ])
-                        "
-                        min="0"
-                        style="width: 100%"
-                        @change="calculateSalary"
-                    >
+                <a-form-item name="ctc_value" :help="rules.ctc_value ? rules.ctc_value.message : null"
+                    :validateStatus="rules.ctc_value ? 'error' : null" class="required">
+                    <a-input-number v-model:value="formData.ctc_value" disabled :placeholder="$t('common.placeholder_default_text', [
+                        $t('basic_salary.ctc_value'),
+                    ])
+                        " min="0" style="width: 100%" @change="calculateSalary">
                         <!-- <template #addonBefore>
                             {{ appSetting.currency.symbol }}
                         </template> -->
                         <!-- <template #addonAfter> -->
                         <div style="display: none">
-                            <a-select
-                                v-model:value="formData.calculation_type"
-                                style="width: 120px"
-                                @change="calculateSalary"
-                            >
+                            <a-select v-model:value="formData.calculation_type" style="width: 120px"
+                                @change="calculateSalary">
                                 <a-select-option value="fixed">{{
                                     $t("basic_salary.fixed")
-                                }}</a-select-option>
+                                    }}</a-select-option>
                                 <a-select-option value="%_of_ctc">{{
                                     $t("basic_salary.%_of_ctc")
-                                }}</a-select-option>
+                                    }}</a-select-option>
                             </a-select>
                         </div>
                         <!-- </template> -->
@@ -242,17 +156,10 @@
 
             <!-- Monthly Amount -->
             <a-col :xs="24" :sm="12" :md="6" :lg="6" class="column-text">
-                <a-input-number
-                    v-model:value="monthlySalary"
-                    :placeholder="
-                        $t('common.placeholder_default_text', [
-                            $t('basic_salary.ctc'),
-                        ])
-                    "
-                    min="0"
-                    :disabled="true"
-                    style="width: 100%"
-                >
+                <a-input-number v-model:value="monthlySalary" :placeholder="$t('common.placeholder_default_text', [
+                    $t('basic_salary.ctc'),
+                ])
+                    " min="0" :disabled="true" style="width: 100%">
                     <template #addonBefore>
                         {{ appSetting.currency.symbol }}
                     </template>
@@ -261,17 +168,10 @@
 
             <!-- Annual Amount -->
             <a-col :xs="24" :sm="12" :md="6" :lg="6" class="column-text">
-                <a-input-number
-                    v-model:value="annualSalary"
-                    :placeholder="
-                        $t('common.placeholder_default_text', [
-                            $t('basic_salary.ctc'),
-                        ])
-                    "
-                    min="0"
-                    :disabled="true"
-                    style="width: 100%"
-                >
+                <a-input-number v-model:value="annualSalary" :placeholder="$t('common.placeholder_default_text', [
+                    $t('basic_salary.ctc'),
+                ])
+                    " min="0" :disabled="true" style="width: 100%">
                     <template #addonBefore>
                         {{ appSetting.currency.symbol }}
                     </template>
@@ -281,26 +181,13 @@
         <a-row :gutter="16" class="new-class">
             <a-col :xs="24" :sm="24" :md="4" :lg="4">{{
                 $t("basic_salary.earnings")
-            }}</a-col>
+                }}</a-col>
         </a-row>
         <a-row :gutter="16">
-            <a-col
-                :xs="24"
-                :sm="24"
-                :md="24"
-                :lg="24"
-                v-if="salaryGroupComponentProps"
-            >
-                <div
-                    v-for="(component, idx) in salaryGroupComponentProps"
-                    :key="idx"
-                >
+            <a-col :xs="24" :sm="24" :md="24" :lg="24" v-if="salaryGroupComponentProps">
+                <div v-for="(component, idx) in salaryGroupComponentProps" :key="idx">
                     <!-- Check if the salary component is of type 'earnings' -->
-                    <a-row
-                        v-if="component.salary_component.type === 'earnings'"
-                        :gutter="16"
-                        style="margin-top: 14px"
-                    >
+                    <a-row v-if="component.salary_component.type === 'earnings'" :gutter="16" style="margin-top: 14px">
                         <!-- Salary Component Name -->
                         <a-col :span="6" class="column-text">
                             <span>{{ component.salary_component.name }}</span>
@@ -311,36 +198,28 @@
                             <span>
                                 {{
                                     component.salary_component.value_type ===
-                                    "fixed"
+                                        "fixed"
                                         ? $t("salary_component.fixed")
                                         : component.salary_component
-                                              .value_type === "basic_percent"
-                                        ? $t("salary_component.basic_percent")
-                                        : component.salary_component
-                                              .value_type === "ctc_percent"
-                                        ? $t("salary_component.ctc_percent")
-                                        : $t("salary_component.variable")
+                                            .value_type === "basic_percent"
+                                            ? $t("salary_component.basic_percent")
+                                            : component.salary_component
+                                                .value_type === "ctc_percent"
+                                                ? $t("salary_component.ctc_percent")
+                                                : $t("salary_component.variable")
                                 }}
                             </span>
                         </a-col>
                         <a-col :span="6">
-                            <a-input
-                                :value="getMonthlyValue(component)"
-                                @input="
-                                    (event) =>
-                                        updateMonthlyValue(
-                                            event.target.value,
-                                            component.salary_component
-                                        )
-                                "
-                                :disabled="
-                                    component.salary_component.value_type !==
+                            <a-input :value="getMonthlyValue(component)" @input="
+                                (event) =>
+                                    updateMonthlyValue(
+                                        event.target.value,
+                                        component.salary_component
+                                    )
+                            " :disabled="component.salary_component.value_type !==
                                     'variable'
-                                "
-                                placeholder="Enter Monthly Value"
-                                @change="calculateSalary"
-                                style="width: 100%"
-                            >
+                                    " placeholder="Enter Monthly Value" @change="calculateSalary" style="width: 100%">
                                 <template #addonBefore>
                                     {{ appSetting.currency.symbol }}
                                 </template>
@@ -349,16 +228,9 @@
 
                         <!-- Annual Input (calculated) -->
                         <a-col :span="6">
-                            <a-input
-                                :value="calculateAnnualValue(component)"
-                                :disabled="
-                                    component.salary_component.value_type !==
-                                    'variable'
-                                "
-                                placeholder="Annual Value"
-                                readonly
-                                style="width: 100%"
-                            >
+                            <a-input :value="calculateAnnualValue(component)" :disabled="component.salary_component.value_type !==
+                                'variable'
+                                " placeholder="Annual Value" readonly style="width: 100%">
                                 <template #addonBefore>
                                     {{ appSetting.currency.symbol }}
                                 </template>
@@ -396,14 +268,10 @@
             </a-col>
         </a-row> -->
 
-        <a-row
-            v-if="
-                formData?.hra_percent_monthly &&
-                formData?.hra_percent_monthly > 0
-            "
-            :gutter="16"
-            style="margin-top: 10px"
-        >
+        <a-row v-if="
+            formData?.hra_percent_monthly &&
+            formData?.hra_percent_monthly > 0
+        " :gutter="16" style="margin-top: 10px">
             <a-col :xs="24" :sm="24" :md="6" :lg="6" class="column-text">
                 <div>HRA</div>
             </a-col>
@@ -424,13 +292,9 @@
             </a-col>
         </a-row>
 
-        <a-row
-            v-if="
-                formData?.allowance_percent && formData?.allowance_percent > 0
-            "
-            :gutter="16"
-            style="margin-top: 10px"
-        >
+        <a-row v-if="
+            formData?.allowance_percent && formData?.allowance_percent > 0
+        " :gutter="16" style="margin-top: 10px">
             <a-col :xs="24" :sm="24" :md="6" :lg="6" class="column-text">
                 <div>Allowance</div>
             </a-col>
@@ -451,14 +315,10 @@
             </a-col>
         </a-row>
 
-        <a-row
-            v-if="
-                formData?.food_allowance_percent &&
-                formData?.food_allowance_percent > 0
-            "
-            :gutter="16"
-            style="margin-top: 10px"
-        >
+        <a-row v-if="
+            formData?.food_allowance_percent &&
+            formData?.food_allowance_percent > 0
+        " :gutter="16" style="margin-top: 10px">
             <a-col :xs="24" :sm="24" :md="6" :lg="6" class="column-text">
                 <div>Food Allowance</div>
             </a-col>
@@ -504,13 +364,9 @@
         <a-row :gutter="16" style="margin-top: 20px" class="new-class">
             <a-col :xs="24" :sm="24" :md="4" :lg="4">{{
                 $t("basic_salary.deductions")
-            }}</a-col>
+                }}</a-col>
         </a-row>
-        <a-row
-            v-if="formData?.pf_enabled"
-            :gutter="16"
-            style="margin-top: 10px"
-        >
+        <a-row v-if="formData?.pf_enabled" :gutter="16" style="margin-top: 10px">
             <a-col :xs="24" :sm="24" :md="6" :lg="6" class="column-text">
                 <div>PF</div>
             </a-col>
@@ -535,11 +391,7 @@
                 </span>
             </a-col>
         </a-row>
-        <a-row
-            v-if="formData?.esi_enabled"
-            :gutter="16"
-            style="margin-top: 10px"
-        >
+        <a-row v-if="formData?.esi_enabled" :gutter="16" style="margin-top: 10px">
             <a-col :xs="24" :sm="24" :md="6" :lg="6" class="column-text">
                 <div>ESI</div>
             </a-col>
@@ -564,11 +416,7 @@
                 </span>
             </a-col>
         </a-row>
-        <a-row
-            v-if="formData?.prof_tax_enabled"
-            :gutter="16"
-            style="margin-top: 10px"
-        >
+        <a-row v-if="formData?.prof_tax_enabled" :gutter="16" style="margin-top: 10px">
             <a-col :xs="24" :sm="24" :md="6" :lg="6" class="column-text">
                 <div>Proffesional Tax</div>
             </a-col>
@@ -593,11 +441,7 @@
                 </span>
             </a-col>
         </a-row>
-        <a-row
-            v-if="formData?.tds_enabled"
-            :gutter="16"
-            style="margin-top: 10px"
-        >
+        <a-row v-if="formData?.tds_enabled" :gutter="16" style="margin-top: 10px">
             <a-col :xs="24" :sm="24" :md="6" :lg="6" class="column-text">
                 <div>TDS</div>
             </a-col>
@@ -624,15 +468,9 @@
         </a-row>
         <a-row :gutter="[16, 24]">
             <a-col :xs="24" :sm="24" :md="24" :lg="24">
-                <div
-                    v-for="(component, idx) in salaryGroupComponentProps"
-                    :key="idx"
-                >
-                    <a-row
-                        v-if="component.salary_component.type === 'deductions'"
-                        :gutter="16"
-                        style="margin-top: 10px"
-                    >
+                <div v-for="(component, idx) in salaryGroupComponentProps" :key="idx">
+                    <a-row v-if="component.salary_component.type === 'deductions'" :gutter="16"
+                        style="margin-top: 10px">
                         <a-col :span="6" class="column-text">
                             <span>{{ component.salary_component.name }}</span>
                         </a-col>
@@ -641,66 +479,45 @@
                             <span>
                                 {{
                                     component.salary_component.value_type ===
-                                    "fixed"
+                                        "fixed"
                                         ? $t("salary_component.fixed")
                                         : component.salary_component
-                                              .value_type === "basic_percent"
-                                        ? $t("salary_component.basic_percent")
-                                        : component.salary_component
-                                              .value_type === "ctc_percent"
-                                        ? $t("salary_component.ctc_percent")
-                                        : $t("salary_component.variable")
+                                            .value_type === "basic_percent"
+                                            ? $t("salary_component.basic_percent")
+                                            : component.salary_component
+                                                .value_type === "ctc_percent"
+                                                ? $t("salary_component.ctc_percent")
+                                                : $t("salary_component.variable")
                                 }}
                             </span>
                         </a-col>
 
-                        <a-col
-                            :span="6"
-                            style="border: 2px solid red !important"
-                        >
-                            <a-input
-                                :value="getMonthlyValue(component)"
-                                @input="
-                                    (event) =>
-                                        updateMonthlyValue(
-                                            event.target.value,
-                                            component.salary_component
-                                        )
-                                "
-                                :disabled="
-                                    component.salary_component.value_type !==
+                        <a-col :span="6" style="border: 2px solid red !important">
+                            <a-input :value="getMonthlyValue(component)" @input="
+                                (event) =>
+                                    updateMonthlyValue(
+                                        event.target.value,
+                                        component.salary_component
+                                    )
+                            " :disabled="component.salary_component.value_type !==
                                     'variable'
-                                "
-                                placeholder="Enter Monthly Value"
-                                @change="calculateSalary"
-                                style="width: 100%"
-                            >
+                                    " placeholder="Enter Monthly Value" @change="calculateSalary" style="width: 100%">
                                 <template #addonBefore>
                                     {{ appSetting.currency.symbol }}
                                 </template>
                             </a-input>
                         </a-col>
 
-                        <a-col
-                            :span="6"
-                            style="border: 2px solid red !important"
-                        >
-                            <a-input
-                                :value="calculateAnnualValue(component)"
-                                :disabled="
-                                    component.salary_component.value_type !==
-                                    'variable'
-                                "
-                                placeholder="Annual Value"
-                                readonly
-                                style="
+                        <a-col :span="6" style="border: 2px solid red !important">
+                            <a-input :value="calculateAnnualValue(component)" :disabled="component.salary_component.value_type !==
+                                'variable'
+                                " placeholder="Annual Value" readonly style="
                                     width: 100%;
                                     border: none;
                                     background: transparent;
                                     color: inherit;
                                     padding: 0;
-                                "
-                            >
+                                ">
                                 <template #addonBefore>
                                     pppp {{ appSetting.currency.symbol }}
                                 </template>
@@ -963,14 +780,14 @@ export default defineComponent({
                             amount =
                                 (monthlySalary.value *
                                     Number(salary_component.monthly)) /
-                                    100 || 0;
+                                100 || 0;
                             break;
 
                         case "ctc_percent":
                             amount =
                                 (monthlySalary.value *
                                     Number(salary_component.monthly)) /
-                                    formData.value.ctc_value || 0;
+                                formData.value.ctc_value || 0;
                             break;
 
                         default:
@@ -1000,109 +817,59 @@ export default defineComponent({
             calculateEarningsAndDeductions();
 
             const { calculation_type, ctc_value, monthly_ctc } = formData.value;
+         
             if (formData.value.pf_enabled) {
                 if (formData.value.pf_fix_amount) {
-                    formData.value.monthly_pf =
-                        formData.value.pf_amount.toFixed(2);
-                    formData.value.annual_pf = (
-                        12 * formData.value.pf_amount
-                    ).toFixed(2);
+                    formData.value.monthly_pf = formData.value.pf_amount.toFixed(2);
+                    formData.value.annual_pf = (12 * formData.value.pf_amount).toFixed(2);
                 } else {
-                    formData.value.monthly_pf = (
-                        (monthly_ctc * formData.value.pf_percentage) /
-                        100
-                    ).toFixed(2);
-                    formData.value.annual_pf =
-                        12 *
-                        (
-                            (monthly_ctc * formData.value.pf_percentage) /
-                            100
-                        ).toFixed(2);
+                    const pfAmount = (monthlySalary.value * formData.value.pf_percentage) / 100;
+                    formData.value.monthly_pf = pfAmount.toFixed(2);
+                    formData.value.annual_pf = (12 * pfAmount).toFixed(2);
+                    // const pfAmount = (monthly_ctc * formData.value.pf_percentage) / 100;
                 }
             }
+
             if (formData.value.hra_percent_monthly) {
-                formData.value.monthly_hra_percent_monthly = (
-                    (monthly_ctc * formData.value.hra_percent_monthly) /
-                    100
-                ).toFixed(2);
-
-                formData.value.annual_hra_percent_monthly =
-                    12 *
-                    (
-                        (monthly_ctc * formData.value.hra_percent_monthly) /
-                        100
-                    ).toFixed(2);
+                const hraAmount = (monthly_ctc * formData.value.hra_percent_monthly) / 100;
+                formData.value.monthly_hra_percent_monthly = hraAmount.toFixed(2);
+                formData.value.annual_hra_percent_monthly = (12 * hraAmount).toFixed(2);
             }
+
             if (formData.value.allowance_percent) {
-                formData.value.monthly_allowance_percent = (
-                    (monthly_ctc * formData.value.allowance_percent) /
-                    100
-                ).toFixed(2);
-
-                formData.value.annual_allowance_percent =
-                    12 *
-                    (
-                        (monthly_ctc * formData.value.allowance_percent) /
-                        100
-                    ).toFixed(2);
+                const allowanceAmount = (monthly_ctc * formData.value.allowance_percent) / 100;
+                formData.value.monthly_allowance_percent = allowanceAmount.toFixed(2);
+                formData.value.annual_allowance_percent = (12 * allowanceAmount).toFixed(2);
             }
-            if (formData.value.food_allowance_percent) {
-                formData.value.monthly_food_allowance_percent = (
-                    (monthly_ctc * formData.value.food_allowance_percent) /
-                    100
-                ).toFixed(2);
 
-                formData.value.annual_food_allowance_percent =
-                    12 *
-                    (
-                        (monthly_ctc * formData.value.food_allowance_percent) /
-                        100
-                    ).toFixed(2);
+            if (formData.value.food_allowance_percent) {
+                const foodAllowanceAmount = (monthly_ctc * formData.value.food_allowance_percent) / 100;
+                formData.value.monthly_food_allowance_percent = foodAllowanceAmount.toFixed(2);
+                formData.value.annual_food_allowance_percent = (12 * foodAllowanceAmount).toFixed(2);
             }
 
             if (formData.value.esi_enabled) {
                 if (formData.value.esi_fix_amount) {
-                    formData.value.monthly_esi =
-                        formData.value.esi_percentage.toFixed(2);
-                    formData.value.annual_esi = (
-                        12 * formData.value.esi_percentage
-                    ).toFixed(2);
+                    formData.value.monthly_esi = formData.value.esi_percentage.toFixed(2);
+                    formData.value.annual_esi = (12 * formData.value.esi_percentage).toFixed(2);
                 } else {
-                    formData.value.monthly_esi = (
-                        (monthly_ctc * formData.value.esi_percentage) /
-                        100
-                    ).toFixed(2);
-
-                    formData.value.annual_esi =
-                        12 *
-                        (
-                            (monthly_ctc * formData.value.esi_percentage) /
-                            100
-                        ).toFixed(2);
+                    const esiAmount = (monthlySalary.value * formData.value.esi_percentage) / 100;
+                    formData.value.monthly_esi = esiAmount.toFixed(2);
+                    formData.value.annual_esi = (12 * esiAmount).toFixed(2);
                 }
             }
 
             if (formData.value.prof_tax_enabled) {
                 if (formData.value.prof_tax_fix_amount) {
-                    formData.value.monthly_prof_tax =
-                        formData.value.prof_tax_percentage;
-                    formData.value.annual_prof_tax = (
-                        12 * formData.value.prof_tax_percentage
-                    ).toFixed(2);
+                    formData.value.monthly_prof_tax = formData.value.prof_tax_percentage;
+                    formData.value.annual_prof_tax = (12 * formData.value.prof_tax_percentage).toFixed(2);
                 } else {
-                    formData.value.monthly_prof_tax = (
-                        (monthly_ctc * formData.value.prof_tax_percentage) /
-                        100
-                    ).toFixed(2);
-
-                    formData.value.annual_prof_tax =
-                        12 *
-                        (
-                            (monthly_ctc * formData.value.prof_tax_percentage) /
-                            100
-                        ).toFixed(2);
+                    const profTaxAmount = (monthlySalary.value * formData.value.prof_tax_percentage) / 100;
+                    formData.value.monthly_prof_tax = profTaxAmount.toFixed(2);
+                    formData.value.annual_prof_tax = (12 * profTaxAmount).toFixed(2);
                 }
             }
+
 
             if (formData.value.tds_enabled) {
                 if (formData.value.tds_fix_amount) {
@@ -1290,11 +1057,11 @@ export default defineComponent({
                                             ...salComponent.salary_component,
                                             monthly:
                                                 findValueObject.value_type ===
-                                                "variable"
+                                                    "variable"
                                                     ? findValueObject.monthly
                                                     : salComponent
-                                                          .salary_component
-                                                          .monthly,
+                                                        .salary_component
+                                                        .monthly,
                                         },
                                     });
                                 } else {
@@ -1382,6 +1149,7 @@ export default defineComponent({
 .column-text {
     text-align: left;
 }
+
 .styled-row {
     background-color: #f8f9fa;
     height: 55px;
