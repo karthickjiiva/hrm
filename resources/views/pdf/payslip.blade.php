@@ -32,26 +32,37 @@
         }
 
         /* Header */
-        .header {
-            text-align: left; /* Centered as per image */
+         .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 5px; /* Space between name/logo and address */
         }
-        .header h1 {
-            font-size: 16px;
-            margin: 0 0 5px 0;
-            font-weight: bold;
+
+        .header-table td {
+            padding: 0; /* Reset padding for this specific table */
+            vertical-align: middle; /* Vertically aligns the name and logo */
         }
+
         .company-name {
             font-weight: bold;
             font-size: 13px;
-            padding-bottom: 10px;
-            margin: 0;
+            text-align: left;
         }
+
         .company-address {
             font-size: 12px;
-            padding-bottom: 10px;
             margin: 0;
         }
 
+        .logo-cell {
+            text-align: right;
+        }
+
+        .company-logo {
+            width: 150px; /* Adjust width as needed */
+            height: auto;
+            display: block;
+        }
         /* Employee Details Section */
         .employee-name {
             font-weight: bold;
@@ -143,16 +154,37 @@
             font-style: italic;
             color: #888;
         }
+         .payslip-title {
+            font-size: 16px;
+            margin: 0 0 5px 0;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="header">
-            <h1>PAYSLIP {{ strtoupper(\Carbon\Carbon::create()->month($payroll->month)->format('M')) }} {{ $payroll->year }}</h1>
-            <p class="company-name">BUILDCRAFT INTERIOR PVT LTD</p>
-            <p class="company-address">NO.2, 8TH FLOOR, KRM CENTER, HARRINGTON ROAD, CHETPET, CHENNAI - 600031<br>CHENNAI TAMILNADU 600031</p>
-        </div>
+   
+         <h1 class="payslip-title">PAYSLIP {{ strtoupper(\Carbon\Carbon::create()->month($payroll->month)->format('M')) }} {{ $payroll->year }}</h1>
+
+        <table class="header-table">
+            <tr>
+                <td class="company-name">BUILDCRAFT INTERIOR PVT LTD</td>
+                <td class="logo-cell">
+                    @if(!empty($logoBase64))
+                        <img src="{{ $logoBase64 }}" class="company-logo" alt="Company Logo"/>
+                    @else
+                        <span>[Logo not found]</span>
+                    @endif
+                </td>
+            </tr>
+        </table>
+        
+        <!-- Company Address below the name/logo line -->
+        <p class="company-address">
+            NO.2, 8TH FLOOR, KRM CENTER, HARRINGTON ROAD, CHETPET, CHENNAI - 600031<br>
+            CHENNAI TAMILNADU 600031
+        </p>
 
         <hr class="section-break">
 
@@ -311,6 +343,30 @@
                         <tfoot>
                              <tr class="total-row">
                                 <td>Total Taxes & Deductions (C)</td>
+                                <td class="amount">{{ number_format($payroll->total_taxes_deductions, 2) }}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                       <table class="data-table contributions-deductions-table">
+                        <thead>
+                            <tr>
+                                <th colspan="2">LOAN & ADVANCE </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>LOAN</td>
+                                <td class="amount">{{ number_format($payroll->professional_tax, 2) }}</td>
+                            </tr>
+                              <tr>
+                                <td>ADVANCE</td>
+                                <td class="amount">{{ number_format($payroll->professional_tax, 2) }}</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                             <tr class="total-row">
+                                <td>Total LOAN & ADVANCE (D)</td>
                                 <td class="amount">{{ number_format($payroll->total_taxes_deductions, 2) }}</td>
                             </tr>
                         </tfoot>

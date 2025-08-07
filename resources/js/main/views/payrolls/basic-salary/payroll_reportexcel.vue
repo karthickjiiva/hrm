@@ -33,8 +33,18 @@
                     </a-form-item>
 
                     <div class="text-center mt-3">
-                        <a-button type="primary" :loading="loading" @click="handleExportToExcel">
-                           Download Payroll Report                           
+                       <a-button
+                        type="primary"
+                        :loading="loading"
+                        @click="handleExportToExcel"
+                        style="width: 60%"
+                        >
+                        <template #icon>
+                            <template v-if="!loading">
+                            <DownloadOutlined />
+                            </template>
+                        </template>
+                        Download Payroll Report
                         </a-button>
                     </div>
                 </a-col>
@@ -48,11 +58,13 @@
 import { ref, onMounted } from "vue";
 import { message, Modal } from "ant-design-vue";
 import axios from "axios";
+import { DownloadOutlined } from '@ant-design/icons-vue';
 import AdminPageHeader from "../../../../common/layouts/AdminPageHeader.vue";
 
 export default {
     components: {
         AdminPageHeader,
+        DownloadOutlined,
     },
     setup() {
         const loading = ref(false);

@@ -2,7 +2,7 @@
     <AdminPageHeader>
         <template #header>
             <!-- <a-page-header :title="$t(`menu.users`)" class="p-0" /> -->
-            <a-page-header title="Bank Master" class="p-0" />
+            <a-page-header title="Loan Master" class="p-0" />
         </template>
         <template #breadcrumb>
             <a-breadcrumb separator="-" style="font-size: 12px">
@@ -14,7 +14,9 @@
                 <!-- <a-breadcrumb-item>
                     {{ $t(`menu.users`) }}
                 </a-breadcrumb-item> -->
-                <a-breadcrumb-item> Bank Master </a-breadcrumb-item>
+                <a-breadcrumb-item> 
+                Loan Master
+                </a-breadcrumb-item>
             </a-breadcrumb>
         </template>
     </AdminPageHeader>
@@ -33,7 +35,7 @@
                             <a-button type="primary" @click="addItem">
                                 <PlusOutlined />
                                 <!-- {{ $t("user.add") }} -->
-                                Add Bank Master
+                                Add Loan
                             </a-button>
                             <!-- <a-button type="primary" @click="addItems">
                                 <PlusOutlined />
@@ -59,7 +61,7 @@
             <a-col :xs="24" :sm="24" :md="12" :lg="18" :xl="18">
                 <a-row :gutter="[16, 16]" justify="end">
                     <a-col :xs="24" :sm="24" :md="12" :lg="6" :xl="6">
-                        <a-input-search
+                        <!-- <a-input-search
                             style="width: 100%"
                             v-model:value="table.searchString"
                             show-search
@@ -68,7 +70,7 @@
                             @search="onTableSearch"
                             :loading="table.filterLoading"
                             placeholder="Search By Employee Name"
-                        />
+                        /> -->
                     </a-col>
                 </a-row>
             </a-col>
@@ -92,15 +94,15 @@
         <a-row>
             <a-col :span="24">
                 <a-tabs
-                    v-model:activeKey="extraFilters.status"
+                    v-model:activeKey="all"
                     @change="setUrlData"
                 >
                     <a-tab-pane key="all" :tab="`${$t('common.all')}`" />
-                    <a-tab-pane key="active" :tab="`${$t('common.active')}`" />
+                    <!-- <a-tab-pane key="active" :tab="`${$t('common.active')}`" />
                     <a-tab-pane
                         key="inactive"
                         :tab="`${$t('common.inactive')}`"
-                    />
+                    /> -->
                 </a-tabs>
             </a-col>
         </a-row>
@@ -144,6 +146,15 @@
                                 {{ formatDateTime(record.created_at) }}
                             </template>
                             <template v-if="column.dataIndex === 'action'">
+                               <a-button
+  type="primary"
+  @click="openRepaymentModal(record.xid)"
+  style="margin-left: 4px"
+>
+  Manage
+</a-button>
+
+
                                 <a-button
                                     v-if="permsArray.includes('admin')"
                                     type="primary"
@@ -178,6 +189,12 @@
         :visible="detailsVisible"
         @closed="onCloseDetails"
     /> -->
+   <RepaymentModal
+  :visible="isRepaymentModalVisible"
+  :loan-xid="selectedLoanXid"
+  @update:visible="isRepaymentModalVisible = $event"
+  @updated="fetchData"
+/>
 </template>
 <script>
 import { onMounted, ref } from "vue";
@@ -194,7 +211,7 @@ import AddEdit from "./AddEdit.vue";
 import AdminPageHeader from "../../../../common/layouts/AdminPageHeader.vue";
 import ImportUsers from "../../../../common/core/ui/Import.vue";
 import UserInfo from "../../../../common/components/user/UserInfo.vue";
-// import ViewVue from "./View.vue";
+import RepaymentModal from "./RepaymentModal.vue";
 import UserListDisplayVue from "@/common/components/user/UserListDisplay.vue";
 
 export default {
@@ -205,6 +222,7 @@ export default {
         EyeOutlined,
         UserListDisplayVue,
         AddEdit,
+        RepaymentModal,
         AdminPageHeader,
         ImportUsers,
         UserInfo,
@@ -229,6 +247,21 @@ export default {
         const userOpen = ref(false);
         const userId = ref(undefined);
 
+        const { fetch } = crud();  
+
+     function fetchData() {
+    setUrlData();       
+}
+
+
+        const isRepaymentModalVisible = ref(false);
+const selectedLoanXid = ref(null);
+
+function openRepaymentModal(xid) { 
+  selectedLoanXid.value = xid;
+  isRepaymentModalVisible.value = true;
+}
+
         const openUserView = (item) => {
             userId.value = item.xid;
             userOpen.value = true;
@@ -238,8 +271,9 @@ export default {
             crudVariables.viewData.value = {};
             userOpen.value = false;
         };
-        console.log("Component Loaded: Bank Master");
-        
+
+     
+
         onMounted(() => {
             setUrlData();
         });
@@ -277,7 +311,11 @@ export default {
             sampleFileUrl,
             setUrlData,
             user,
+            selectedLoanXid,
+            isRepaymentModalVisible,
+            openRepaymentModal,
             extraFilters,
+            fetchData,
             addItems,
             detailsVisibles,
             openUserView,

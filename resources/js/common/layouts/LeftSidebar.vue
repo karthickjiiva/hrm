@@ -423,6 +423,47 @@
                             <span>{{ $t("menu.awards") }}</span>
                         </a-menu-item>
                     </a-sub-menu>
+
+                    <a-sub-menu
+                        key="myloans"
+                        v-if="
+                            permsArray.includes('admin')
+                        "
+                    >
+                        <template #title>
+                            <span>
+                                <ScheduleOutlined />
+                                <span>Loans & Advance</span>
+                            </span>
+                        </template>
+                        <a-menu-item
+                            @click="
+                                () => {
+                                    menuSelected();
+                                    $router.push({
+                                        name: 'admin.loan_master.index',
+                                    });
+                                }
+                            "
+                            key="loan_master"
+                        >
+                            <span>Loan</span>
+                        </a-menu-item>                     
+                        <a-menu-item
+                            @click="
+                                () => {
+                                    menuSelected();
+                                    $router.push({
+                                        name: 'admin.all-holidays.index',
+                                    });
+                                }
+                            "
+                            key="advance"
+                        >
+                            <span>Advance</span>
+                        </a-menu-item>
+                    </a-sub-menu>
+
                     <a-sub-menu
                         key="leaves"
                         v-if="

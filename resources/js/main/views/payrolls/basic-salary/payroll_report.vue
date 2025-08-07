@@ -113,10 +113,21 @@
                                 </div>
                             </template> -->
                             <template v-if="column.dataIndex === 'action'">
-                                <a-button type="primary" @click="downloadPayslip(record)" style="margin-left: 4px">
+                                <a-button
+                                    type="primary"
+                                    :loading="downloadLoadingIds.includes(record.xid)"
+                                    @click="downloadPayslip(record)"
+                                    style="margin-left: 1px; width: 120px;"
+                                >
+                                    <template #icon>
+                                    <template v-if="!downloadLoadingIds.includes(record.xid)">
+                                        <DownloadOutlined />
+                                    </template>
+                                    </template>
                                     Download
                                 </a-button>
                             </template>
+
                         </template>
                     </a-table>
                 </div>
@@ -128,12 +139,14 @@
 <script>
 import { ref, computed } from "vue";
 import { useI18n } from "vue-i18n";
+import { DownloadOutlined } from '@ant-design/icons-vue';
 import AdminPageHeader from "../../../../common/layouts/AdminPageHeader.vue";
 import api from "../../../../common/composable/api";
 import axios from "axios";
 export default {
     components: {
         AdminPageHeader,
+        DownloadOutlined,
     },
     setup() {
         const { t } = useI18n();
@@ -149,6 +162,8 @@ export default {
             pageSize: 10,
             total: 0,
         });
+        
+        const downloadLoadingIds = ref([]);
 
         const columns = ref([
              {
@@ -231,18 +246,19 @@ export default {
             }
         };
 
-        const downloadPayslip = async (record) => {
+       const downloadPayslip = async (record) => {
             const token = localStorage.getItem('auth_token');
-        try {
-            const response = await axios.get(`/api/v1/payroll_new/${record.xid}/download`, {
-                 headers: {
-                        Authorization: `Bearer ${token}`,
+            downloadLoadingIds.value.push(record.xid);
+            try {
+                const response = await axios.get(`/api/v1/payroll_new/${record.xid}/download`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
                 },
                 responseType: 'blob',
-            });
+                });
 
-            const blob = new Blob([response.data], { type: 'application/pdf' });
-            const url = window.URL.createObjectURL(blob);
+                const blob = new Blob([response.data], { type: 'application/pdf' });
+                const url = window.URL.createObjectURL(blob);
 
                 const link = document.createElement('a');
                 link.href = url;
@@ -254,9 +270,12 @@ export default {
                 document.body.removeChild(link);
             } catch (error) {
                 console.error("Error downloading payslip:", error);
+            } finally {
+                downloadLoadingIds.value = downloadLoadingIds.value.filter(
+                (x) => x !== record.xid
+                );
             }
         };
-
 
         const handleTableChange = (pag) => {
             pagination.value = pag;
@@ -275,6 +294,7 @@ export default {
             formatCurrency,
             getMonthName,
             downloadPayslip,
+            downloadLoadingIds,
             handleTableChange,
             fetchPayrollData,
         };

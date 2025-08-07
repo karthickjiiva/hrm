@@ -99,6 +99,18 @@ export default [
                     permission: "users_view",
                 },
             },
+             {
+                path: "/admin/loan_master",
+                component: () =>
+                    import("../views/staff-members/loan_master/index.vue"),
+                name: "admin.loan_master.index",
+                meta: {
+                    requireAuth: true,
+                    menuParent: "myloans",
+                    menuKey: "loan_master",
+                    permission: "users_view",
+                },
+            },
         ],
     },
 ];

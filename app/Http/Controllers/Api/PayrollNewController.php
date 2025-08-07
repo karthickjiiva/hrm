@@ -13,6 +13,7 @@ use Vinkla\Hashids\Facades\Hashids;
 use App\Models\StaffMember;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Models\Company;
 use Carbon\CarbonTimeZone;
 use App\Models\Holiday;
 use App\Models\Leave;
@@ -73,12 +74,24 @@ public function index()
             abort(404, 'Payroll record not found');
         }
 
-        $payroll = PayrollNew::with([
-            'employee.designation',
-            'employee.department',
-        ])->findOrFail($id);       
+        $payroll = PayrollNew::with(['employee.designation','employee.department',])->findOrFail($id);     
 
-        $pdf = Pdf::loadView('pdf.payslip', compact('payroll'));
+        $company = Company::first();
+        $logoUrl = $company->dark_logo_url;
+        $defaultLogoPath = public_path('images/dark.png');
+        $logoPath = $logoUrl === asset('images/dark.png')
+            ? $defaultLogoPath
+            : str_replace(asset('storage'), storage_path('app/public'), $logoUrl);        
+        $logoBase64 = '';
+        if (file_exists($logoPath)) {
+            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+            $data = file_get_contents($logoPath);
+            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        } else {
+            dd("File not found at: " . $logoPath); 
+        }
+        
+        $pdf = Pdf::loadView('pdf.payslip', compact('payroll', 'company', 'logoBase64'));
         return $pdf->download("payslip-{$payroll->employee->name}.pdf");
     }
 
