@@ -258,9 +258,9 @@
         <div class="salary-details-title">SALARY DETAILS</div>
         <table class="salary-details-table">
             <tr>
-                <td><span class="label">Actual Payable Days</span> {{ number_format($payroll->actual_payable_days, 1) }}</td>
-                <td><span class="label">Total Working Days</span> {{ number_format($payroll->total_working_days, 1) }}</td>
-                <td><span class="label">Loss Of Pay Days</span> {{ number_format($payroll->loss_of_pay_days, 1) }}</td>
+                <td><span class="label">Total Working Days</span> {{$payroll->total_working_days }} Days</td>
+                <td><span class="label">Actual Payable Days</span> {{ $payroll->actual_payable_days, 1 }} Days</td>                
+                <td><span class="label">Loss Of Pay Days</span> {{ $payroll->loss_of_pay_days, 1 }} Days</td>
                 <td><span class="label">Days Payable</span> {{ $payroll->days_payable }}</td>
             </tr>
         </table>

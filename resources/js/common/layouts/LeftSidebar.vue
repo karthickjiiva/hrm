@@ -454,11 +454,11 @@
                                 () => {
                                     menuSelected();
                                     $router.push({
-                                        name: 'admin.all-holidays.index',
+                                        name: 'admin.advance_master.index',
                                     });
                                 }
                             "
-                            key="advance"
+                            key="advance_master"
                         >
                             <span>Advance</span>
                         </a-menu-item>

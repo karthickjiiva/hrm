@@ -19,9 +19,11 @@
     </AdminPageHeader>
 
     <a-card class="page-content-container">
+    <div class="payroll-form-wrapper">
+    <div class="payroll-form-box">
         <a-form layout="vertical">
             <a-row justify="center">
-                <a-col :xs="18" :sm="12" :md="8">
+                <a-col :xs="18" :sm="12" :md="12">
                     <a-form-item label="Select Year" name="year">
                         <a-select v-model:value="formData.year" placeholder="Select Year" :options="yearOptions"
                             allow-clear />
@@ -37,7 +39,7 @@
                         type="primary"
                         :loading="loading"
                         @click="handleExportToExcel"
-                        style="width: 60%"
+                        style="width: 100%"
                         >
                         <template #icon>
                             <template v-if="!loading">
@@ -50,6 +52,8 @@
                 </a-col>
             </a-row>
         </a-form>
+    </div>
+    </div>
     </a-card>
 
 </template>
@@ -153,3 +157,20 @@ export default {
     },
 };
 </script>
+<style scoped>
+.payroll-form-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 40px 16px;
+}
+
+.payroll-form-box {
+  border: 1px solid #dcdcdc;
+  border-radius: 12px;
+  padding: 32px;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  margin: 0 auto;  
+}
+</style>

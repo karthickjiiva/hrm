@@ -27,37 +27,48 @@ const fields = () => {
             key: "employee_name",
         },
         {
-            title: "Amount",
+            title: "Loan Amount",
             dataIndex: "amount",
             key: "amount",
-        },
+            customRender: ({ text }) =>
+                `₹ ${Number(text).toLocaleString("en-IN", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+            })}`,
+        },       
         {
-            title: "Tenure (months)",
+            title: "Tenure",
             dataIndex: "tenure",
             key: "tenure",
+            customRender: ({ text }) => `${text} months`            
         },
         {
             title: "Monthly Amount",
             dataIndex: "monthly_amount",
             key: "monthly_amount",
+            customRender: ({ text }) =>
+                `₹ ${Number(text).toLocaleString("en-IN", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+            })}`,
         },
         {
             title: "Start From",
             dataIndex: "start_month",
             key: "start_month",
              customRender: ({ text }) => {
-    const date = new Date(text);
-    return date.toLocaleString('default', { month: 'short', year: 'numeric' });
-  }
+                const date = new Date(text);
+                return date.toLocaleString('default', { month: 'short', year: 'numeric' });
+            }
         },
         {
             title: "End On",
             dataIndex: "end_month",
             key: "end_month",
              customRender: ({ text }) => {
-    const date = new Date(text);
-    return date.toLocaleString('default', { month: 'short', year: 'numeric' });
-  }
+                const date = new Date(text);
+                return date.toLocaleString('default', { month: 'short', year: 'numeric' });
+            }
         },
         {
             title: t("common.action"),

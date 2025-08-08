@@ -350,11 +350,18 @@ protected function calculateWorkingDays($month, $year)
     
    
     // Create payroll record
-    $payroll = PayrollNew::create($payrollData);
+    //$payroll = PayrollNew::create($payrollData);
     //  print_r($employee);exit;
+    $payroll = PayrollNew::updateOrCreate(
+    [
+        'employee_id' => $employee->id,
+        'month' => $month,
+        'year' => $year,
+    ],
+    $payrollData
+);
 
-    $this->updateLeaveCredits($employee->id, $payableDays);
-
+$this->updateLeaveCredits($employee->id, $payableDays);
     return $payroll;
 }
 
@@ -388,7 +395,7 @@ public function updateLeaveCredits($employeeId, $workingDays, $createdBy = null)
     $leaveRecord = \App\Models\EmployeeLeaveMaster::firstOrNew([
         'employee_id' => $employeeId
     ]);
-    $workingDays = 25;
+    //$workingDays = 25;
     if (!$leaveRecord->exists) {
         $leaveRecord->cl = 0;
         $leaveRecord->sl = 0;
