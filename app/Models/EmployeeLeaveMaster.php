@@ -41,9 +41,9 @@ class EmployeeLeaveMaster extends BaseModel
         // 'employee_id' => Hash::class . ':hash',
         'created_by'  => Hash::class . ':hash',
         'updated_by'  => Hash::class . ':hash',
-        'sl' => 'integer',
-        'cl' => 'integer',
-        'el' => 'integer',
+        'sl' => 'float',
+        'cl' => 'float',
+        'el' => 'float',
     ];
 
     protected static function boot()

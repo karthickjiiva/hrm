@@ -712,21 +712,7 @@
                             key="basic_salaries"
                         >
                             <span>Payroll Generate</span>
-                        </a-menu-item>
-                         <a-menu-item
-                            v-if="permsArray.includes('admin')"
-                            @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.basic_salaries.payroll_reportexcel',
-                                    });
-                                }
-                            "
-                            key="payroll_reportexcel"
-                        >
-                            <span>Payroll Report</span>
-                        </a-menu-item>
+                        </a-menu-item>                    
                         <a-menu-item
                             v-if="permsArray.includes('admin')"
                             @click="
@@ -741,7 +727,65 @@
                         >
                             <span>Payslip</span>
                         </a-menu-item>
+
                     </a-sub-menu>
+                        <a-sub-menu
+                        key="allreports"
+                        v-if="
+                            permsArray.includes('salary_settings') ||
+                            permsArray.includes('admin')
+                        "
+                    >
+                        <template #title>
+                            <span>
+                                <ScheduleOutlined />
+                                <span>All Reports</span>
+                            </span>
+                        </template>                
+                         <a-menu-item
+                            v-if="permsArray.includes('admin')"
+                            @click="
+                                () => {
+                                    menuSelected();
+                                    $router.push({
+                                        name: 'admin.basic_salaries.payroll_reportexcel',
+                                    });
+                                }
+                            "
+                            key="payroll_reportexcel"
+                        >
+                            <span>Payroll Report</span>
+                        </a-menu-item>     
+                           <a-menu-item
+                            v-if="permsArray.includes('admin')"
+                            @click="
+                                () => {
+                                    menuSelected();
+                                    $router.push({
+                                        name: 'admin.bank_reports.bank_reportexcel',
+                                    });
+                                }
+                            "
+                            key="bank_reportexcel"
+                        >
+                            <span>Bank Report</span>
+                        </a-menu-item>         
+                           <a-menu-item
+                            v-if="permsArray.includes('admin')"
+                            @click="
+                                () => {
+                                    menuSelected();
+                                    $router.push({
+                                        name: 'admin.leave.leave_salaryreport',
+                                    });
+                                }
+                            "
+                            key="leave_salaryreport"
+                        >
+                            <span>Leave Salary Report</span>
+                        </a-menu-item>             
+                    </a-sub-menu>
+
                     <a-menu-item
                         v-if="
                             permsArray.includes('company_policies_view') ||

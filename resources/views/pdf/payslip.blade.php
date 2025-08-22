@@ -258,10 +258,25 @@
         <div class="salary-details-title">SALARY DETAILS</div>
         <table class="salary-details-table">
             <tr>
-                <td><span class="label">Total Working Days</span> {{$payroll->total_working_days }} Days</td>
-                <td><span class="label">Actual Payable Days</span> {{ $payroll->actual_payable_days, 1 }} Days</td>                
-                <td><span class="label">Loss Of Pay Days</span> {{ $payroll->loss_of_pay_days, 1 }} Days</td>
-                <td><span class="label">Days Payable</span> {{ $payroll->days_payable }}</td>
+                <td>
+                    <span class="label">Total Working Days</span>
+                    {{ $payroll->total_working_days }} {{ $payroll->total_working_days == 1 ? 'Day' : 'Days' }}
+                </td>
+
+                <td>
+                    <span class="label">Actual Payable Days</span>
+                    {{ $payroll->actual_payable_days }} {{ $payroll->actual_payable_days == 1 ? 'Day' : 'Days' }}
+                </td>
+
+                <td>
+                    <span class="label">Loss Of Pay Days</span>
+                    {{ $payroll->loss_of_pay_days }} {{ $payroll->loss_of_pay_days == 1 ? 'Day' : 'Days' }}
+                </td>
+
+                <td>
+                    <span class="label">Days Payable</span>
+                    {{ $payroll->days_payable }} {{ $payroll->days_payable == 1 ? 'Day' : 'Days' }}
+                </td>
             </tr>
         </table>
 
@@ -357,17 +372,17 @@
                         <tbody>
                             <tr>
                                 <td>LOAN</td>
-                                <td class="amount">{{ number_format($payroll->professional_tax, 2) }}</td>
+                                <td class="amount">{{ number_format($payroll->loan_deduct, 2) }}</td>
                             </tr>
                               <tr>
                                 <td>ADVANCE</td>
-                                <td class="amount">{{ number_format($payroll->professional_tax, 2) }}</td>
+                                <td class="amount">{{ number_format($payroll->advance_deduct, 2) }}</td>
                             </tr>
                         </tbody>
                         <tfoot>
                              <tr class="total-row">
                                 <td>Total LOAN & ADVANCE (D)</td>
-                                <td class="amount">{{ number_format($payroll->total_taxes_deductions, 2) }}</td>
+                                <td class="amount">{{ number_format($payroll->loan_deduct + $payroll->advance_deduct, 2) }}</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -378,13 +393,35 @@
         <hr class="section-break">
 
         <table class="net-salary-table">
+        @php
+            function convertToIndianCurrencyWords($amount) {
+            $formatter = new \NumberFormatter('en', \NumberFormatter::SPELLOUT);
+            $rupees = floor($amount);
+            $paise = round(($amount - $rupees) * 100);
+            
+            $rupeesWords = $rupees > 0 ? $formatter->format($rupees) . ' rupees' : '';
+            $paiseWords = $paise > 0 ? $formatter->format($paise) . ' paise' : '';
+            
+            if ($rupees && $paise) {
+                $full = ucfirst($rupeesWords . ' and ' . $paiseWords);
+            } elseif ($rupees) {
+                $full = ucfirst($rupeesWords);
+            } elseif ($paise) {
+                $full = ucfirst($paiseWords);
+            } else {
+                $full = 'Zero rupees';
+            }
+            
+            return $full . '';
+            }
+        @endphp
             <tr>
-                <td class="label">Net Salary Payable (A - B - C)</td>
+                <td class="label">Net Salary Payable (A - B - C - D)</td>
                 <td class="total-amount">{{ number_format($payroll->net_salary, 2) }}</td>
             </tr>
             <tr>
                 <td class="label">Net Salary in words</td>
-                <td class="total-amount">{{ $payroll->net_salary_in_words }}</td>
+                <td class="total-amount">{{ convertToIndianCurrencyWords($payroll->net_salary) }}</td>
             </tr>
         </table>
         

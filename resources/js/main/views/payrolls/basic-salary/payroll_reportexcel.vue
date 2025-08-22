@@ -105,37 +105,28 @@ export default {
 
         const handleExportToExcel = async () => {
             if (!formData.value.year || !formData.value.month) {
-                message.error("Please select both year and month");
+                message.error("Please select year and month");
                 return;
             }
-
             loading.value = true;
-
             try {
                 const token = localStorage.getItem('auth_token');
                 const params = {
                     month: formData.value.month,
                     year: formData.value.year,
                 };
-
                 const response = await axios.get("/api/v1/payroll/export", {
                     params,
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                    responseType: "blob",
+                    headers: { Authorization: `Bearer ${token}` },
                 });
-
-                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const downloadUrl = response.data.download_url;
+                const filename = response.data.filename;
                 const link = document.createElement("a");
-                link.href = url;
-
-                const monthName = monthOptions.value.find(m => m.value === formData.value.month)?.label || formData.value.month;
-                link.setAttribute("download", `Payroll_${monthName}_${formData.value.year}.xlsx`);
+                link.href = downloadUrl;
+                link.setAttribute("download", filename);
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-
                 message.success("Payroll Report downloaded successfully.");
             } catch (error) {
                 console.error("Error downloading payroll report:", error);

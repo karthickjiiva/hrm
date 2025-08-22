@@ -20,10 +20,12 @@ ApiRoute::group(['namespace' => 'App\Http\Controllers\Api'], function () {
     ApiRoute::post('payroll-generate',  ['as' => 'api.payroll-generate', 'uses' => 'MyPayrollController@generatePayroll']);
     ApiRoute::get('payroll_new/{xid}/download', 'PayrollNewController@downloadPayslip');
     ApiRoute::get('payroll/export', 'PayrollNewController@export');
+    ApiRoute::get('bank_statements/export', 'BankstatementsController@export');
     ApiRoute::get('loan_repayments/{xid}', 'EmployeeLoanController@getRepayments');
     ApiRoute::post('loan_repayments/{id}/skip', 'EmployeeLoanController@skipMonth');
     ApiRoute::post('loan_repayments/{loan}/close', 'EmployeeLoanController@closeLoan'); 
 
+    ApiRoute::get('salary_leave/export', 'SalaryLeaveController@export');
 
     // Check visibility of module according to subscription plan
     ApiRoute::post('check-subscription-module-visibility', ['as' => 'api.extra.check-subscription-module-visibility', 'uses' => 'AuthController@checkSubscriptionModuleVisibility']);
@@ -99,6 +101,8 @@ ApiRoute::group(['namespace' => 'App\Http\Controllers\Api'], function () {
         ApiRoute::resource('departments', 'DepartmentController', $options);
 
         ApiRoute::resource('payroll_new', 'PayrollNewController', $options);
+        ApiRoute::resource('bank_statements', 'BankstatementsController', $options);
+        ApiRoute::resource('salary_leave', 'SalaryLeaveController', $options);
         ApiRoute::resource('employee_loans', 'EmployeeLoanController', $options);
         ApiRoute::apiResource('emp_advance', 'EmpAdvanceController', $options);
         ApiRoute::resource('designations', 'DesignationController', $options);

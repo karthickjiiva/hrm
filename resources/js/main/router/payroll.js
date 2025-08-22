@@ -62,18 +62,18 @@ export default [
                     permission: "salary_settings",
                 },
             },
-              {
+            {
                 path: "payroll_reportexcel",
                 component: () =>
                     import("../views/payrolls/basic-salary/payroll_reportexcel.vue"),
                 name: "admin.basic_salaries.payroll_reportexcel",
                 meta: {
                     requireAuth: true,
-                    menuParent: "payrolls",
+                    menuParent: "allreports",
                     menuKey: (route) => "payroll_reportexcel",
                     permission: "salary_settings",
                 },
-            },
+            },           
             {
                 path: "payroll_report",
                 component: () =>
@@ -83,6 +83,30 @@ export default [
                     requireAuth: true,
                     menuParent: "payrolls",
                     menuKey: (route) => "payroll_report",
+                    permission: "salary_settings",
+                },
+            },
+            {
+                path: "bank_reportexcel",
+                component: () =>
+                    import("../views/banks/bank-reports/bank_reportexcel.vue"),
+                name: "admin.bank_reports.bank_reportexcel",
+                meta: {
+                    requireAuth: true,
+                    menuParent: "allreports",
+                    menuKey: (route) => "bank_reportexcel",
+                    permission: "salary_settings",
+                },
+            },
+             {
+                path: "leave_salaryreport",
+                component: () =>
+                    import("../views/employee/leaves/leave_salaryreport.vue"),
+                name: "admin.leave.leave_salaryreport",
+                meta: {
+                    requireAuth: true,
+                    menuParent: "allreports",
+                    menuKey: (route) => "leave_salaryreport",
                     permission: "salary_settings",
                 },
             },

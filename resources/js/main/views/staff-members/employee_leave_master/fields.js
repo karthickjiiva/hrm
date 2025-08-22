@@ -23,16 +23,16 @@ const fields = () => {
             title: 'Employee',
             dataIndex: ['employee', 'name'], // Assumes relation exists and returns employee.name
             key: 'employee_name',
+        },       
+        {
+            title: 'Casual Leave (CL)',
+            dataIndex: 'cl',
+            key: 'cl',
         },
         {
             title: 'Sick Leave (SL)',
             dataIndex: 'sl',
             key: 'sl',
-        },
-        {
-            title: 'Casual Leave (CL)',
-            dataIndex: 'cl',
-            key: 'cl',
         },
         {
             title: 'Earned Leave (EL)',

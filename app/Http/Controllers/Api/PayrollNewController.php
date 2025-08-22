@@ -95,7 +95,35 @@ public function index()
         return $pdf->download("payslip-{$payroll->employee->name}.pdf");
     }
 
-    public function export(Request $request)
+      public function export(Request $request)
+    {
+        $month = $request->get('month');
+        $year = $request->get('year');
+        
+        if (!$month || !$year) {
+            return response()->json(['message' => 'Month and Year are required.'], 422);
+        }
+        
+        try {
+            $filename = "Payroll_{$month}_{$year}.xlsx";
+            $export = new PayrollExport($month, $year);
+            $filePath = 'exports/' . $filename;
+            // Store in storage/app/public/exports
+            Excel::store($export, $filePath, 'public');
+            return response()->json([
+                'success' => true,
+                'download_url' => asset('storage/' . $filePath),
+                'filename' => $filename
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Export failed: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function exportoldd(Request $request)
     {
         $month = $request->get('month');
         $year = $request->get('year');
