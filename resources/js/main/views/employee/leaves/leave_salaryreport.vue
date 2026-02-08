@@ -1,7 +1,7 @@
 <template>
   <AdminPageHeader>
     <template #header>
-      <a-page-header title="Bank Report" class="p-0" />
+      <a-page-header title="Leave Salary Report" class="p-0" />
     </template>
     <template #breadcrumb>
       <a-breadcrumb separator="-" style="font-size: 12px">
@@ -10,8 +10,8 @@
             {{ $t("menu.dashboard") }}
           </router-link>
         </a-breadcrumb-item>
-        <a-breadcrumb-item>{{ $t("menu.payrolls") }}</a-breadcrumb-item>
-        <a-breadcrumb-item>{{ $t("menu.bank_report") }}</a-breadcrumb-item>
+        <a-breadcrumb-item>reports</a-breadcrumb-item>
+        <a-breadcrumb-item>Leave Salary Report</a-breadcrumb-item>
       </a-breadcrumb>
     </template>
   </AdminPageHeader>

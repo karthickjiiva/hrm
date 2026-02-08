@@ -35,7 +35,12 @@ class MyPayrollController extends ApiBaseController
         $month = $request->month;
         $year = $request->year;
 
-        $employees = StaffMember::where('status', 'active')->get();
+        //$employees = StaffMember::where('status', 'active')->get();
+        $employees = StaffMember::where('status', 'active')
+        ->where('has_resigned', 1) 
+        ->where('name', '!=', 'Admin')
+        ->get();
+
         $generated = [];
         $errors = [];
 
@@ -81,7 +86,8 @@ class MyPayrollController extends ApiBaseController
         $totalLeavesTaken = round(array_sum($leaveInfo['all_leave_dates']), 2);
         $daysPresent = $totalDaysInMonth - $totalLeavesTaken;
 
-        $earned = $this->calculateMonthlyEarnedLeaves($daysPresent);
+        $earned = $this->calculateMonthlyEarnedLeaves($employee, $daysPresent, $month, $year);
+        //$earned = $this->calculateMonthlyEarnedLeaves($daysPresent);
         $leaveMaster = $this->updateEarnedLeaves($employee->id, $earned);
 
         $leaveDeduction = $this->applyLeaveDeductions($employee->id, $totalLeavesTaken, $leaveMaster);
@@ -291,7 +297,49 @@ protected function getDetailedLeaveInfo($employeeId, $month, $year)
     ];
 }
 
-    protected function calculateMonthlyEarnedLeaves($presentDays)
+    protected function calculateMonthlyEarnedLeaves($employee, $presentDays, $month, $year)
+    {
+        $joiningDate = Carbon::parse($employee->joining_date);
+        $payrollDate = Carbon::create($year, $month, 1)->endOfMonth();
+        $gapInYears = $joiningDate->diffInYears($payrollDate);
+
+        $earned = ['cl' => 0, 'sl' => 0, 'el' => 0];
+
+        if ($gapInYears >= 1) {
+            if ($presentDays >= 7 && $presentDays <= 12) {
+                $earned['cl'] = 1;
+            } elseif ($presentDays >= 12.5 && $presentDays <= 17) {
+                $earned['cl'] = 1;
+                $earned['sl'] = 0.5;
+            } elseif ($presentDays >= 17.5 && $presentDays <= 22) {
+                $earned['cl'] = 1;
+                $earned['sl'] = 1;
+            } elseif ($presentDays >= 22.5 && $presentDays <= 27) {
+                $earned['cl'] = 1;
+                $earned['sl'] = 1;
+                $earned['el'] = 0.5;
+            } elseif ($presentDays > 27) {
+                $earned['cl'] = 1;
+                $earned['sl'] = 1;
+                $earned['el'] = 1;
+            }
+        } else {
+            if ($presentDays >= 7 && $presentDays <= 12) {
+                $earned['cl'] = 0.5;
+            } elseif ($presentDays >= 12.5 && $presentDays <= 17) {
+                $earned['cl'] = 1;
+            } elseif ($presentDays >= 17.5 && $presentDays <= 22) {
+                $earned['cl'] = 1;
+                $earned['sl'] = 0.5;
+            } elseif ($presentDays > 22) {
+                $earned['cl'] = 1;
+                $earned['sl'] = 1;
+            }
+        }
+        return $earned; 
+    }
+
+    protected function calculateMonthlyEarnedLeaves_old($presentDays)
     {
         if ($presentDays > 26) {
             return ['cl' => 1, 'sl' => 1, 'el' => 1];

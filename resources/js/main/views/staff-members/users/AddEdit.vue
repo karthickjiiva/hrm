@@ -107,7 +107,6 @@
                                         :validateStatus="
                                             rules.email ? 'error' : null
                                         "
-                                        class="required"
                                     >
                                         <a-input
                                             v-model:value="formData.email"
@@ -1230,16 +1229,24 @@ export default defineComponent({
                 appSetting.value.employee_id_start;
         });
 
-        const onSubmit = () => {
-            var newFormData = {
-                ...props.formData,
-                joining_date: joiningDate.value,
-                is_manager: isManager.value,
-                role_id: staffRole.value,
-                visibility: selectedVisibility.value,
-                employee_number: employeeId.value,
-                ...newData.value,
-            };
+            const sanitizeDate = (date) => {
+  if (!date || date === '0000-00-00' || date.startsWith('-001')) return null;
+  return date; // valid date, send as-is
+};
+
+const onSubmit = () => {
+  // Merge form data and sanitize specific dates
+  const newFormData = {
+    ...props.formData,
+    joining_date: sanitizeDate(joiningDate.value),
+    resignation_date: sanitizeDate(props.formData.resignation_date),
+    rejoining_date: sanitizeDate(props.formData.rejoining_date),
+    is_manager: isManager.value,
+    role_id: staffRole.value,
+    visibility: selectedVisibility.value,
+    employee_number: employeeId.value,
+    ...newData.value,
+  };
             addEditRequestAdmin({
                 id: "add_edit_user_form",
                 url: props.url,

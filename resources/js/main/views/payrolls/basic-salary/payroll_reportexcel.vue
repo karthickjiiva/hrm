@@ -11,7 +11,7 @@
                     </router-link>
                 </a-breadcrumb-item>
                 <a-breadcrumb-item>
-                    {{ $t(`menu.payrolls`) }}
+                    reports
                 </a-breadcrumb-item>
                 <a-breadcrumb-item> Payroll Report </a-breadcrumb-item>
             </a-breadcrumb>

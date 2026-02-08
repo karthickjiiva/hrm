@@ -148,7 +148,6 @@ export default {
             }
         };
 
-        // Handle form submission
         const handleSubmit = async () => {
             if (!formData.value.year || !formData.value.month) {
                 message.error("Please select both year and month");
@@ -158,9 +157,7 @@ export default {
             loading.value = true;
 
             try {
-                // Check if payroll already exists
                 const exists = await checkPayrollExists();
-
                 if (exists) {
                     Modal.confirm({
                         title: "Payroll Already Exists",
@@ -168,17 +165,21 @@ export default {
                             "Payroll for the selected period already exists. Do you want to regenerate it?",
                         okText: "Regenerate",
                         cancelText: "Cancel",
-                        onOk: () => generatePayroll(),
+                      onOk: () => {
+                            return generatePayroll(); 
+                        },
+                        onCancel: () => { loading.value = false; } 
                     });
                 } else {
-                    generatePayroll();
+                    await generatePayroll();
                 }
-            } finally {
+            } catch (error) {
+                console.error(error);
                 loading.value = false;
             }
         };
 
-        // Generate payroll function
+
         const generatePayroll = async () => {
             loading.value = true;
 

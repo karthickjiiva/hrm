@@ -73,7 +73,7 @@ export default [
                     menuKey: (route) => "payroll_reportexcel",
                     permission: "salary_settings",
                 },
-            },           
+            },
             {
                 path: "payroll_report",
                 component: () =>
@@ -98,7 +98,19 @@ export default [
                     permission: "salary_settings",
                 },
             },
-             {
+            {
+                path: "pf_reports",
+                component: () =>
+                    import("../views/banks/bank-reports/pf_reports.vue"),
+                name: "admin.bank_reports.pf_reports",
+                meta: {
+                    requireAuth: true,
+                    menuParent: "allreports",
+                    menuKey: (route) => "pf_reports",
+                    permission: "salary_settings",
+                },
+            },
+            {
                 path: "leave_salaryreport",
                 component: () =>
                     import("../views/employee/leaves/leave_salaryreport.vue"),
@@ -107,6 +119,76 @@ export default [
                     requireAuth: true,
                     menuParent: "allreports",
                     menuKey: (route) => "leave_salaryreport",
+                    permission: "salary_settings",
+                },
+            },
+            {
+                path: "leave_salarystatement",
+                component: () =>
+                    import("../views/employee/leaves/LeaveSalaryStatement.vue"),
+                name: "admin.leave.leave_salarystatement",
+                meta: {
+                    requireAuth: true,
+                    menuParent: "allreports",
+                    menuKey: (route) => "leave_salarystatement",
+                    permission: "salary_settings",
+                },
+            },
+            {
+                path: "leave_salarybankstatement",
+                component: () =>
+                    import("../views/employee/leaves/LeaveSalaryBankStatement.vue"),
+                name: "admin.leave.leave_salarybankstatement",
+                meta: {
+                    requireAuth: true,
+                    menuParent: "allreports",
+                    menuKey: (route) => "leave_salarybankstatement",
+                    permission: "salary_settings",
+                },
+            },
+            {
+                path: "professsional_tax",
+                component: () =>
+                    import("../views/Extras/professsional_tax.vue"),
+                name: "admin.reports.professsional_tax",
+                meta: {
+                    requireAuth: true,
+                    menuParent: "allreports",
+                    menuKey: (route) => "professsional_tax",
+                    permission: "salary_settings",
+                },
+            },
+            {
+                path: "arrears",
+                component: () => import("../views/Extras/arrear_generate.vue"),
+                name: "admin.arrears.arrear_generate",
+                meta: {
+                    requireAuth: true,
+                    menuParent: "arrearmenu",
+                    menuKey: (route) => "arrears",
+                    permission: "salary_settings",
+                },
+            },
+            {
+                path: "arrear_slip",
+                component: () => import("../views/Extras/arrear_slip.vue"),
+                name: "admin.arrears.arrear_slip",
+                meta: {
+                    requireAuth: true,
+                    menuParent: "arrearmenu",
+                    menuKey: (route) => "arrear_slip",
+                    permission: "salary_settings",
+                },
+            },
+            {
+                path: "arrears_pfreports",
+                component: () =>
+                    import("../views/Extras/arrears_pfreports.vue"),
+                name: "admin.arrears.arrears_pfreports",
+                meta: {
+                    requireAuth: true,
+                    menuParent: "arrearmenu",
+                    menuKey: (route) => "arrears_pfreports",
                     permission: "salary_settings",
                 },
             },

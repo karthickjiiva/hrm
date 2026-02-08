@@ -17,7 +17,7 @@ class PayrollExport implements FromCollection, WithHeadings, WithStyles, WithCol
     {
         return [
             'B' => 25, 
-            'C' => 30, 
+            'D' => 30, 
         ];
     }
 
@@ -29,15 +29,20 @@ class PayrollExport implements FromCollection, WithHeadings, WithStyles, WithCol
 
     public function collection()
     {
-        $payrolls = PayrollNew::with(['employee.designation']) 
+          $payrolls = PayrollNew::with(['employee.designation'])
         ->where('month', $this->month)
         ->where('year', $this->year)
+        ->whereHas('employee', function ($query) {
+            $query->where('has_resigned', 1)
+                  ->where('name', '!=', 'Admin');
+        })
         ->get();
         
         return $payrolls->map(function ($payroll, $index) {
             return [
                 'SL' => $index + 1,
                 'NAME' => $payroll->employee->name ?? '-',
+                'EMP NO' => $payroll->employee->employee_number ?? '-', 
                 'DESIGNATION' => $payroll->employee->designation->name ?? '-',
                 'NEW GROSS' => $payroll->total_earnings,
                 'BASIC 60%' => $payroll->basic,
@@ -45,7 +50,7 @@ class PayrollExport implements FromCollection, WithHeadings, WithStyles, WithCol
                 'HRA 30%' => $payroll->hra,
                 'FOOD ALLOW 6%' => $payroll->food_allowance,
                 'CONVEY 4%' => $payroll->allowance,
-                'GROSS PAY' => $payroll->total_earnings,
+                'GROSS PAY' => round($payroll->total_earnings),
                 'PF' => $payroll->pf_employee,
                 'ESI' => $payroll->esi_employee,
                 'NO OF DAYS FOR THE MONTH' => $payroll->total_working_days,
@@ -53,10 +58,10 @@ class PayrollExport implements FromCollection, WithHeadings, WithStyles, WithCol
                 'ACTUAL DAYS OF SALARY' => $payroll->actual_payable_days,
                 'TDS' => $payroll->tds,
                 'PRO TAX' => $payroll->professional_tax,
-                'NET SALARY' => $payroll->net_salary,
+                'NET SALARY' => round($payroll->net_salary), 
                 'GROSS SALARY CHECK' => $payroll->total_earnings,
                 'OTHERS' => '',
-                'NET SALARY (2)' => $payroll->net_salary,
+                'NET SALARY (2)' => round($payroll->net_salary), 
                 'REMARKS' => '',
             ];
         });
@@ -65,7 +70,7 @@ class PayrollExport implements FromCollection, WithHeadings, WithStyles, WithCol
     public function headings(): array
     {
         return [
-            'SL', 'NAME', 'DESIGNATION', 'NEW GROSS', 'BASIC 60%', 'LIMIT',
+            'SL', 'NAME','EMP NO', 'DESIGNATION', 'NEW GROSS', 'BASIC 60%', 'LIMIT',
             'HRA 30%', 'FOOD ALLOW 6%', 'CONVEY 4%', 'GROSS PAY', 'PF', 'ESI',
             'NO OF DAYS FOR THE MONTH', 'DAYS OF LOP', 'ACTUAL DAYS OF SALARY',
             'TDS', 'PRO TAX', 'NET SALARY', 'GROSS SALARY CHECK',
@@ -77,7 +82,7 @@ class PayrollExport implements FromCollection, WithHeadings, WithStyles, WithCol
 { 
     $sheet->getRowDimension(1)->setRowHeight(40);
  
-    $sheet->getStyle('A1:W1')->applyFromArray([
+    $sheet->getStyle('A1:X1')->applyFromArray([
         'font' => [
             'bold' => true,
             'size' => 12,

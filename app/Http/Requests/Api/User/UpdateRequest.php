@@ -35,7 +35,7 @@ class UpdateRequest extends FormRequest
         $rules = [
             'name' => 'required',
             'email'    => [
-                'required',
+                'nullable',
                 'email',
                 Rule::unique('users', 'email')->where(function ($query) {
                     return $query->where('user_type', 'staff_members')

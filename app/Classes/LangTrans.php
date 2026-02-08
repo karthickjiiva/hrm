@@ -163,6 +163,7 @@ class LangTrans
         ],
         'menu' => [
             'dashboard' => 'Dashboard',
+            'reports' => 'Reports',
             'users' => 'Users',
             'staff_members' => 'Employees',
             'settings' => 'Settings',

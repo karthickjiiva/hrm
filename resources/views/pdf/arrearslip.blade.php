@@ -182,7 +182,7 @@
         
         <!-- Company Address below the name/logo line -->
         <p class="company-address">
-            No. 61, 2nd floor, 2nd street, Kamdar Nagar, Nungambakkam, Chennai- 600034.  
+            No. 61, 2nd floor, 2nd street, Kamdar Nagar, Nungambakkam, Chennai- 600034.            
         </p>
 
         <hr class="section-break">
@@ -264,7 +264,7 @@
 
                 <td>
                     <span class="label">Actual Payable Days</span>
-                    {{ $payroll->actual_payable_days }} {{ $payroll->actual_payable_days == 1 ? 'Day' : 'Days' }}
+                    {{ $payroll->days_payable }} {{ $payroll->days_payable == 1 ? 'Day' : 'Days' }}
                 </td>
 
                 <td>

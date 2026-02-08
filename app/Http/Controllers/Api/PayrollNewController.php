@@ -16,9 +16,12 @@ use Carbon\Carbon;
 use App\Models\Company;
 use Carbon\CarbonTimeZone;
 use App\Models\Holiday;
+use App\Models\User;
 use App\Models\Leave;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\PayrollExport;
+use App\Exports\PfreportExport;
+use App\Exports\ProfTaxExport;
 
 
 class PayrollNewController extends ApiBaseController
@@ -95,7 +98,105 @@ public function index()
         return $pdf->download("payslip-{$payroll->employee->name}.pdf");
     }
 
-      public function export(Request $request)
+    
+    public function proftax_export(Request $request)
+    {
+        $monthRange = $request->get('month'); 
+        $year = $request->get('year');
+
+        if (!$monthRange || !$year) {
+            return response()->json(['message' => 'Month and Year are required.'], 422);
+        }
+
+        try {
+            [$startMonth, $endMonth] = explode('-', $monthRange);
+
+            // Get users (with relations if needed)
+            if ($monthRange === "10-3") {
+                $months1 = range(10, 12);
+                $months2 = range(1, 3);
+
+                // Users don’t change by month, so just fetch all
+                $users = User::with('employeeType')->get();
+            } else {
+                $months = range($startMonth, $endMonth);
+
+                $users = User::with('employeeType')->get();
+            }
+
+            if ($users->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No users found.'
+                ], 404);
+            }
+
+            $filename = "prof_tax_{$monthRange}_{$year}.xlsx";
+
+            // Pass users into export instead of payrolls
+            $export = new ProfTaxExport($users, $monthRange, $year);
+            $filePath = 'exports/' . $filename;
+            Excel::store($export, $filePath, 'public');
+
+            return response()->json([
+                'success' => true,
+                'download_url' => asset('storage/' . $filePath),
+                'filename' => $filename
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Export failed: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+
+    public function pfexport(Request $request)
+    {
+        $month = $request->get('month');
+        $year = $request->get('year');
+
+        if (!$month || !$year) {
+            return response()->json(['message' => 'Month and Year are required.'], 422);
+        }
+
+        try {
+            $payrolls = PayrollNew::with(['employee.employeeType'])
+                ->where('month', $month)
+                ->where('year', $year)
+                ->get();
+
+            if ($payrolls->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No data found for the selected month and year.'
+                ], 404);
+            }
+
+            $filename = "pf_{$month}_{$year}.xlsx";
+            $export = new PfreportExport($month, $year);
+            $filePath = 'exports/' . $filename;
+            Excel::store($export, $filePath, 'public');
+
+            return response()->json([
+                'success' => true,
+                'download_url' => asset('storage/' . $filePath),
+                'filename' => $filename
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Export failed: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+    public function export(Request $request)
     {
         $month = $request->get('month');
         $year = $request->get('year');

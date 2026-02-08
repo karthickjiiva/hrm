@@ -1,4 +1,5 @@
 <template>
+    <a-spin :spinning="loading">
     <a-form>
         <a-row :gutter="16">
             <a-col :xs="24" :sm="24" :md="24" :lg="24">
@@ -543,14 +544,15 @@
             <a-col :xs="24" :sm="24" :md="6" :lg="6">
                 <div>
                     {{ appSetting.currency.symbol }}
-                    {{ deductions * 12 }}
+                    {{ (deductions * 12).toFixed(2) }}
                 </div>
             </a-col>
         </a-row>
     </a-form>
+    </a-spin>
 </template>
 <script>
-import { defineComponent, ref, computed, watch, onMounted } from "vue";
+import { nextTick, defineComponent, ref, computed, watch, onMounted } from "vue";
 import { SaveOutlined } from "@ant-design/icons-vue";
 import common from "../../../../common/composable/common";
 import UserInfo from "../../../../common/components/user/UserInfo.vue";
@@ -579,569 +581,410 @@ export default defineComponent({
         UserInfo,
         SalaryGroupAddButton,
     },
-    setup(props, { emit }) {
-        const { loading, rules } = apiAdmin();
-        const { appSetting } = common();
-        const monthlyCTC = ref(null);
-        const monthlyCTCError = ref(null);
-        const selectUsers = ref("");
-        const componentIds = ref([]);
-        const formData = ref({
-            basic_salary: 0,
-            monthly_amount: 0,
-            annual_amount: 0,
-            annual_ctc: 0,
-            monthly_ctc: 0,
-            calculation_type: "%_of_ctc",
-            ctc_value: 50,
-        });
-        const monthlySalary = ref(0);
-        const annualSalary = ref(0);
-        const earnings = ref(0);
-        const deductions = ref(0);
-        const monthlyCostToCompany = ref(0);
-        const salaryComponents = ref([]);
-        const salaryGroups = ref([]);
-        const employeeTypeGroups = ref([]);
-        const salaryGroupUrl =
-            "employee_types?fields=id,xid,type,basic_percent,hra_percent,allowance_percent,food_allowance_percent,pf_enabled,pf_percentage,pf_limit,esi_enabled,esi_percentage,esi_limit,prof_tax_enabled,prof_tax_percentage,prof_tax_limit,tds_enabled,tds_percentage,tds_limit,status,pf_fix_amount,esi_fix_amount,tds_fix_amount,prof_tax_fix_amount&limit=1000";
+   setup(props, { emit }) {
+    const { loading, rules } = apiAdmin();
+    const { appSetting } = common();
 
-        const employeeTypeGroupUrl =
-            "employee_types?fields=id,xid,type,basic_percent,hra_percent,allowance_percent,food_allowance_percent,pf_enabled,pf_percentage,pf_limit,esi_enabled,esi_percentage,esi_limit,prof_tax_enabled,prof_tax_percentage,prof_tax_limit,tds_enabled,tds_percentage,tds_limit,status,pf_fix_amount,esi_fix_amount,tds_fix_amount,prof_tax_fix_amount&limit=1000";
+    const monthlyCTC = ref(null);
+    const monthlyCTCError = ref(null);
+    const selectUsers = ref("");
+    const componentIds = ref([]);
+    const formData = ref({
+        basic_salary: 0,
+        monthly_amount: 0,
+        annual_amount: 0,
+        annual_ctc: 0,
+        monthly_ctc: 0,
+        calculation_type: "%_of_ctc",
+        ctc_value: 50,
+    });
 
-        const salaryGroupComponentProps = ref([]);
-        const employeeTypeComponentProps = ref([]);
-        onMounted(() => {
-            fetchSalaryGroups();
-            fetchEmployeeTypeGroupUrl();
-        });
+    const monthlySalary = ref(0);
+    const annualSalary = ref(0);
+    const earnings = ref(0);
+    const deductions = ref(0);
+    const monthlyCostToCompany = ref(0);
+    const salaryComponents = ref([]);
+    const salaryGroups = ref([]);
+    const employeeTypeGroups = ref([]);
+    const salaryGroupComponentProps = ref([]);
+    const employeeTypeComponentProps = ref([]);
 
-        const fetchSalaryGroups = () => {
-            const salaryGroupPromise = axiosAdmin.get(salaryGroupUrl);
+    const salaryGroupUrl =
+        "employee_types?fields=id,xid,type,basic_percent,hra_percent,allowance_percent,food_allowance_percent,pf_enabled,pf_percentage,pf_limit,esi_enabled,esi_percentage,esi_limit,prof_tax_enabled,prof_tax_percentage,prof_tax_limit,tds_enabled,tds_percentage,tds_limit,status,pf_fix_amount,esi_fix_amount,tds_fix_amount,prof_tax_fix_amount&limit=1000";
 
-            Promise.all([salaryGroupPromise]).then(([salaryGroupResponse]) => {
-                salaryGroups.value = salaryGroupResponse.data;
-            });
-        };
+    const employeeTypeGroupUrl = salaryGroupUrl;
 
-        const fetchEmployeeTypeGroupUrl = () => {
-            const employeeTypeGroupsPromise =
-                axiosAdmin.get(employeeTypeGroupUrl);
+  onMounted(async () => {
+  loading.value = true;
+  try {
+    await Promise.all([fetchSalaryGroups(), fetchEmployeeTypeGroupUrl()]);
+  } finally {
+    loading.value = false;
+  }
+});
 
-            Promise.all([employeeTypeGroupsPromise]).then(
-                ([employeeTypeGroupResponse]) => {
-                    employeeTypeGroups.value = employeeTypeGroupResponse.data;
-                }
+const fetchSalaryGroups = () => {
+  return axiosAdmin.get(salaryGroupUrl).then((response) => {
+    salaryGroups.value = response.data;
+  });
+};
+
+const fetchEmployeeTypeGroupUrl = () => {
+  return axiosAdmin.get(employeeTypeGroupUrl).then((response) => {
+    employeeTypeGroups.value = response.data;
+  });
+};
+
+    const salaryGroupAdded = () => {
+        fetchSalaryGroups();
+    };
+
+    const fetch_employee_type_components = (employeeTypeId) => {
+        if (!employeeTypeId) {
+            employeeTypeComponentProps.value = [];
+            calculateSalary();
+            return;
+        }
+
+        setTimeout(() => {
+            const allGroups = employeeTypeGroups.value;
+            const selectedGroup = allGroups.find(
+                (group) => group.xid === employeeTypeId
             );
-        };
 
-        const salaryGroupAdded = () => {
-            axiosAdmin.get(salaryGroupUrl).then((response) => {
-                salaryGroups.value = response.data;
-            });
-        };
-        const fetch_employee_type_components = (employeTypeGroupId) => {
-            if (!employeTypeGroupId) {
+            if (selectedGroup) {
+                formData.value.pf_enabled = selectedGroup.pf_enabled;
+                formData.value.pf_percentage = selectedGroup.pf_percentage;
+                formData.value.hra_percent_monthly = selectedGroup.hra_percent;
+                formData.value.allowance_percent = selectedGroup.allowance_percent;
+                formData.value.food_allowance_percent =
+                    selectedGroup.food_allowance_percent;
+                formData.value.esi_enabled = selectedGroup.esi_enabled;
+                formData.value.esi_percentage = selectedGroup.esi_percentage;
+                formData.value.prof_tax_enabled = selectedGroup.prof_tax_enabled;
+                formData.value.prof_tax_percentage =
+                    selectedGroup.prof_tax_percentage;
+                formData.value.tds_enabled = selectedGroup.tds_enabled;
+                formData.value.tds_percentage = selectedGroup.tds_percentage;
+
+                formData.value.pf_fix_amount = selectedGroup.pf_fix_amount;
+                formData.value.esi_fix_amount = selectedGroup.esi_fix_amount;
+                formData.value.tds_fix_amount = selectedGroup.tds_fix_amount;
+                formData.value.prof_tax_fix_amount =
+                    selectedGroup.prof_tax_fix_amount;
+
+                formData.value.ctc_value = selectedGroup.basic_percent;
+
+                employeeTypeComponentProps.value =
+                    selectedGroup.salary_group_components || [];
+            } else {
                 employeeTypeComponentProps.value = [];
-                calculateSalary();
-                return;
-            }
-            // const url = `${employeeTypeGroupUrl}${employeTypeGroupId}`;
-            // axiosAdmin.get(url).then((response) => {
-
-            setTimeout(() => {
-                const allSalaryGroups = employeeTypeGroups.value;
-                console.log("Checking Group:", allSalaryGroups);
-                const selectedGroup = allSalaryGroups.find((group) => {
-                    console.log("Checking Group:", group);
-                    if (group.xid === employeTypeGroupId) {
-                        formData.value.pf_enabled = group.pf_enabled;
-                        formData.value.pf_percentage = group.pf_percentage;
-                        formData.value.hra_percent_monthly = group.hra_percent;
-                        formData.value.allowance_percent =
-                            group.allowance_percent;
-                        formData.value.food_allowance_percent =
-                            group.food_allowance_percent;
-                        formData.value.esi_enabled = group.esi_enabled;
-                        formData.value.esi_percentage = group.esi_percentage;
-                        formData.value.prof_tax_enabled =
-                            group.prof_tax_enabled;
-                        formData.value.prof_tax_percentage =
-                            group.prof_tax_percentage;
-                        formData.value.tds_enabled = group.tds_enabled;
-                        formData.value.tds_percentage = group.tds_percentage;
-
-                        formData.value.pf_fix_amount = group.pf_fix_amount;
-                        formData.value.esi_fix_amount = group.esi_fix_amount;
-                        formData.value.tds_fix_amount = group.tds_fix_amount;
-                        formData.value.prof_tax_fix_amount =
-                            group.prof_tax_fix_amount;
-
-                        formData.value.ctc_value = group.basic_percent;
-                        return true;
-                    }
-                    return false;
-                });
-                const rawGroup = toRaw(selectedGroup); // Removes proxy
-                console.log(rawGroup); // Full object access
-                console.log(JSON.parse(JSON.stringify(selectedGroup)));
-
-                if (selectedGroup) {
-                    employeeTypeComponentProps.value =
-                        selectedGroup.salary_group_components;
-                } else {
-                    employeeTypeComponentProps.value = [];
-                }
-                console.log(
-                    employeeTypeComponentProps.employeeTypeComponentProps
-                );
-
-                calculateSalary();
-            }, 0);
-            // });
-        };
-        const fetchSalaryComponentsAndUsers = (salaryGroupId) => {
-            if (!salaryGroupId) {
-                salaryGroupComponentProps.value = [];
-                calculateSalary();
-                return;
             }
 
-            axiosAdmin.get(salaryGroupUrl).then((response) => {
-                const allSalaryGroups = response.data;
+            calculateSalary();
+        }, 0);
+    };
 
-                const selectedGroup = allSalaryGroups.find(
-                    (group) => group.xid === salaryGroupId
-                );
+    const fetchSalaryComponentsAndUsers = (salaryGroupId) => {
+        if (!salaryGroupId) {
+            salaryGroupComponentProps.value = [];
+            calculateSalary();
+            return;
+        }
 
-                if (selectedGroup) {
-                    salaryGroupComponentProps.value =
-                        selectedGroup.salary_group_components;
-                } else {
-                    salaryGroupComponentProps.value = [];
-                }
-
-                calculateSalary();
-            });
-        };
-
-        // Computed properties
-        const pfAmount = computed(() => {
-            if (!formData.value?.pf_enabled) return 0;
-            return formData.value.pf_percentage;
-        });
-
-        // Computed property for annual PF amount
-        const annualPfAmount = computed(() => (pfAmount.value * 12).toFixed(2));
-
-        const specialAllowance = computed(() =>
-            (
-                Number(monthlyCostToCompany.value) -
-                Number(monthlySalary.value) -
-                Number(earnings.value)
-            ).toFixed(2)
-        );
-
-        const basicSalary = computed(() =>
-            (
-                Number(monthlySalary.value) +
-                Number(specialAllowance.value) +
-                Number(earnings.value) -
-                Number(deductions.value)
-            ).toFixed(2)
-        );
-
-        const netSalary = computed(() => {
-            return (
-                Number(formData.value.basic_salary) +
-                Number(specialAllowance.value) +
-                Number(earnings.value) -
-                Number(deductions.value)
-            ).toFixed(2);
-        });
-
-        const calculateEarningsAndDeductions = () => {
-            earnings.value = 0;
-            deductions.value = 0;
-            componentIds.value = [];
-            salaryComponents.value = [];
-
-            salaryGroupComponentProps.value.forEach(
-                ({ salary_component, xid }) => {
-                    let amount = 0;
-
-                    switch (salary_component.value_type) {
-                        case "fixed":
-                        case "variable":
-                            amount = Number(salary_component.monthly) || 0;
-                            break;
-
-                        case "basic_percent":
-                            amount =
-                                (monthlySalary.value *
-                                    Number(salary_component.monthly)) /
-                                100 || 0;
-                            break;
-
-                        case "ctc_percent":
-                            amount =
-                                (monthlySalary.value *
-                                    Number(salary_component.monthly)) /
-                                formData.value.ctc_value || 0;
-                            break;
-
-                        default:
-                            amount = 0;
-                            break;
-                    }
-
-                    if (salary_component.type === "earnings") {
-                        earnings.value += amount;
-                    } else if (salary_component.type === "deductions") {
-                        deductions.value += amount;
-                    }
-
-                    salaryComponents.value.push({
-                        id: salary_component.xid,
-                        type: salary_component.type,
-                        value_type: salary_component.value_type,
-                        monthly_value: amount,
-                    });
-
-                    componentIds.value.push(xid);
-                }
+        axiosAdmin.get(salaryGroupUrl).then((response) => {
+            const selectedGroup = response.data.find(
+                (group) => group.xid === salaryGroupId
             );
-        };
 
-        const calculateSalary = () => {
-            calculateEarningsAndDeductions();
+            salaryGroupComponentProps.value =
+                selectedGroup?.salary_group_components || [];
 
-            const { calculation_type, ctc_value, monthly_ctc } = formData.value;
-         
-            if (formData.value.pf_enabled) {
-                if (formData.value.pf_fix_amount) {
-                    formData.value.monthly_pf = formData.value.pf_amount.toFixed(2);
-                    formData.value.annual_pf = (12 * formData.value.pf_amount).toFixed(2);
-                } else {
-                    const pfAmount = (monthlySalary.value * formData.value.pf_percentage) / 100;
-                    formData.value.monthly_pf = pfAmount.toFixed(2);
-                    formData.value.annual_pf = (12 * pfAmount).toFixed(2);
-                    // const pfAmount = (monthly_ctc * formData.value.pf_percentage) / 100;
-                }
-            }
+            calculateSalary();
+        });
+    };
 
-            if (formData.value.hra_percent_monthly) {
-                const hraAmount = (monthly_ctc * formData.value.hra_percent_monthly) / 100;
-                formData.value.monthly_hra_percent_monthly = hraAmount.toFixed(2);
-                formData.value.annual_hra_percent_monthly = (12 * hraAmount).toFixed(2);
-            }
+    // Computed
+    const pfAmount = computed(() =>
+        formData.value?.pf_enabled ? formData.value.pf_percentage : 0
+    );
 
-            if (formData.value.allowance_percent) {
-                const allowanceAmount = (monthly_ctc * formData.value.allowance_percent) / 100;
-                formData.value.monthly_allowance_percent = allowanceAmount.toFixed(2);
-                formData.value.annual_allowance_percent = (12 * allowanceAmount).toFixed(2);
-            }
+    const annualPfAmount = computed(() => (pfAmount.value * 12).toFixed(2));
 
-            if (formData.value.food_allowance_percent) {
-                const foodAllowanceAmount = (monthly_ctc * formData.value.food_allowance_percent) / 100;
-                formData.value.monthly_food_allowance_percent = foodAllowanceAmount.toFixed(2);
-                formData.value.annual_food_allowance_percent = (12 * foodAllowanceAmount).toFixed(2);
-            }
+    const specialAllowance = computed(() =>
+        (
+            Number(monthlyCostToCompany.value) -
+            Number(monthlySalary.value) -
+            Number(earnings.value)
+        ).toFixed(2)
+    );
 
-            if (formData.value.esi_enabled) {
-                if (formData.value.esi_fix_amount) {
-                    formData.value.monthly_esi = formData.value.esi_percentage.toFixed(2);
-                    formData.value.annual_esi = (12 * formData.value.esi_percentage).toFixed(2);
-                } else {
-                    const esiAmount = (monthlySalary.value * formData.value.esi_percentage) / 100;
-                    formData.value.monthly_esi = esiAmount.toFixed(2);
-                    formData.value.annual_esi = (12 * esiAmount).toFixed(2);
-                }
-            }
+    const basicSalary = computed(() =>
+        (
+            Number(monthlySalary.value) +
+            Number(specialAllowance.value) +
+            Number(earnings.value) -
+            Number(deductions.value)
+        ).toFixed(2)
+    );
 
-            if (formData.value.prof_tax_enabled) {
-                if (formData.value.prof_tax_fix_amount) {
-                    formData.value.monthly_prof_tax = formData.value.prof_tax_percentage;
-                    formData.value.annual_prof_tax = (12 * formData.value.prof_tax_percentage).toFixed(2);
-                } else {
-                    const profTaxAmount = (monthlySalary.value * formData.value.prof_tax_percentage) / 100;
-                    formData.value.monthly_prof_tax = profTaxAmount.toFixed(2);
-                    formData.value.annual_prof_tax = (12 * profTaxAmount).toFixed(2);
-                }
-            }
+    const netSalary = computed(() =>
+        (
+            Number(formData.value.basic_salary) +
+            Number(specialAllowance.value) +
+            Number(earnings.value) -
+            Number(deductions.value)
+        ).toFixed(2)
+    );
 
+    // Methods
+    const calculateEarningsAndDeductions = () => {
+        earnings.value = 0;
+        deductions.value = 0;
+        componentIds.value = [];
+        salaryComponents.value = [];
 
-            if (formData.value.tds_enabled) {
-                if (formData.value.tds_fix_amount) {
-                    formData.value.monthly_tds =
-                        formData.value.tds_percentage.toFixed(2);
-                    formData.value.annual_tds = (
-                        12 * formData.value.tds_percentage
-                    ).toFixed(2);
-                } else {
-                    formData.value.monthly_tds = (
-                        (monthly_ctc * formData.value.tds_percentage) /
-                        100
-                    ).toFixed(2);
-
-                    formData.value.annual_tds =
-                        12 *
-                        (
-                            (monthly_ctc * formData.value.tds_percentage) /
-                            100
-                        ).toFixed(2);
-                }
-            }
-            let ded =
-                parseFloat(formData.value.monthly_prof_tax) +
-                parseFloat(formData.value.monthly_pf) +
-                parseFloat(formData.value.monthly_esi) +
-                parseFloat(formData.value.monthly_tds);
-            deductions.value = ded;
-
-            let annual_ctc = monthly_ctc * 12;
-            console.log(annual_ctc, monthly_ctc);
-            formData.value.annual_ctc = annual_ctc;
-
-            if (calculation_type === "fixed") {
-                monthlySalary.value = ctc_value;
-                annualSalary.value = ctc_value * 12;
-            } else if (calculation_type === "%_of_ctc") {
-                const percentage = Number(ctc_value);
-                monthlySalary.value = (
-                    (annual_ctc * percentage) /
-                    100 /
-                    12
-                ).toFixed(2);
-                annualSalary.value = ((annual_ctc * percentage) / 100).toFixed(
-                    2
-                );
-            }
-
-            monthlyCostToCompany.value = (annual_ctc / 12).toFixed(2);
-
-            emit("updateSalaryData", {
-                ...formData.value,
-                xid: props.user.xid,
-                basic_salary: monthlySalary.value,
-                annual_amount: annualSalary.value,
-                monthly_amount: basicSalary.value,
-                salary_component_ids: componentIds.value,
-                special_allowances: specialAllowance.value,
-                salary_components: salaryComponents.value,
-                net_salary: netSalary.value,
-            });
-        };
-
-        const getMonthlyValue = (component) => {
-            if (!component) return;
-
-            const { value_type, monthly } = component.salary_component;
-            const { ctc_value } = formData.value;
-
-            switch (value_type) {
+        salaryGroupComponentProps.value.forEach(({ salary_component, xid }) => {
+            let amount = 0;
+            switch (salary_component.value_type) {
                 case "fixed":
-                    return Number(monthly) || 0;
                 case "variable":
-                    return Number(monthly) || 0;
+                    amount = Number(salary_component.monthly) || 0;
+                    break;
                 case "basic_percent":
-                    return (monthlySalary.value * Number(monthly)) / 100 || 0;
+                    amount = (monthlySalary.value * Number(salary_component.monthly)) / 100;
+                    break;
                 case "ctc_percent":
-                    return (
-                        (monthlySalary.value * Number(monthly)) / ctc_value || 0
-                    );
-                default:
-                    return 0;
+                    amount =
+                        (monthlySalary.value * Number(salary_component.monthly)) /
+                        formData.value.ctc_value;
+                    break;
             }
-        };
 
-        const updateMonthlyValue = (value, component) => {
-            if (!component) return;
+            if (salary_component.type === "earnings") earnings.value += amount;
+            else if (salary_component.type === "deductions") deductions.value += amount;
 
-            if (component.value_type === "variable") {
-                component.monthly = parseFloat(value) || 0;
+            salaryComponents.value.push({
+                id: salary_component.xid,
+                type: salary_component.type,
+                value_type: salary_component.value_type,
+                monthly_value: amount,
+            });
 
-                const targetComponent = salaryComponents.value.find(
-                    (item) => item.id === component.xid
-                );
+            componentIds.value.push(xid);
+        });
+    };
 
-                if (targetComponent) {
-                    targetComponent.monthly_value = component.monthly;
-                } else {
-                    salaryComponents.value.push({
-                        id: component.xid,
-                        type: component.type,
-                        value_type: component.value_type,
-                        monthly_value: component.monthly,
-                    });
-                }
+    const calculateSalary = () => {
+        calculateEarningsAndDeductions();
+        const { calculation_type, ctc_value, monthly_ctc } = formData.value;
 
-                calculateSalary();
-            }
-        };
+        formData.value.monthly_hra_percent_monthly = 0;
+        formData.value.annual_hra_percent_monthly = 0;
+        formData.value.monthly_allowance_percent = 0;
+        formData.value.annual_allowance_percent = 0;
+        formData.value.monthly_food_allowance_percent = 0;
+        formData.value.annual_food_allowance_percent = 0;
+        formData.value.monthly_pf = 0;
+        formData.value.annual_pf = 0;
+        formData.value.monthly_esi = 0;
+        formData.value.annual_esi = 0;
+        formData.value.monthly_prof_tax = 0;
+        formData.value.annual_prof_tax = 0;
+        formData.value.monthly_tds = 0;
+        formData.value.annual_tds = 0;
 
-        const calculateAnnualValue = (component) => {
-            return (getMonthlyValue(component) * 12).toFixed(2);
-        };
+        // PF
+        if (formData.value.pf_enabled) {
+            const pfAmountVal = formData.value.pf_fix_amount
+                ? formData.value.pf_percentage
+                : (monthlySalary.value * formData.value.pf_percentage) / 100;
+            formData.value.monthly_pf = pfAmountVal.toFixed(2);
+            formData.value.annual_pf = (12 * pfAmountVal).toFixed(2);
+        }
 
-        watch(
-            () => props.visible,
-            (newVal, oldVal) => {
-                fetchSalaryGroups();
-                if (newVal) {
-                    formData.value = {
-                        basic_salary: props.user.basic_salary || 0,
-                        ctc_value: props.user.ctc_value || 50,
-                        calculation_type:
-                            props.user.calculation_type || "%_of_ctc",
-                        annual_ctc: props.user.annual_ctc || 0,
-                        monthly_ctc: props.user.monthly_ctc || 0,
-                        monthly_amount: props.user.monthly_amount || 0,
-                        annual_amount: props.user.annual_amount || 0,
-                        salary_group_id: props.user.salary_group?.xid,
-                        employee_type_id: props.user.employee_type_id?.xid,
-                        pf_enabled: false,
-                        pf_percentage: 0,
-                        monthly_pf: 0,
-                        annual_pf: 0,
-                        esi_enabled: false,
-                        esi_percentage: 0,
-                        monthly_esi: 0,
-                        annual_esi: 0,
-                        prof_tax_enabled: false,
-                        prof_tax_percentage: 0,
-                        monthly_prof_tax: 0,
-                        annual_prof_tax: 0,
-                        tds_enabled: false,
-                        tds_percentage: 0,
-                        monthly_tds: 0,
-                        annual_tds: 0,
-                        hra_percent_monthly: 0,
-                        monthly_hra_percent_monthly: 0,
-                        annual_hra_percent_monthly: 0,
-                        allowance_percent: 0,
-                        monthly_allowance_percent: 0,
-                        annual_allowance_percent: 0,
-                        food_allowance_percent: 0,
-                        monthly_food_allowance_percent: 0,
-                        annual_food_allowance_percent: 0,
-                        pf_fix_amount: 0,
-                        esi_fix_amount: 0,
-                        tds_fix_amount: 0,
-                        prof_tax_fix_amount: 0,
-                    };
+        // HRA / allowances
+        if (formData.value.hra_percent_monthly) {
+            const hraAmount = (monthly_ctc * formData.value.hra_percent_monthly) / 100;
+            formData.value.monthly_hra_percent_monthly = hraAmount.toFixed(2);
+            formData.value.annual_hra_percent_monthly = (12 * hraAmount).toFixed(2);
+        }
 
-                    if (
-                        (props.user.annual_ctc != 0 &&
-                            props.user.annual_ctc != null) ||
-                        (props.user.monthly_ctc != 0 &&
-                            props.user.monthly_ctc != null)
-                    ) {
-                        var allValues = [];
+        if (formData.value.allowance_percent) {
+            const allowanceAmount = (monthly_ctc * formData.value.allowance_percent) / 100;
+            formData.value.monthly_allowance_percent = allowanceAmount.toFixed(2);
+            formData.value.annual_allowance_percent = (12 * allowanceAmount).toFixed(2);
+        }
 
-                        forEach(
-                            props.user.salary_group?.salary_group_components,
-                            (salComponent) => {
-                                var findValueObject = find(
-                                    props.user.basic_salary_details,
-                                    {
-                                        x_salary_component_id:
-                                            salComponent.x_salary_component_id,
-                                    }
-                                );
+        if (formData.value.food_allowance_percent) {
+            const foodAmount = (monthly_ctc * formData.value.food_allowance_percent) / 100;
+            formData.value.monthly_food_allowance_percent = foodAmount.toFixed(2);
+            formData.value.annual_food_allowance_percent = (12 * foodAmount).toFixed(2);
+        }
 
-                                if (findValueObject) {
-                                    allValues.push({
-                                        ...salComponent,
-                                        salary_component: {
-                                            ...salComponent.salary_component,
-                                            monthly:
-                                                findValueObject.value_type ===
-                                                    "variable"
-                                                    ? findValueObject.monthly
-                                                    : salComponent
-                                                        .salary_component
-                                                        .monthly,
-                                        },
-                                    });
-                                } else {
-                                    allValues.push(salComponent);
-                                }
-                            }
-                        );
 
-                        salaryGroupComponentProps.value = allValues;
-                    } else {
-                        salaryGroupComponentProps.value =
-                            props.user?.salary_group?.salary_group_components ||
-                            [];
-                    }
+        if (formData.value.esi_enabled) {
+            const hraAmount = Number((monthly_ctc * formData.value.hra_percent_monthly) / 100);
+            const baseSalary = Number(monthlySalary.value);
+            const totalEarnings = baseSalary + hraAmount;
+            const esiAmount = formData.value.esi_fix_amount
+                ? formData.value.esi_percentage
+                : (totalEarnings * formData.value.esi_percentage) / 100;
+            formData.value.monthly_esi = esiAmount.toFixed(2);
+            formData.value.annual_esi = (12 * esiAmount).toFixed(2);
+        }
 
-                    monthlySalary.value = props.user.monthly_amount || 0;
-                    annualSalary.value = props.user.annual_amount || 0;
-                    formData.value.salary_group_id =
-                        props.user.salary_group?.xid;
-                    if (props.user.salary_group) {
-                        fetchSalaryComponentsAndUsers(
-                            props.user.salary_group.xid
-                        );
-                    }
+        // Prof tax
+        if (formData.value.prof_tax_enabled) {
+            const profTaxAmount = formData.value.prof_tax_fix_amount
+                ? formData.value.prof_tax_percentage
+                : (monthlySalary.value * formData.value.prof_tax_percentage) / 100;
+            formData.value.monthly_prof_tax = profTaxAmount.toFixed(2);
+            formData.value.annual_prof_tax = (12 * profTaxAmount).toFixed(2);
+        }
 
-                    formData.value.employee_type_id =
-                        props.user.employee_type_id?.xid;
-                    if (props.user.employee_type_id) {
-                        fetch_employee_type_components(
-                            props.user.employee_type_id.xid
-                        );
-                    }
-                    basicSalary.value = 0;
-                    calculateSalary();
-                }
-            }
-        );
+        // TDS
+        if (formData.value.tds_enabled) {
+            const tdsAmount = formData.value.tds_fix_amount
+                ? formData.value.tds_percentage
+                : (monthly_ctc * formData.value.tds_percentage) / 100;
+            formData.value.monthly_tds = tdsAmount.toFixed(2);
+            formData.value.annual_tds = (12 * tdsAmount).toFixed(2);
+        }
 
-        watch(
-            [
-                () => formData.value.annual_ctc,
-                () => formData.value.monthly_ctc,
-                () => formData.value.ctc_value,
-                () => earnings.value,
-                () => deductions.value,
-                () => formData.value.monthly_ctc,
-            ],
-            () => {
-                calculateSalary();
-            }
-        );
+        deductions.value =
+            parseFloat(formData.value.monthly_pf || 0) +
+            parseFloat(formData.value.monthly_esi || 0) +
+            parseFloat(formData.value.monthly_prof_tax || 0) +
+            parseFloat(formData.value.monthly_tds || 0);
 
-        return {
-            loading,
-            getMonthlyValue,
-            updateMonthlyValue,
-            calculateAnnualValue,
-            rules,
-            formData,
-            appSetting,
-            selectUsers,
-            monthlySalary,
-            annualSalary,
-            earnings,
-            deductions,
-            specialAllowance,
-            basicSalary,
-            calculateSalary,
-            monthlyCostToCompany,
-            salaryComponents,
-            salaryGroupComponentProps,
-            salaryGroups,
-            employeeTypeGroups,
-            fetchSalaryComponentsAndUsers,
-            fetch_employee_type_components,
-            salaryGroupAdded,
+        const annual_ctc = monthly_ctc * 12;
+        formData.value.annual_ctc = annual_ctc;
 
-            drawerWidth: window.innerWidth <= 991 ? "90%" : "60%",
-        };
-    },
+        if (calculation_type === "fixed") {
+            monthlySalary.value = ctc_value;
+            annualSalary.value = ctc_value * 12;
+        } else if (calculation_type === "%_of_ctc") {
+            const percentage = Number(ctc_value);
+            monthlySalary.value = ((annual_ctc * percentage) / 100 / 12).toFixed(2);
+            annualSalary.value = ((annual_ctc * percentage) / 100).toFixed(2);
+        }
+
+        monthlyCostToCompany.value = (annual_ctc / 12).toFixed(2);
+
+        emit("updateSalaryData", {
+            ...formData.value,
+            xid: props.user.xid,
+            basic_salary: monthlySalary.value,
+            annual_amount: annualSalary.value,
+            //monthly_amount: basicSalary.value,
+            monthly_amount:monthly_ctc,
+            salary_component_ids: componentIds.value,
+            special_allowances: specialAllowance.value,
+            salary_components: salaryComponents.value,
+            net_salary: netSalary.value,
+        });
+    };
+
+    const getMonthlyValue = (component) => {
+        if (!component) return 0;
+        const { value_type, monthly } = component.salary_component;
+        const { ctc_value } = formData.value;
+
+        switch (value_type) {
+            case "fixed":
+            case "variable":
+                return Number(monthly) || 0;
+            case "basic_percent":
+                return (monthlySalary.value * Number(monthly)) / 100 || 0;
+            case "ctc_percent":
+                return (monthlySalary.value * Number(monthly)) / ctc_value || 0;
+            default:
+                return 0;
+        }
+    };
+
+    const updateMonthlyValue = (value, component) => {
+        if (!component) return;
+        if (component.value_type === "variable") {
+            component.monthly = parseFloat(value) || 0;
+
+            const target = salaryComponents.value.find(
+                (item) => item.id === component.xid
+            );
+            if (target) target.monthly_value = component.monthly;
+            else
+                salaryComponents.value.push({
+                    id: component.xid,
+                    type: component.type,
+                    value_type: component.value_type,
+                    monthly_value: component.monthly,
+                });
+
+            calculateSalary();
+        }
+    };
+
+    const calculateAnnualValue = (component) =>
+        (getMonthlyValue(component) * 12).toFixed(2);
+
+ watch(
+  [() => props.user, () => employeeTypeGroups.value],
+  ([user, groups]) => {
+    if (!user || !user.x_employee_type_id || !groups.length) return;
+ 
+    formData.value.employee_type_id = user.x_employee_type_id;
+    formData.value.monthly_ctc =
+      user.monthly_amount !== undefined && user.monthly_amount !== null
+        ? user.monthly_amount
+        : 1200;
+
+    fetch_employee_type_components(user.x_employee_type_id);
+  },
+  { immediate: true }
+);
+
+    watch(
+        [
+            () => formData.value.annual_ctc,
+            () => formData.value.monthly_ctc,
+            () => formData.value.ctc_value,
+            () => earnings.value,
+            () => deductions.value,
+        ],
+        () => calculateSalary()
+    );
+
+    return {
+        loading,
+        rules,
+        formData,
+        appSetting,
+        selectUsers,
+        monthlySalary,
+        annualSalary,
+        earnings,
+        deductions,
+        specialAllowance,
+        basicSalary,
+        netSalary,
+        monthlyCostToCompany,
+        salaryComponents,
+        salaryGroupComponentProps,
+        salaryGroups,
+        employeeTypeGroups,
+        fetchSalaryComponentsAndUsers,
+        fetch_employee_type_components,
+        salaryGroupAdded,
+        getMonthlyValue,
+        updateMonthlyValue,
+        calculateAnnualValue,
+        calculateSalary,
+        drawerWidth: window.innerWidth <= 991 ? "90%" : "60%",
+    };
+}
+
 });
 </script>
 

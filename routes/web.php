@@ -20,12 +20,22 @@ ApiRoute::group(['namespace' => 'App\Http\Controllers\Api'], function () {
     ApiRoute::post('payroll-generate',  ['as' => 'api.payroll-generate', 'uses' => 'MyPayrollController@generatePayroll']);
     ApiRoute::get('payroll_new/{xid}/download', 'PayrollNewController@downloadPayslip');
     ApiRoute::get('payroll/export', 'PayrollNewController@export');
+    ApiRoute::get('pf_report/export', 'PayrollNewController@pfexport');
+    ApiRoute::get('prof_tax/export', 'PayrollNewController@proftax_export');
     ApiRoute::get('bank_statements/export', 'BankstatementsController@export');
     ApiRoute::get('loan_repayments/{xid}', 'EmployeeLoanController@getRepayments');
     ApiRoute::post('loan_repayments/{id}/skip', 'EmployeeLoanController@skipMonth');
-    ApiRoute::post('loan_repayments/{loan}/close', 'EmployeeLoanController@closeLoan'); 
-
+    ApiRoute::post('loan_repayments/{loan}/close', 'EmployeeLoanController@closeLoan');   
     ApiRoute::get('salary_leave/export', 'SalaryLeaveController@export');
+
+    ApiRoute::post('leave-salary-statement/generate', 'SalaryLeaveController@statementgenerate');
+    ApiRoute::get('leave-salary-statement/history', 'SalaryLeaveController@statementHistory');
+    ApiRoute::get('salaryleave_statement/{month}/{year}/download', 'SalaryLeaveController@downloadSalaryLeaveStatement');
+
+    ApiRoute::post('upload_arrears', 'ArrearsController@uploadArrears');
+    ApiRoute::post('arrears/generate', 'ArrearsController@generateArrears');
+    ApiRoute::get('get_arrears/{xid}/download', 'ArrearsController@downloadPayslip');
+    ApiRoute::get('arrear_pf/export', 'ArrearsController@pfexport');
 
     // Check visibility of module according to subscription plan
     ApiRoute::post('check-subscription-module-visibility', ['as' => 'api.extra.check-subscription-module-visibility', 'uses' => 'AuthController@checkSubscriptionModuleVisibility']);
@@ -101,6 +111,7 @@ ApiRoute::group(['namespace' => 'App\Http\Controllers\Api'], function () {
         ApiRoute::resource('departments', 'DepartmentController', $options);
 
         ApiRoute::resource('payroll_new', 'PayrollNewController', $options);
+        ApiRoute::resource('arrears_fetch', 'ArrearsController', $options);
         ApiRoute::resource('bank_statements', 'BankstatementsController', $options);
         ApiRoute::resource('salary_leave', 'SalaryLeaveController', $options);
         ApiRoute::resource('employee_loans', 'EmployeeLoanController', $options);

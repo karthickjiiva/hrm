@@ -20,9 +20,10 @@
                     </a-form-item>
                 </a-col>                
 
+                <!-- :disabledDate="disablePastMonths" -->
                 <a-col :span="12">
                     <a-form-item label="Deduction Month" name="deduct_month" class="required">
-                        <a-date-picker v-model:value="localFormData.deduct_month" :disabledDate="disablePastMonths"
+                        <a-date-picker v-model:value="localFormData.deduct_month"
                             picker="month" format="MMM YYYY" value-format="YYYY-MM" placeholder="Select Month"
                             style="width: 100%" />
                     </a-form-item>
