@@ -341,102 +341,116 @@
                     :tab="$t('user.personal_info')"
                     force-render
                 >
-                    <a-row :gutter="16">
-                        <a-col :xs="24" :sm="24" :md="12" :lg="12">
-                            <a-form-item
-                                :label="$t('user.gender')"
-                                name="gender"
-                                :help="
-                                    rules.gender ? rules.gender.message : null
-                                "
-                                :validateStatus="rules.gender ? 'error' : null"
-                                class="required"
-                            >
-                                <a-select
-                                    v-model:value="formData.gender"
-                                    :placeholder="
-                                        $t('common.select_default_text', [
-                                            $t('user.gender'),
-                                        ])
-                                    "
-                                >
-                                    <a-select-option value="male">{{
-                                        $t("user.male")
-                                    }}</a-select-option>
-                                    <a-select-option value="female">{{
-                                        $t("user.female")
-                                    }}</a-select-option>
-                                    <a-select-option value="other">{{
-                                        $t("user.other")
-                                    }}</a-select-option>
-                                </a-select>
-                            </a-form-item>
-                        </a-col>
-                        <a-col :xs="24" :sm="24" :md="12" :lg="12">
-                            <a-form-item
-                                :label="$t('user.date_of_birth')"
-                                name="dob"
-                                :help="rules.dob ? rules.dob.message : null"
-                                :validateStatus="rules.dob ? 'error' : null"
-                            >
-                                <a-date-picker
-                                    v-model:value="formData.dob"
-                                    :format="appSetting.date_format"
-                                    valueFormat="YYYY-MM-DD"
-                                    style="width: 100%"
-                                />
-                            </a-form-item>
-                        </a-col>
-                    </a-row>
+                <a-row :gutter="16">
+    <a-col :xs="24" :sm="24" :md="8" :lg="8">
+        <a-form-item
+            :label="$t('user.gender')"
+            name="gender"
+            :help="rules.gender ? rules.gender.message : null"
+            :validateStatus="rules.gender ? 'error' : null"
+            class="required"
+        >
+            <a-select
+                v-model:value="formData.gender"
+                :placeholder="$t('common.select_default_text', [$t('user.gender')])"
+            >
+                <a-select-option value="male">
+                    {{ $t("user.male") }}
+                </a-select-option>
+                <a-select-option value="female">
+                    {{ $t("user.female") }}
+                </a-select-option>
+                <a-select-option value="other">
+                    {{ $t("user.other") }}
+                </a-select-option>
+            </a-select>
+        </a-form-item>
+    </a-col>
 
-                    <a-row :gutter="16">
-                        <a-col :xs="24" :sm="24" :md="12" :lg="12">
-                            <a-form-item
-                                :label="$t('user.personal_email')"
-                                name="personal_email"
-                                :help="
-                                    rules.personal_email
-                                        ? rules.personal_email.message
-                                        : null
-                                "
-                                :validateStatus="
-                                    rules.personal_email ? 'error' : null
-                                "
-                            >
-                                <a-input
-                                    v-model:value="formData.personal_email"
-                                    :placeholder="
-                                        $t('common.placeholder_default_text', [
-                                            $t('user.personal_email'),
-                                        ])
-                                    "
-                                />
-                            </a-form-item>
-                        </a-col>
-                        <a-col :xs="24" :sm="24" :md="12" :lg="12">
-                            <a-form-item
-                                :label="$t('user.personal_phone')"
-                                name="personal_phone"
-                                :help="
-                                    rules.personal_phone
-                                        ? rules.personal_phone.message
-                                        : null
-                                "
-                                :validateStatus="
-                                    rules.personal_phone ? 'error' : null
-                                "
-                            >
-                                <a-input
-                                    v-model:value="formData.personal_phone"
-                                    :placeholder="
-                                        $t('common.placeholder_default_text', [
-                                            $t('user.personal_phone'),
-                                        ])
-                                    "
-                                />
-                            </a-form-item>
-                        </a-col>
-                    </a-row>
+    <a-col :xs="24" :sm="24" :md="8" :lg="8">
+        <a-form-item
+            :label="$t('user.date_of_birth')"
+            name="dob"
+            :help="rules.dob ? rules.dob.message : null"
+            :validateStatus="rules.dob ? 'error' : null"
+        >
+            <a-date-picker
+                v-model:value="formData.dob"
+                :format="appSetting.date_format"
+                valueFormat="YYYY-MM-DD"
+                style="width: 100%"
+            />
+        </a-form-item>
+    </a-col>
+
+    <!-- NEW FIELD: Education -->
+    <a-col :xs="24" :sm="24" :md="8" :lg="8">
+        <a-form-item
+            label="Education"
+            name="education"
+            :help="rules.education ? rules.education.message : null"
+            :validateStatus="rules.education ? 'error' : null"
+        >
+            <a-input
+                v-model:value="formData.education"
+                placeholder="Enter Employee Education"
+            />
+        </a-form-item>
+    </a-col>
+</a-row>
+<a-row :gutter="16">
+    <a-col :xs="24" :sm="24" :md="8" :lg="8">
+        <a-form-item
+            :label="$t('user.personal_email')"
+            name="personal_email"
+            :help="rules.personal_email ? rules.personal_email.message : null"
+            :validateStatus="rules.personal_email ? 'error' : null"
+        >
+            <a-input
+                v-model:value="formData.personal_email"
+                :placeholder="$t('common.placeholder_default_text', [$t('user.personal_email')])"
+            />
+        </a-form-item>
+    </a-col>
+
+    <a-col :xs="24" :sm="24" :md="8" :lg="8">
+        <a-form-item
+            :label="$t('user.personal_phone')"
+            name="personal_phone"
+            :help="rules.personal_phone ? rules.personal_phone.message : null"
+            :validateStatus="rules.personal_phone ? 'error' : null"
+        >
+            <a-input
+                v-model:value="formData.personal_phone"
+                :placeholder="$t('common.placeholder_default_text', [$t('user.personal_phone')])"
+            />
+        </a-form-item>
+    </a-col>
+
+    <!-- NEW FIELD: Blood Group -->
+    <a-col :xs="24" :sm="24" :md="8" :lg="8">
+        <a-form-item
+            label="Blood Group"
+            name="blood_group"
+            :help="rules.blood_group ? rules.blood_group.message : null"
+            :validateStatus="rules.blood_group ? 'error' : null"
+        >
+            <a-select
+                v-model:value="formData.blood_group"
+                placeholder="Select Employee Blood Group"
+            >
+                <a-select-option value="A+">A+</a-select-option>
+                <a-select-option value="A-">A-</a-select-option>
+                <a-select-option value="B+">B+</a-select-option>
+                <a-select-option value="B-">B-</a-select-option>
+                <a-select-option value="O+">O+</a-select-option>
+                <a-select-option value="O-">O-</a-select-option>
+                <a-select-option value="AB+">AB+</a-select-option>
+                <a-select-option value="AB-">AB-</a-select-option>
+            </a-select>
+        </a-form-item>
+    </a-col>
+</a-row>
                     <!-- Row 3: Emergency Contact Name, Emergency Contact Number, Alternate Number -->
                     <a-row :gutter="16">
                         <a-col :xs="24" :sm="24" :md="8" :lg="8">
@@ -478,56 +492,60 @@
                         </a-col>
                     </a-row>
 
-                    <a-row :gutter="16">
-                        <a-col :xs="24" :sm="24" :md="12" :lg="12">
-                            <a-form-item
-                                :label="$t('user.is_married')"
-                                name="is_married"
-                                :help="
-                                    rules.is_married
-                                        ? rules.is_married.message
-                                        : null
-                                "
-                                :validateStatus="
-                                    rules.is_married ? 'error' : null
-                                "
-                            >
-                                <a-switch
-                                    v-model:checked="formData.is_married"
-                                    :checkedValue="1"
-                                    :unCheckedValue="0"
-                                />
-                            </a-form-item>
-                        </a-col>
-                        <a-col
-                            :xs="24"
-                            :sm="24"
-                            :md="12"
-                            :lg="12"
-                            v-if="formData.is_married == 1"
-                        >
-                            <a-form-item
-                                :label="$t('user.marriage_date')"
-                                name="marriage_date"
-                                :help="
-                                    rules.marriage_date
-                                        ? rules.marriage_date.message
-                                        : null
-                                "
-                                :validateStatus="
-                                    rules.marriage_date ? 'error' : null
-                                "
-                                class="required"
-                            >
-                                <a-date-picker
-                                    v-model:value="formData.marriage_date"
-                                    :format="appSetting.date_format"
-                                    valueFormat="YYYY-MM-DD"
-                                    style="width: 100%"
-                                />
-                            </a-form-item>
-                        </a-col>
-                    </a-row>
+                   <a-row :gutter="16">
+    <!-- Is Married -->
+    <a-col :xs="24" :sm="24" :md="8" :lg="8">
+        <a-form-item :label="$t('user.is_married')" name="is_married">
+            <a-switch
+                v-model:checked="formData.is_married"
+                :checkedValue="1"
+                :unCheckedValue="0"
+            />
+        </a-form-item>
+    </a-col>
+
+    <!-- Marriage Date -->
+    <a-col
+        :xs="24"
+        :sm="24"
+        :md="8"
+        :lg="8"
+        v-if="formData.is_married == 1"
+    >
+        <a-form-item
+            :label="$t('user.marriage_date')"
+            name="marriage_date"
+            class="required"
+        >
+            <a-date-picker
+                v-model:value="formData.marriage_date"
+                :format="appSetting.date_format"
+                valueFormat="YYYY-MM-DD"
+                style="width: 100%"
+            />
+        </a-form-item>
+    </a-col>
+
+    <!-- Spouse Name -->
+    <a-col
+        :xs="24"
+        :sm="24"
+        :md="8"
+        :lg="8"
+        v-if="formData.is_married == 1"
+    >
+        <a-form-item
+            label="Spouse Name"
+            name="spouse_name"
+            class="required"
+        >
+            <a-input
+                v-model:value="formData.spouse_name"
+                placeholder="Please Enter Spouse Name"
+            />
+        </a-form-item>
+    </a-col>
+</a-row>
                 </a-tab-pane>
                 <a-tab-pane
                     key="company"

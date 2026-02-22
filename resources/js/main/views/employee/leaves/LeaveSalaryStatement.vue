@@ -141,7 +141,7 @@ export default {
                         generating.value = true;
                         const token = localStorage.getItem("auth_token");
 
-                        const response = await axios.post("https://bc.shakthicorp.com/api/v1/leave-salary-statement/generate",
+                        const response = await axios.post("/api/v1/leave-salary-statement/generate",
                             { year: filters.year },
                             { headers: { Authorization: `Bearer ${token}` } }
                         );
@@ -166,7 +166,7 @@ export default {
                 loading.value = true;
                 const token = localStorage.getItem("auth_token");
 
-                const response = await axios.get("https://bc.shakthicorp.com/api/v1/leave-salary-statement/history", {
+                const response = await axios.get("/api/v1/leave-salary-statement/history", {
                     params: {
                         page: pagination.current,
                         limit: pagination.pageSize

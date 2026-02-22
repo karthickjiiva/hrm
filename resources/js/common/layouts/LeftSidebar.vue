@@ -638,6 +638,30 @@
                         </a-menu-item>
 
                     </a-sub-menu>
+
+                        <a-menu-item v-if="permsArray.includes('admin')" @click="
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.leave.insurance_report',
+                                });
+                            }
+                        " key="insurance_report">
+                           <ScheduleOutlined />  <span>Insurance Report</span>
+                        </a-menu-item>
+
+
+                        <a-menu-item v-if="permsArray.includes('admin')" @click="
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.leave.settlement_report',
+                                });
+                            }
+                        " key="settlement_report">
+                           <ScheduleOutlined />  <span>Settlement Report</span>
+                        </a-menu-item>
+
                     <a-sub-menu key="allreports" v-if="
                         permsArray.includes('salary_settings') ||
                         permsArray.includes('admin')
@@ -648,6 +672,18 @@
                                 <span>All Reports</span>
                             </span>
                         </template>
+
+                         <a-menu-item v-if="permsArray.includes('admin')" @click="
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.leave.master_report',
+                                });
+                            }
+                        " key="master_report">
+                            <span>Master Reports</span>
+                        </a-menu-item>
+                
                         <a-menu-item v-if="permsArray.includes('admin')" @click="
                             () => {
                                 menuSelected();
@@ -679,6 +715,28 @@
                             <span>PF Report</span>
                         </a-menu-item>
 
+                         <a-menu-item v-if="permsArray.includes('admin')" @click="
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.reports.bangalore_reports',
+                                });
+                            }
+                        " key="bangalore_reports">
+                            <span>Bangalore Reports</span>
+                        </a-menu-item> 
+
+                          <a-menu-item v-if="permsArray.includes('admin')" @click="
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.leave.leave_list_report',
+                                });
+                            }
+                        " key="leave_list_report">
+                            <span>Leave List Report</span>
+                        </a-menu-item>
+
                         <a-menu-item v-if="permsArray.includes('admin')" @click="
                             () => {
                                 menuSelected();
@@ -700,16 +758,48 @@
                         " key="leave_salarystatement">
                             <span>Leave Salary Statement</span>
                         </a-menu-item>
-                        <!-- <a-menu-item v-if="permsArray.includes('admin')" @click="
+                         <a-menu-item v-if="permsArray.includes('admin')" @click="
                             () => {
                                 menuSelected();
                                 $router.push({
-                                    name: 'admin.leave.leave_salarybankstatement',
+                                    name: 'admin.reports.bonusreport_yearly',
                                 });
                             }
-                        " key="leave_salarybankstatement">
-                            <span>Leave Salary Bank Statement</span>
-                        </a-menu-item> -->
+                        " key="bonusreport_yearly">
+                            <span>Bonus Report(Yearly)</span>
+                        </a-menu-item> 
+
+                         <a-menu-item v-if="permsArray.includes('admin')" @click="
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.reports.office_esi_report',
+                                });
+                            }
+                        " key="office_esi_report">
+                            <span>Office ESI Report</span>
+                        </a-menu-item> 
+                          <a-menu-item v-if="permsArray.includes('admin')" @click="
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.reports.wage_register_report',
+                                });
+                            }
+                        " key="wage_register_report">
+                            <span>Wage Register Report</span>
+                        </a-menu-item> 
+
+                          <a-menu-item v-if="permsArray.includes('admin')" @click="
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.reports.form_x_report',
+                                });
+                            }
+                        " key="form_x_report">
+                            <span>Form X Report</span>
+                        </a-menu-item> 
 
                         <a-menu-item v-if="permsArray.includes('admin')" @click="
                             () => {

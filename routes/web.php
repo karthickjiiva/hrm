@@ -37,6 +37,26 @@ ApiRoute::group(['namespace' => 'App\Http\Controllers\Api'], function () {
     ApiRoute::get('get_arrears/{xid}/download', 'ArrearsController@downloadPayslip');
     ApiRoute::get('arrear_pf/export', 'ArrearsController@pfexport');
 
+     //Allreports
+    ApiRoute::get('reports/history/{type}', 'ReportController@history');
+    ApiRoute::post('reports/generate/bonus', 'ReportController@generateBonus');
+    ApiRoute::post('reports/generate/office_esi', 'ReportController@generateOfficeEsi');
+    ApiRoute::post('reports/generate/wage_register', 'ReportController@generateWageRegister');
+    ApiRoute::post('reports/generate/form_x', 'ReportController@generateFormX');
+    ApiRoute::get('leavelist/export', 'SalaryLeaveController@export_leavelist');
+    ApiRoute::get('master-reports/employee-export', 'MasterController@master_employee_export'); 
+    ApiRoute::get('master-reports/payroll-export', 'MasterController@master_payroll_export'); 
+    ApiRoute::post('reports/generate/settlement', 'MasterController@generateSettlementReport');
+    
+    ApiRoute::get('employees/all', 'MasterController@getEmployeesList'); 
+    ApiRoute::get('employeesinfo/{id}', 'MasterController@employeesinfo');  
+    ApiRoute::post('add-emp-insurances', 'MasterController@addEmpInsurances');
+    ApiRoute::get('employee-insurances', 'MasterController@list_insurance');
+    ApiRoute::delete('employee-insurances/{id}', 'MasterController@delete_insurance');
+    ApiRoute::post('employee-insurances/generate-report','MasterController@generateInsuranceReport');
+ 
+    
+
     // Check visibility of module according to subscription plan
     ApiRoute::post('check-subscription-module-visibility', ['as' => 'api.extra.check-subscription-module-visibility', 'uses' => 'AuthController@checkSubscriptionModuleVisibility']);
     ApiRoute::post('visible-subscription-modules', ['as' => 'api.extra.visible-subscription-modules', 'uses' => 'AuthController@visibleSubscriptionModules']);

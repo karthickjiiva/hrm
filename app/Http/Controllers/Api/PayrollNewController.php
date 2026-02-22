@@ -209,7 +209,6 @@ public function index()
             $filename = "Payroll_{$month}_{$year}.xlsx";
             $export = new PayrollExport($month, $year);
             $filePath = 'exports/' . $filename;
-            // Store in storage/app/public/exports
             Excel::store($export, $filePath, 'public');
             return response()->json([
                 'success' => true,

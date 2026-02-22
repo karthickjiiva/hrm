@@ -1,12 +1,6 @@
 <template>
-    <a-drawer
-        :title="user.name"
-        :width="drawerWidth"
-        :open="visible"
-        :body-style="{ paddingBottom: '80px' }"
-        :maskClosable="false"
-        @close="onClose"
-    >
+    <a-drawer :title="user.name" :width="drawerWidth" :open="visible" :body-style="{ paddingBottom: '80px' }"
+        :maskClosable="false" @close="onClose">
         <div class="user-details">
             <a-row :gutter="[16, 16]">
                 <a-col :xs="24" :sm="24" :md="4" :lg="4">
@@ -20,13 +14,10 @@
                                     {{ $t("user.basic_info") }}
                                 </span>
                             </template>
-                            <a-descriptions
-                                layout="vertical"
-                                :contentStyle="{ fontWeight: 500, marginBottom: '5px' }"
+                            <a-descriptions layout="vertical" :contentStyle="{ fontWeight: 500, marginBottom: '5px' }"
                                 :labelStyle="{
                                     fontWeight: 'bold',
-                                }"
-                            >
+                                }">
                                 <a-descriptions-item :label="$t('user.name')">
                                     {{ user.name }}
                                 </a-descriptions-item>
@@ -53,10 +44,7 @@
                                         {{ $t(`common.${user.status}`) }}
                                     </a-tag>
                                 </a-descriptions-item>
-                                <a-descriptions-item
-                                    :label="$t('user.address')"
-                                    :span="2"
-                                >
+                                <a-descriptions-item :label="$t('user.address')" :span="2">
                                     {{ user.address ? user.address : "-" }}
                                 </a-descriptions-item>
                             </a-descriptions>
@@ -67,27 +55,52 @@
                                     {{ $t("user.personal_info") }}
                                 </span>
                             </template>
-                            <a-descriptions
-                                layout="vertical"
-                                :labelStyle="{
-                                    fontWeight: 'bold',
-                                }"
-                                :contentStyle="{ fontWeight: 500, marginBottom: '5px' }"
-                            >
+                            <a-descriptions layout="vertical" :labelStyle="{
+                                fontWeight: 'bold',
+                            }" :contentStyle="{ fontWeight: 500, marginBottom: '5px' }">
                                 <a-descriptions-item :label="$t('user.gender')">
                                     {{ user.gender }}
                                 </a-descriptions-item>
+
                                 <a-descriptions-item :label="$t('user.date_of_birth')">
                                     {{ user.dob ? user.dob : "-" }}
                                 </a-descriptions-item>
+
                                 <a-descriptions-item :label="$t('user.personal_email')">
                                     {{ user.personal_email ? user.personal_email : "-" }}
                                 </a-descriptions-item>
+
                                 <a-descriptions-item :label="$t('user.personal_phone')">
                                     {{ user.personal_phone ? user.personal_phone : "-" }}
                                 </a-descriptions-item>
+
                                 <a-descriptions-item :label="$t('user.is_married')">
-                                    {{ user.is_married ? user.is_married : "-" }}
+                                    {{ user.is_married == 1 ? "Yes" : "No" }}
+                                </a-descriptions-item>
+
+
+                                <a-descriptions-item v-if="user.is_married == 1" label="Spouse Name">
+                                    {{ user.spouse_name ? user.spouse_name : "-" }}
+                                </a-descriptions-item>
+
+                                <a-descriptions-item v-if="user.is_married == 1" label="Marriage Date">
+                                    {{ user.marriage_date ? user.marriage_date : "-" }}
+                                </a-descriptions-item>
+
+                                <a-descriptions-item label="Education">
+                                    {{ user.education ? user.education : "-" }}
+                                </a-descriptions-item>
+
+                                <a-descriptions-item label="Blood Group">
+                                    {{ user.blood_group ? user.blood_group : "-" }}
+                                </a-descriptions-item>
+
+                                <a-descriptions-item label="Emergency Contact Name">
+                                    {{ user.emergency_contact_name ? user.emergency_contact_name : "-" }}
+                                </a-descriptions-item>
+
+                                <a-descriptions-item label="Emergency Contact Number">
+                                    {{ user.emergency_contact_number ? user.emergency_contact_number : "-" }}
                                 </a-descriptions-item>
                             </a-descriptions>
                         </a-tab-pane>
@@ -97,13 +110,9 @@
                                     {{ $t("user.company_relation") }}
                                 </span>
                             </template>
-                            <a-descriptions
-                                layout="vertical"
-                                :labelStyle="{
-                                    fontWeight: 'bold',
-                                }"
-                                :contentStyle="{ fontWeight: 500, marginBottom: '5px' }"
-                            >
+                            <a-descriptions layout="vertical" :labelStyle="{
+                                fontWeight: 'bold',
+                            }" :contentStyle="{ fontWeight: 500, marginBottom: '5px' }">
                                 <a-descriptions-item :label="$t('user.location_id')">
                                     {{ user.location ? user.location.name : "-" }}
                                 </a-descriptions-item>
@@ -127,34 +136,24 @@
                                     {{ $t("user.work_info") }}
                                 </span>
                             </template>
-                            <a-descriptions
-                                layout="vertical"
-                                :labelStyle="{
-                                    fontWeight: 'bold',
-                                }"
-                                :contentStyle="{ fontWeight: 500, marginBottom: '5px' }"
-                            >
-                                <a-descriptions-item
-                                    :label="$t('user.probation_start_date')"
-                                >
+                            <a-descriptions layout="vertical" :labelStyle="{
+                                fontWeight: 'bold',
+                            }" :contentStyle="{ fontWeight: 500, marginBottom: '5px' }">
+                                <a-descriptions-item :label="$t('user.probation_start_date')">
                                     {{
                                         user.probation_start_date
                                             ? formatDate(user.probation_start_date)
                                             : "-"
                                     }}
                                 </a-descriptions-item>
-                                <a-descriptions-item
-                                    :label="$t('user.probation_end_date')"
-                                >
+                                <a-descriptions-item :label="$t('user.probation_end_date')">
                                     {{
                                         user.probation_end_date
                                             ? formatDate(user.probation_end_date)
                                             : "-"
                                     }}
                                 </a-descriptions-item>
-                                <a-descriptions-item
-                                    :label="$t('user.notice_start_date')"
-                                >
+                                <a-descriptions-item :label="$t('user.notice_start_date')">
                                     {{
                                         user.notice_start_date
                                             ? formatDate(user.notice_start_date)
@@ -173,24 +172,14 @@
                                 </a-descriptions-item>
                             </a-descriptions>
                         </a-tab-pane>
-                        <a-tab-pane
-                            key="salary_details"
-                            :tab="$t('user.salary_details')"
-                            v-if="
-                                permsArray.includes('salary_settings') ||
-                                permsArray.includes('admin')
-                            "
-                        >
-                            <a-descriptions
-                                layout="vertical"
-                                :labelStyle="{
-                                    fontWeight: 'bold',
-                                }"
-                                :contentStyle="{ fontWeight: 500, marginBottom: '5px' }"
-                            >
-                                <a-descriptions-item
-                                    :label="$t('basic_salary.basic_salary')"
-                                >
+                        <a-tab-pane key="salary_details" :tab="$t('user.salary_details')" v-if="
+                            permsArray.includes('salary_settings') ||
+                            permsArray.includes('admin')
+                        ">
+                            <a-descriptions layout="vertical" :labelStyle="{
+                                fontWeight: 'bold',
+                            }" :contentStyle="{ fontWeight: 500, marginBottom: '5px' }">
+                                <a-descriptions-item :label="$t('basic_salary.basic_salary')">
                                     {{
                                         user.basic_salary
                                             ? formatAmountCurrency(user.basic_salary)
@@ -205,71 +194,41 @@
             <a-row :gutter="[16, 16]">
                 <a-col :xs="24" :sm="24" :md="24" :lg="24">
                     <a-tabs v-model:activeKey="tabKeys" @change="onTabChange">
-                        <a-tab-pane
-                            key="appreciations_view"
-                            :tab="$t('user.apprecation')"
-                            v-if="
-                                permsArray.includes('appreciations_view') ||
-                                permsArray.includes('admin')
-                            "
-                            force-render
-                        >
-                            <AppreciationTable
-                                ref="appreciationTableRef"
-                                :filters="filters"
-                                tableSize="middle"
-                                :bordered="true"
-                                :selectable="true"
-                                :isPageTableContent="false"
-                            >
-                                <template
-                                    #actions="{
-                                        addItem,
-                                        selectedRowKeys,
-                                        showSelectedDeleteConfirm,
-                                    }"
-                                >
+                        <a-tab-pane key="appreciations_view" :tab="$t('user.apprecation')" v-if="
+                            permsArray.includes('appreciations_view') ||
+                            permsArray.includes('admin')
+                        " force-render>
+                            <AppreciationTable ref="appreciationTableRef" :filters="filters" tableSize="middle"
+                                :bordered="true" :selectable="true" :isPageTableContent="false">
+                                <template #actions="{
+                                    addItem,
+                                    selectedRowKeys,
+                                    showSelectedDeleteConfirm,
+                                }">
                                     <a-row :gutter="[16, 16]" class="mb-10">
-                                        <a-col
-                                            :xs="24"
-                                            :sm="24"
-                                            :md="12"
-                                            :lg="10"
-                                            :xl="10"
-                                        >
+                                        <a-col :xs="24" :sm="24" :md="12" :lg="10" :xl="10">
                                             <a-space>
-                                                <template
-                                                    v-if="
-                                                        permsArray.includes(
-                                                            'appreciations_create'
-                                                        ) || permsArray.includes('admin')
-                                                    "
-                                                >
-                                                    <a-button
-                                                        type="primary"
-                                                        @click="addItem"
-                                                        class="mb-5"
-                                                    >
+                                                <template v-if="
+                                                    permsArray.includes(
+                                                        'appreciations_create'
+                                                    ) || permsArray.includes('admin')
+                                                ">
+                                                    <a-button type="primary" @click="addItem" class="mb-5">
                                                         <PlusOutlined />
                                                         {{ $t("appreciation.add") }}
                                                     </a-button>
                                                 </template>
-                                                <a-button
-                                                    v-if="
-                                                        selectedRowKeys.length > 0 &&
-                                                        (permsArray.includes(
-                                                            'appreciations_delete'
-                                                        ) ||
-                                                            permsArray.includes('admin'))
-                                                    "
-                                                    type="primary"
-                                                    class="mb-5"
-                                                    @click="showSelectedDeleteConfirm"
-                                                    danger
-                                                >
-                                                    <template #icon
-                                                        ><DeleteOutlined
-                                                    /></template>
+                                                <a-button v-if="
+                                                    selectedRowKeys.length > 0 &&
+                                                    (permsArray.includes(
+                                                        'appreciations_delete'
+                                                    ) ||
+                                                        permsArray.includes('admin'))
+                                                " type="primary" class="mb-5" @click="showSelectedDeleteConfirm"
+                                                    danger>
+                                                    <template #icon>
+                                                        <DeleteOutlined />
+                                                    </template>
                                                     {{ $t("common.delete") }}
                                                 </a-button>
                                             </a-space>
@@ -279,72 +238,42 @@
                             </AppreciationTable>
                         </a-tab-pane>
 
-                        <a-tab-pane
-                            key="warnings_view"
-                            :tab="$t('menu.warnings')"
-                            v-if="
-                                permsArray.includes('warnings_view') ||
-                                permsArray.includes('admin')
-                            "
-                            force-render
-                        >
-                            <WarningTable
-                                ref="warningTableRef"
-                                :filters="filters"
-                                tableSize="middle"
-                                :bordered="true"
-                                :selectable="true"
-                                :isPageTableContent="false"
-                            >
-                                <template
-                                    #actions="{
-                                        addItem,
-                                        showSelectedDeleteConfirm,
-                                        table,
-                                    }"
-                                >
+                        <a-tab-pane key="warnings_view" :tab="$t('menu.warnings')" v-if="
+                            permsArray.includes('warnings_view') ||
+                            permsArray.includes('admin')
+                        " force-render>
+                            <WarningTable ref="warningTableRef" :filters="filters" tableSize="middle" :bordered="true"
+                                :selectable="true" :isPageTableContent="false">
+                                <template #actions="{
+                                    addItem,
+                                    showSelectedDeleteConfirm,
+                                    table,
+                                }">
                                     <a-row :gutter="[16, 16]" class="mb-10">
-                                        <a-col
-                                            :xs="24"
-                                            :sm="24"
-                                            :md="12"
-                                            :lg="10"
-                                            :xl="10"
-                                        >
+                                        <a-col :xs="24" :sm="24" :md="12" :lg="10" :xl="10">
                                             <a-space>
-                                                <template
-                                                    v-if="
-                                                        permsArray.includes(
-                                                            'warnings_create'
-                                                        ) || permsArray.includes('admin')
-                                                    "
-                                                >
-                                                    <a-button
-                                                        type="primary"
-                                                        @click="addItem"
-                                                        class="mb-5"
-                                                    >
+                                                <template v-if="
+                                                    permsArray.includes(
+                                                        'warnings_create'
+                                                    ) || permsArray.includes('admin')
+                                                ">
+                                                    <a-button type="primary" @click="addItem" class="mb-5">
                                                         <PlusOutlined />
                                                         {{ $t("warning.add") }}
                                                     </a-button>
                                                 </template>
-                                                <a-button
-                                                    v-if="
-                                                        table.selectedRowKeys.length >
-                                                            0 &&
-                                                        (permsArray.includes(
-                                                            'warnings_delete'
-                                                        ) ||
-                                                            permsArray.includes('admin'))
-                                                    "
-                                                    type="primary"
-                                                    class="mb-5"
-                                                    @click="showSelectedDeleteConfirm"
-                                                    danger
-                                                >
-                                                    <template #icon
-                                                        ><DeleteOutlined
-                                                    /></template>
+                                                <a-button v-if="
+                                                    table.selectedRowKeys.length >
+                                                    0 &&
+                                                    (permsArray.includes(
+                                                        'warnings_delete'
+                                                    ) ||
+                                                        permsArray.includes('admin'))
+                                                " type="primary" class="mb-5" @click="showSelectedDeleteConfirm"
+                                                    danger>
+                                                    <template #icon>
+                                                        <DeleteOutlined />
+                                                    </template>
                                                     {{ $t("common.delete") }}
                                                 </a-button>
                                             </a-space>
@@ -354,92 +283,51 @@
                             </WarningTable>
                         </a-tab-pane>
 
-                        <a-tab-pane
-                            key="assets_view"
-                            :tab="$t('user.assets')"
-                            v-if="
-                                permsArray.includes('assets_view') ||
-                                permsArray.includes('admin')
-                            "
-                            force-render
-                        >
-                            <AssetUserTable
-                                ref="assetUserTableRef"
-                                :filters="filters"
-                                tableSize="middle"
-                                :bordered="true"
-                                :selectable="true"
-                                :isPageTableContent="false"
-                            >
+                        <a-tab-pane key="assets_view" :tab="$t('user.assets')" v-if="
+                            permsArray.includes('assets_view') ||
+                            permsArray.includes('admin')
+                        " force-render>
+                            <AssetUserTable ref="assetUserTableRef" :filters="filters" tableSize="middle"
+                                :bordered="true" :selectable="true" :isPageTableContent="false">
                             </AssetUserTable>
                         </a-tab-pane>
 
-                        <a-tab-pane
-                            key="leaves_view"
-                            :tab="$t('user.leaves')"
-                            v-if="
-                                permsArray.includes('leaves_view') ||
-                                permsArray.includes('admin')
-                            "
-                            force-render
-                        >
-                            <LeavesTable
-                                ref="leavesTableRef"
-                                :filters="filters"
-                                tableSize="middle"
-                                :bordered="true"
-                                :selectable="true"
-                                :isPageTableContent="false"
-                            >
-                                <template
-                                    #actions="{
-                                        addItem,
-                                        showSelectedDeleteConfirm,
-                                        table,
-                                    }"
-                                >
+                        <a-tab-pane key="leaves_view" :tab="$t('user.leaves')" v-if="
+                            permsArray.includes('leaves_view') ||
+                            permsArray.includes('admin')
+                        " force-render>
+                            <LeavesTable ref="leavesTableRef" :filters="filters" tableSize="middle" :bordered="true"
+                                :selectable="true" :isPageTableContent="false">
+                                <template #actions="{
+                                    addItem,
+                                    showSelectedDeleteConfirm,
+                                    table,
+                                }">
                                     <a-row :gutter="[16, 16]" class="mb-10">
-                                        <a-col
-                                            :xs="24"
-                                            :sm="24"
-                                            :md="12"
-                                            :lg="10"
-                                            :xl="10"
-                                        >
+                                        <a-col :xs="24" :sm="24" :md="12" :lg="10" :xl="10">
                                             <a-space>
-                                                <template
-                                                    v-if="
-                                                        permsArray.includes(
-                                                            'leaves_create'
-                                                        ) || permsArray.includes('admin')
-                                                    "
-                                                >
-                                                    <a-button
-                                                        type="primary"
-                                                        @click="addItem"
-                                                        class="mb-5"
-                                                    >
+                                                <template v-if="
+                                                    permsArray.includes(
+                                                        'leaves_create'
+                                                    ) || permsArray.includes('admin')
+                                                ">
+                                                    <a-button type="primary" @click="addItem" class="mb-5">
                                                         <PlusOutlined />
                                                         {{ $t("leave.add") }}
                                                     </a-button>
                                                 </template>
-                                                <a-button
-                                                    v-if="
-                                                        table.selectedRowKeys.length >
-                                                            0 &&
-                                                        (permsArray.includes(
-                                                            'leaves_delete'
-                                                        ) ||
-                                                            permsArray.includes('admin'))
-                                                    "
-                                                    type="primary"
-                                                    class="mb-5"
-                                                    @click="showSelectedDeleteConfirm"
-                                                    danger
-                                                >
-                                                    <template #icon
-                                                        ><DeleteOutlined
-                                                    /></template>
+                                                <a-button v-if="
+                                                    table.selectedRowKeys.length >
+                                                    0 &&
+                                                    (permsArray.includes(
+                                                        'leaves_delete'
+                                                    ) ||
+                                                        permsArray.includes('admin'))
+                                                " type="primary" class="mb-5" @click="showSelectedDeleteConfirm"
+                                                    danger>
+                                                    <template #icon>
+                                                        <DeleteOutlined />
+                                                    </template>
                                                     {{ $t("common.delete") }}
                                                 </a-button>
                                             </a-space>
@@ -448,72 +336,42 @@
                                 </template>
                             </LeavesTable>
                         </a-tab-pane>
-                        <a-tab-pane
-                            key="complaints_view"
-                            :tab="$t('menu.complaints')"
-                            v-if="
-                                permsArray.includes('complaints_view') ||
-                                permsArray.includes('admin')
-                            "
-                            force-render
-                        >
-                            <ComplaintTable
-                                ref="complaintTableRef"
-                                :filters="complaintFilters"
-                                tableSize="middle"
-                                :bordered="true"
-                                :selectable="true"
-                                :isPageTableContent="false"
-                            >
-                                <template
-                                    #actions="{
-                                        addItem,
-                                        showSelectedDeleteConfirm,
-                                        table,
-                                    }"
-                                >
+                        <a-tab-pane key="complaints_view" :tab="$t('menu.complaints')" v-if="
+                            permsArray.includes('complaints_view') ||
+                            permsArray.includes('admin')
+                        " force-render>
+                            <ComplaintTable ref="complaintTableRef" :filters="complaintFilters" tableSize="middle"
+                                :bordered="true" :selectable="true" :isPageTableContent="false">
+                                <template #actions="{
+                                    addItem,
+                                    showSelectedDeleteConfirm,
+                                    table,
+                                }">
                                     <a-row :gutter="[16, 16]" class="mb-10">
-                                        <a-col
-                                            :xs="24"
-                                            :sm="24"
-                                            :md="12"
-                                            :lg="10"
-                                            :xl="10"
-                                        >
+                                        <a-col :xs="24" :sm="24" :md="12" :lg="10" :xl="10">
                                             <a-space>
-                                                <template
-                                                    v-if="
-                                                        permsArray.includes(
-                                                            'complaints_create'
-                                                        ) || permsArray.includes('admin')
-                                                    "
-                                                >
-                                                    <a-button
-                                                        type="primary"
-                                                        @click="addItem"
-                                                        class="mb-5"
-                                                    >
+                                                <template v-if="
+                                                    permsArray.includes(
+                                                        'complaints_create'
+                                                    ) || permsArray.includes('admin')
+                                                ">
+                                                    <a-button type="primary" @click="addItem" class="mb-5">
                                                         <PlusOutlined />
                                                         {{ $t("complaint.add") }}
                                                     </a-button>
                                                 </template>
-                                                <a-button
-                                                    v-if="
-                                                        table.selectedRowKeys.length >
-                                                            0 &&
-                                                        (permsArray.includes(
-                                                            'complaints_delete'
-                                                        ) ||
-                                                            permsArray.includes('admin'))
-                                                    "
-                                                    type="primary"
-                                                    class="mb-5"
-                                                    @click="showSelectedDeleteConfirm"
-                                                    danger
-                                                >
-                                                    <template #icon
-                                                        ><DeleteOutlined
-                                                    /></template>
+                                                <a-button v-if="
+                                                    table.selectedRowKeys.length >
+                                                    0 &&
+                                                    (permsArray.includes(
+                                                        'complaints_delete'
+                                                    ) ||
+                                                        permsArray.includes('admin'))
+                                                " type="primary" class="mb-5" @click="showSelectedDeleteConfirm"
+                                                    danger>
+                                                    <template #icon>
+                                                        <DeleteOutlined />
+                                                    </template>
                                                     {{ $t("common.delete") }}
                                                 </a-button>
                                             </a-space>
@@ -522,72 +380,42 @@
                                 </template>
                             </ComplaintTable>
                         </a-tab-pane>
-                        <a-tab-pane
-                            key="pre_payments_view"
-                            :tab="$t('menu.pre_payments')"
-                            v-if="
-                                permsArray.includes('pre_payments_view') ||
-                                permsArray.includes('admin')
-                            "
-                            force-render
-                        >
-                            <PrepaymentTable
-                                ref="prePaymentTableRef"
-                                :filters="filters"
-                                tableSize="middle"
-                                :bordered="true"
-                                :selectable="true"
-                                :isPageTableContent="false"
-                            >
-                                <template
-                                    #actions="{
-                                        addItem,
-                                        showSelectedDeleteConfirm,
-                                        table,
-                                    }"
-                                >
+                        <a-tab-pane key="pre_payments_view" :tab="$t('menu.pre_payments')" v-if="
+                            permsArray.includes('pre_payments_view') ||
+                            permsArray.includes('admin')
+                        " force-render>
+                            <PrepaymentTable ref="prePaymentTableRef" :filters="filters" tableSize="middle"
+                                :bordered="true" :selectable="true" :isPageTableContent="false">
+                                <template #actions="{
+                                    addItem,
+                                    showSelectedDeleteConfirm,
+                                    table,
+                                }">
                                     <a-row :gutter="[16, 16]" class="mb-10">
-                                        <a-col
-                                            :xs="24"
-                                            :sm="24"
-                                            :md="12"
-                                            :lg="10"
-                                            :xl="10"
-                                        >
+                                        <a-col :xs="24" :sm="24" :md="12" :lg="10" :xl="10">
                                             <a-space>
-                                                <template
-                                                    v-if="
-                                                        permsArray.includes(
-                                                            'pre_payments_create'
-                                                        ) || permsArray.includes('admin')
-                                                    "
-                                                >
-                                                    <a-button
-                                                        type="primary"
-                                                        @click="addItem"
-                                                        class="mb-5"
-                                                    >
+                                                <template v-if="
+                                                    permsArray.includes(
+                                                        'pre_payments_create'
+                                                    ) || permsArray.includes('admin')
+                                                ">
+                                                    <a-button type="primary" @click="addItem" class="mb-5">
                                                         <PlusOutlined />
                                                         {{ $t("pre_payment.add") }}
                                                     </a-button>
                                                 </template>
-                                                <a-button
-                                                    v-if="
-                                                        table.selectedRowKeys.length >
-                                                            0 &&
-                                                        (permsArray.includes(
-                                                            'pre_payments_delete'
-                                                        ) ||
-                                                            permsArray.includes('admin'))
-                                                    "
-                                                    type="primary"
-                                                    class="mb-5"
-                                                    @click="showSelectedDeleteConfirm"
-                                                    danger
-                                                >
-                                                    <template #icon
-                                                        ><DeleteOutlined
-                                                    /></template>
+                                                <a-button v-if="
+                                                    table.selectedRowKeys.length >
+                                                    0 &&
+                                                    (permsArray.includes(
+                                                        'pre_payments_delete'
+                                                    ) ||
+                                                        permsArray.includes('admin'))
+                                                " type="primary" class="mb-5" @click="showSelectedDeleteConfirm"
+                                                    danger>
+                                                    <template #icon>
+                                                        <DeleteOutlined />
+                                                    </template>
                                                     {{ $t("common.delete") }}
                                                 </a-button>
                                             </a-space>
@@ -596,89 +424,48 @@
                                 </template>
                             </PrepaymentTable>
                         </a-tab-pane>
-                        <a-tab-pane
-                            v-if="
-                                permsArray.includes('payrolls_view') ||
-                                permsArray.includes('admin')
-                            "
-                            key="payrolls_view"
-                            :tab="$t('menu.payrolls')"
-                            force-render
-                        >
-                            <PayRollTable
-                                ref="payRollTableRef"
-                                :filters="filters"
-                                tableSize="middle"
-                                :bordered="true"
-                                :selectable="true"
-                                :isPageTableContent="false"
-                            >
+                        <a-tab-pane v-if="
+                            permsArray.includes('payrolls_view') ||
+                            permsArray.includes('admin')
+                        " key="payrolls_view" :tab="$t('menu.payrolls')" force-render>
+                            <PayRollTable ref="payRollTableRef" :filters="filters" tableSize="middle" :bordered="true"
+                                :selectable="true" :isPageTableContent="false">
                             </PayRollTable>
                         </a-tab-pane>
-                        <a-tab-pane
-                            v-if="
-                                permsArray.includes('increments_promotions_view') ||
-                                permsArray.includes('admin')
-                            "
-                            key="increments_promotions_view"
-                            :tab="$t('menu.increments_promotions')"
-                            force-render
-                        >
-                            <IncreamentTable
-                                ref="incrementTableRef"
-                                :filters="filters"
-                                tableSize="middle"
-                                :bordered="true"
-                                :selectable="true"
-                                :isPageTableContent="false"
-                            >
-                                <template
-                                    #actions="{
-                                        addItem,
-                                        showSelectedDeleteConfirm,
-                                        table,
-                                    }"
-                                >
+                        <a-tab-pane v-if="
+                            permsArray.includes('increments_promotions_view') ||
+                            permsArray.includes('admin')
+                        " key="increments_promotions_view" :tab="$t('menu.increments_promotions')" force-render>
+                            <IncreamentTable ref="incrementTableRef" :filters="filters" tableSize="middle"
+                                :bordered="true" :selectable="true" :isPageTableContent="false">
+                                <template #actions="{
+                                    addItem,
+                                    showSelectedDeleteConfirm,
+                                    table,
+                                }">
                                     <a-row :gutter="[16, 16]" class="mb-10">
-                                        <a-col
-                                            :xs="24"
-                                            :sm="24"
-                                            :md="12"
-                                            :lg="10"
-                                            :xl="10"
-                                        >
+                                        <a-col :xs="24" :sm="24" :md="12" :lg="10" :xl="10">
                                             <a-space>
-                                                <a-button
-                                                    type="primary"
-                                                    class="mb-5"
-                                                    @click="addItem"
-                                                    v-if="
-                                                        permsArray.includes(
-                                                            'increments_promotions_create'
-                                                        ) || permsArray.includes('admin')
-                                                    "
-                                                >
+                                                <a-button type="primary" class="mb-5" @click="addItem" v-if="
+                                                    permsArray.includes(
+                                                        'increments_promotions_create'
+                                                    ) || permsArray.includes('admin')
+                                                ">
                                                     <PlusOutlined />
                                                     {{ $t("increment_promotion.add") }}
                                                 </a-button>
 
-                                                <a-button
-                                                    class="mb-5"
-                                                    v-if="
-                                                        table.selectedRowKeys.length >
-                                                            0 &&
-                                                        (permsArray.includes(
-                                                            'increments_promotions_delete'
-                                                        ) ||
-                                                            permsArray.includes('admin'))
-                                                    "
-                                                    type="primary"
-                                                    @click="showSelectedDeleteConfirm"
-                                                    danger
-                                                >
-                                                    <template #icon
-                                                        ><DeleteOutlined
-                                                    /></template>
+                                                <a-button class="mb-5" v-if="
+                                                    table.selectedRowKeys.length >
+                                                    0 &&
+                                                    (permsArray.includes(
+                                                        'increments_promotions_delete'
+                                                    ) ||
+                                                        permsArray.includes('admin'))
+                                                " type="primary" @click="showSelectedDeleteConfirm" danger>
+                                                    <template #icon>
+                                                        <DeleteOutlined />
+                                                    </template>
                                                     {{ $t("common.delete") }}
                                                 </a-button>
                                             </a-space>
@@ -687,113 +474,44 @@
                                 </template>
                             </IncreamentTable>
                         </a-tab-pane>
-                        <a-tab-pane
-                            v-if="
-                                permsArray.includes('feedbacks_view') ||
-                                permsArray.includes('admin')
-                            "
-                            key="feedbacks_view"
-                            :tab="$t('menu.feedbacks')"
-                            force-render
-                        >
-                            <ResponseTable
-                                ref="responseTable"
-                                :filters="filters"
-                                tableSize="middle"
-                                :bordered="true"
-                                :selectable="true"
-                                :visible="adjustedVisible"
-                                :responseColumns="responseColumns"
-                                :isPageTableContent="false"
-                            >
+                        <a-tab-pane v-if="
+                            permsArray.includes('feedbacks_view') ||
+                            permsArray.includes('admin')
+                        " key="feedbacks_view" :tab="$t('menu.feedbacks')" force-render>
+                            <ResponseTable ref="responseTable" :filters="filters" tableSize="middle" :bordered="true"
+                                :selectable="true" :visible="adjustedVisible" :responseColumns="responseColumns"
+                                :isPageTableContent="false">
                             </ResponseTable>
                         </a-tab-pane>
-                        <a-tab-pane
-                            v-if="
-                                permsArray.includes('attendances_view') ||
-                                permsArray.includes('admin')
-                            "
-                            key="attendances_view"
-                            :tab="$t('menu.attendance_details')"
-                            force-render
-                        >
-                            <AttendanceDetail
-                                ref="attendanceRef"
-                                :filters="filters"
-                                tableSize="middle"
-                                :bordered="true"
-                                :selectable="true"
-                                :isPageTableContent="false"
-                            >
+                        <a-tab-pane v-if="
+                            permsArray.includes('attendances_view') ||
+                            permsArray.includes('admin')
+                        " key="attendances_view" :tab="$t('menu.attendance_details')" force-render>
+                            <AttendanceDetail ref="attendanceRef" :filters="filters" tableSize="middle" :bordered="true"
+                                :selectable="true" :isPageTableContent="false">
                                 <template #actions="{ filterData, monthArrays }">
                                     <a-row :gutter="[16, 16]" align="middle">
-                                        <a-col
-                                            :xs="24"
-                                            :sm="24"
-                                            :md="12"
-                                            :lg="10"
-                                            :xl="10"
-                                        >
+                                        <a-col :xs="24" :sm="24" :md="12" :lg="10" :xl="10">
                                         </a-col>
-                                        <a-col
-                                            :xs="24"
-                                            :sm="24"
-                                            :md="12"
-                                            :lg="14"
-                                            :xl="14"
-                                        >
-                                            <a-row
-                                                :gutter="[16, 16]"
-                                                justify="end"
-                                                style="margin-bottom: 15px"
-                                            >
-                                                <a-col
-                                                    :xs="24"
-                                                    :sm="24"
-                                                    :md="12"
-                                                    :lg="12"
-                                                    :xl="8"
-                                                >
-                                                    <a-date-picker
-                                                        v-model:value="filters.year"
-                                                        :placeholder="
-                                                            $t(
-                                                                'common.select_default_text',
-                                                                [$t('holiday.year')]
-                                                            )
-                                                        "
-                                                        picker="year"
-                                                        @change="filterData"
-                                                        style="width: 100%"
-                                                        :allowClear="false"
-                                                    />
+                                        <a-col :xs="24" :sm="24" :md="12" :lg="14" :xl="14">
+                                            <a-row :gutter="[16, 16]" justify="end" style="margin-bottom: 15px">
+                                                <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="8">
+                                                    <a-date-picker v-model:value="filters.year" :placeholder="$t(
+                                                        'common.select_default_text',
+                                                        [$t('holiday.year')]
+                                                    )
+                                                        " picker="year" @change="filterData" style="width: 100%"
+                                                        :allowClear="false" />
                                                 </a-col>
-                                                <a-col
-                                                    :xs="24"
-                                                    :sm="24"
-                                                    :md="8"
-                                                    :lg="8"
-                                                    :xl="6"
-                                                >
-                                                    <a-select
-                                                        v-model:value="filters.month"
-                                                        :placeholder="
-                                                            $t(
-                                                                'common.select_default_text',
-                                                                [$t('holiday.month')]
-                                                            )
-                                                        "
-                                                        :allowClear="false"
-                                                        style="width: 100%"
-                                                        optionFilterProp="title"
-                                                        show-search
-                                                        @change="filterData"
-                                                    >
-                                                        <a-select-option
-                                                            v-for="month in monthArrays"
-                                                            :key="month.name"
-                                                            :value="month.value"
-                                                        >
+                                                <a-col :xs="24" :sm="24" :md="8" :lg="8" :xl="6">
+                                                    <a-select v-model:value="filters.month" :placeholder="$t(
+                                                        'common.select_default_text',
+                                                        [$t('holiday.month')]
+                                                    )
+                                                        " :allowClear="false" style="width: 100%"
+                                                        optionFilterProp="title" show-search @change="filterData">
+                                                        <a-select-option v-for="month in monthArrays" :key="month.name"
+                                                            :value="month.value">
                                                             {{ month.name }}
                                                         </a-select-option>
                                                     </a-select>
@@ -802,120 +520,88 @@
                                         </a-col>
                                     </a-row>
                                 </template>
-                                <template
-                                    #card="{
-                                        totalPresentDays,
-                                        workingDays,
-                                        totalOfficeTime,
-                                        formatMinutes,
-                                        clockInDuration,
-                                        clockInDurationPercentage,
-                                        totalLateDaysPercentage,
-                                        totalLateDays,
-                                        halfDayCount,
-                                    }"
-                                >
+                                <template #card="{
+                                    totalPresentDays,
+                                    workingDays,
+                                    totalOfficeTime,
+                                    formatMinutes,
+                                    clockInDuration,
+                                    clockInDurationPercentage,
+                                    totalLateDaysPercentage,
+                                    totalLateDays,
+                                    halfDayCount,
+                                }">
                                     <div style="height: 180px; margin-bottom: 15px">
                                         <a-row :gutter="16">
                                             <a-col :xs="24" :sm="24" :md="8" :lg="5">
                                                 <a-card style="height: 100%">
-                                                    <a-statistic
-                                                        :title="
-                                                            $t(
-                                                                'attendance.present_working_days'
-                                                            )
-                                                        "
-                                                        :value="`${totalPresentDays} / ${workingDays} ${$t(
+                                                    <a-statistic :title="$t(
+                                                        'attendance.present_working_days'
+                                                    )
+                                                        " :value="`${totalPresentDays} / ${workingDays} ${$t(
                                                             'attendance.days'
-                                                        )}`"
-                                                        :value-style="{
+                                                        )}`" :value-style="{
                                                             color:
                                                                 totalPresentDays >=
-                                                                workingDays
+                                                                    workingDays
                                                                     ? '#3f8600'
                                                                     : '#cf1322',
-                                                        }"
-                                                        style="margin-right: 50px"
-                                                    />
+                                                        }" style="margin-right: 50px" />
                                                 </a-card>
                                             </a-col>
                                             <a-col :xs="24" :sm="24" :md="8" :lg="5">
                                                 <a-card style="height: 100%">
-                                                    <a-statistic
-                                                        :title="
-                                                            $t(
-                                                                'attendance.total_office_time'
-                                                            )
-                                                        "
-                                                        :value="
-                                                            totalOfficeTime > 0
+                                                    <a-statistic :title="$t(
+                                                        'attendance.total_office_time'
+                                                    )
+                                                        " :value="totalOfficeTime > 0
                                                                 ? formatMinutes(
-                                                                      totalOfficeTime
-                                                                  )
+                                                                    totalOfficeTime
+                                                                )
                                                                 : '--'
-                                                        "
-                                                        :value-style="{
+                                                            " :value-style="{
                                                             color: '#3f8600',
-                                                        }"
-                                                    />
+                                                        }" />
                                                 </a-card>
                                             </a-col>
                                             <a-col :xs="24" :sm="24" :md="8" :lg="6">
                                                 <a-card style="height: 100%">
-                                                    <a-statistic
-                                                        :title="
-                                                            $t(
-                                                                'attendance.total_worked_time'
-                                                            )
-                                                        "
-                                                        :value="
-                                                            clockInDurationPercentage > 0
+                                                    <a-statistic :title="$t(
+                                                        'attendance.total_worked_time'
+                                                    )
+                                                        " :value="clockInDurationPercentage > 0
                                                                 ? `${formatMinutes(
-                                                                      clockInDuration
-                                                                  )} (${clockInDurationPercentage}%)`
+                                                                    clockInDuration
+                                                                )} (${clockInDurationPercentage}%)`
                                                                 : '--'
-                                                        "
-                                                        :value-style="{
+                                                            " :value-style="{
                                                             color:
                                                                 clockInDuration >=
-                                                                totalOfficeTime
+                                                                    totalOfficeTime
                                                                     ? '#3f8600'
                                                                     : '#cf1322',
-                                                        }"
-                                                    />
+                                                        }" />
                                                 </a-card>
                                             </a-col>
 
                                             <a-col :xs="24" :sm="24" :md="8" :lg="5">
                                                 <a-card style="height: 100%">
-                                                    <a-statistic
-                                                        :title="$t('attendance.late')"
-                                                        :value="
-                                                            totalLateDaysPercentage > 0
-                                                                ? `${totalLateDays} ${$t(
-                                                                      'attendance.days'
-                                                                  )} (${totalLateDaysPercentage}%)`
-                                                                : '--'
-                                                        "
-                                                        class="demo-class"
-                                                        :value-style="{
+                                                    <a-statistic :title="$t('attendance.late')" :value="totalLateDaysPercentage > 0
+                                                            ? `${totalLateDays} ${$t(
+                                                                'attendance.days'
+                                                            )} (${totalLateDaysPercentage}%)`
+                                                            : '--'
+                                                        " class="demo-class" :value-style="{
                                                             color: '#cf1322',
-                                                        }"
-                                                    />
+                                                        }" />
                                                 </a-card>
                                             </a-col>
                                             <a-col :xs="24" :sm="24" :md="8" :lg="3">
                                                 <a-card style="height: 100%">
-                                                    <a-statistic
-                                                        :title="
-                                                            $t('attendance.half_days')
-                                                        "
-                                                        :value="`${halfDayCount}`"
-                                                        class="demo-class"
-                                                        :value-style="{
+                                                    <a-statistic :title="$t('attendance.half_days')
+                                                        " :value="`${halfDayCount}`" class="demo-class" :value-style="{
                                                             color: '#cf1322',
-                                                        }"
-                                                    />
+                                                        }" />
                                                 </a-card>
                                             </a-col>
                                         </a-row>
@@ -1129,10 +815,10 @@ export default defineComponent({
 });
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .user-details {
-    .ant-descriptions-item {
-        padding-bottom: 5px;
+    :deep(.ant-descriptions-item) {
+        padding-bottom: 4px !important;
     }
 }
 </style>
