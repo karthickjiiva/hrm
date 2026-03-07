@@ -12,6 +12,8 @@ use Examyou\RestAPI\ApiResponse;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\SalaryLeavesExport;
 use App\Exports\LeaveSalaryStatementExport;
+use App\Exports\LeaveSalaryBankExport;
+use App\Exports\LeaveListExport;
 
 class SalaryLeaveController extends ApiBaseController
 {
@@ -165,8 +167,10 @@ public function statementHistory()
             'year' => $row->year,
             'period_label' => "Jan {$row->year} - Dec {$row->year}",
             'filename' => $row->filename,
-            'created_at_formatted' => $row->created_at->format('d-M-Y H:i'),
+            'created_at_formatted' => $row->created_at->format('d-M-Y'),
             'download_url' => asset("storage/{$row->path}"), 
+            'bank_filename' => $row->bank_filename, // Needed for the 'bank' type
+            'bank_download_url' => asset("storage/{$row->bank_path}"),
         ];
     });
 
@@ -179,5 +183,66 @@ public function statementHistory()
         ]
     ]);
 }
+
+
+public function export_leavelist(Request $request)
+{
+    $month = $request->get('month');
+    $year = $request->get('year');
+
+    if (!$month || !$year) {
+        return response()->json(['message' => 'Month and Year are required.'], 422);
+    }
+
+    try {
+        $leaves = \App\Models\Leave::with(['user', 'leaveType'])
+            ->byMonth($month, $year)
+            ->whereHas('user', function ($query) {
+                $query->where('name', '!=', 'Admin');
+            })
+            ->orderBy('user_id', 'asc') 
+            ->orderBy('leave_date', 'asc')
+            ->get();
+     
+        // $leaves = \App\Models\Leave::with(['user', 'leaveType'])
+        // ->byMonth($month, $year)
+        // ->whereHas('user', function ($query) {
+        // $query->where('name', '!=', 'Admin');
+        // })
+        // ->orderBy('leave_date', 'asc')
+        // ->get();
+        
+        if ($leaves->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No leave records found for the selected period.'
+            ], 404);
+        }
+
+        // --- NEW DECORATION DATA START ---
+        // Convert month number (4) to name (April) for the title
+        $monthName = date("F", mktime(0, 0, 0, $month, 10));
+        // --- NEW DECORATION DATA END ---
+
+        $filename = "Leave_Report_{$month}_{$year}.xlsx";
+        $filePath = 'exports/' . $filename;
+ 
+
+Excel::store(new LeaveListExport($leaves, $monthName, $year), $filePath, 'public');
+
+        return response()->json([
+            'success' => true,
+            'download_url' => asset('storage/' . $filePath),
+            'filename' => $filename
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Export failed: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
 
 }

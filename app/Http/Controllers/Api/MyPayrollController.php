@@ -35,9 +35,9 @@ class MyPayrollController extends ApiBaseController
         $month = $request->month;
         $year = $request->year;
 
-        //$employees = StaffMember::where('status', 'active')->get();
         $employees = StaffMember::where('status', 'active')
-        ->where('has_resigned', 1) 
+        ->where('has_resigned', 0) 
+        ->where('hold_status', 0) 
         ->where('name', '!=', 'Admin')
         ->get();
 
@@ -85,10 +85,20 @@ class MyPayrollController extends ApiBaseController
         $leaveInfo = $this->getDetailedLeaveInfo($employee->id, $month, $year);
         $totalLeavesTaken = round(array_sum($leaveInfo['all_leave_dates']), 2);
         $daysPresent = $totalDaysInMonth - $totalLeavesTaken;
+        
+        $employeeType = $employee->employeeType->type ?? '';
+        $earned = ['cl' => 0, 'sl' => 0, 'el' => 0];
+    
+        if ($employeeType !== 'Consultant Emp') {
+            $earned = $this->calculateMonthlyEarnedLeaves($employee, $daysPresent, $month, $year);
+            $leaveMaster = $this->updateEarnedLeaves($employee->id, $earned);
+        } else {
+            $leaveMaster = \App\Models\EmployeeLeaveMaster::firstOrNew(['employee_id' => $employee->id]);
+        }
 
-        $earned = $this->calculateMonthlyEarnedLeaves($employee, $daysPresent, $month, $year);
-        //$earned = $this->calculateMonthlyEarnedLeaves($daysPresent);
-        $leaveMaster = $this->updateEarnedLeaves($employee->id, $earned);
+        // $earned = $this->calculateMonthlyEarnedLeaves($employee, $daysPresent, $month, $year);
+        // $earned = $this->calculateMonthlyEarnedLeaves($daysPresent);
+        // $leaveMaster = $this->updateEarnedLeaves($employee->id, $earned);
 
         $leaveDeduction = $this->applyLeaveDeductions($employee->id, $totalLeavesTaken, $leaveMaster);
         $lossOfPayDays = $leaveDeduction['loss_of_pay_days'];
@@ -117,7 +127,9 @@ class MyPayrollController extends ApiBaseController
 
         $esi = 0;
         if ($employee->esi_enabled) {
-            $calculatedESI = round(($basic * $employee->esi_percentage) / 100, 2);
+            $esiBase = $basic + $hra;
+            $calculatedESI = round(($esiBase * $employee->esi_percentage) / 100, 2);
+            //$calculatedESI = round(($basic * $employee->esi_percentage) / 100, 2);
             $esi = ((float) $employee->monthly_esi == $employee->esi_percentage) ? $employee->monthly_esi : $calculatedESI;
         }
 
@@ -306,32 +318,34 @@ protected function getDetailedLeaveInfo($employeeId, $month, $year)
         $earned = ['cl' => 0, 'sl' => 0, 'el' => 0];
 
         if ($gapInYears >= 1) {
-            if ($presentDays >= 7 && $presentDays <= 12) {
+           if ($presentDays >= 4.5 && $presentDays <= 8) {
+                $earned['cl'] = 0.5;
+            } elseif ($presentDays >= 8.5 && $presentDays <= 12) {
                 $earned['cl'] = 1;
-            } elseif ($presentDays >= 12.5 && $presentDays <= 17) {
+            } elseif ($presentDays >= 12.5 && $presentDays <= 16) {
                 $earned['cl'] = 1;
                 $earned['sl'] = 0.5;
-            } elseif ($presentDays >= 17.5 && $presentDays <= 22) {
+            } elseif ($presentDays >= 16.5 && $presentDays <= 21) {
                 $earned['cl'] = 1;
                 $earned['sl'] = 1;
-            } elseif ($presentDays >= 22.5 && $presentDays <= 27) {
+            } elseif ($presentDays >= 21.5 && $presentDays <= 24) {
                 $earned['cl'] = 1;
                 $earned['sl'] = 1;
                 $earned['el'] = 0.5;
-            } elseif ($presentDays > 27) {
+            } elseif ($presentDays >= 24.5) {
                 $earned['cl'] = 1;
                 $earned['sl'] = 1;
                 $earned['el'] = 1;
             }
         } else {
-            if ($presentDays >= 7 && $presentDays <= 12) {
+            if ($presentDays >= 8 && $presentDays <= 13) {
                 $earned['cl'] = 0.5;
-            } elseif ($presentDays >= 12.5 && $presentDays <= 17) {
+            } elseif ($presentDays >= 13.5 && $presentDays <= 18) {
                 $earned['cl'] = 1;
-            } elseif ($presentDays >= 17.5 && $presentDays <= 22) {
+            } elseif ($presentDays >= 18.5 && $presentDays <= 24) {
                 $earned['cl'] = 1;
                 $earned['sl'] = 0.5;
-            } elseif ($presentDays > 22) {
+            } elseif ($presentDays >= 24.5) {
                 $earned['cl'] = 1;
                 $earned['sl'] = 1;
             }
@@ -351,7 +365,24 @@ protected function getDetailedLeaveInfo($employeeId, $month, $year)
         return ['cl' => 0, 'sl' => 0, 'el' => 0];
     }
 
+
     protected function updateEarnedLeaves($employeeId, $earned)
+    {
+        $employee = StaffMember::find($employeeId);
+        $employeeType = $employee->employeeType->type ?? '';
+        if ($employeeType === 'Consultant Emp') {
+            return \App\Models\EmployeeLeaveMaster::firstOrNew(['employee_id' => $employeeId]);
+        }
+    
+        $record = \App\Models\EmployeeLeaveMaster::firstOrNew(['employee_id' => $employeeId]);
+        $record->cl += $earned['cl'];
+        $record->sl += $earned['sl'];
+        $record->el += $earned['el'];
+        $record->save();
+        return $record;
+    }
+
+    protected function updateEarnedLeaves_oldd($employeeId, $earned)
     {
         $record = \App\Models\EmployeeLeaveMaster::firstOrNew(['employee_id' => $employeeId]);
         $record->cl += $earned['cl'];
@@ -362,29 +393,29 @@ protected function getDetailedLeaveInfo($employeeId, $month, $year)
     }
 
     protected function applyLeaveDeductions($employeeId, $totalLeaves, $leaveRecord)
-{
-    $remaining = (float) $totalLeaves;
-    $deductions = ['cl' => 0.0, 'sl' => 0.0, 'el' => 0.0];
-    $leaveOrder = ['cl', 'sl', 'el'];
-
-    foreach ($leaveOrder as $type) {
-        if ($remaining <= 0) break;
-
-        $available = (float) $leaveRecord->$type;
-
-        if ($available > 0) {
-            $used = min($available, $remaining);
-            $deductions[$type] += $used;
-            $leaveRecord->$type = round($available - $used, 2);
-            $remaining = round($remaining - $used, 2);
+    {
+        $remaining = (float) $totalLeaves;
+        $deductions = ['cl' => 0.0, 'sl' => 0.0, 'el' => 0.0];
+        $leaveOrder = ['cl', 'sl', 'el'];
+    
+        foreach ($leaveOrder as $type) {
+            if ($remaining <= 0) break;
+    
+            $available = (float) $leaveRecord->$type;
+    
+            if ($available > 0) {
+                $used = min($available, $remaining);
+                $deductions[$type] += $used;
+                $leaveRecord->$type = round($available - $used, 2);
+                $remaining = round($remaining - $used, 2);
+            }
         }
+        $leaveRecord->save();
+        return [
+            'deductions' => $deductions,
+            'loss_of_pay_days' => max(0, $remaining)
+        ];
     }
-    $leaveRecord->save();
-    return [
-        'deductions' => $deductions,
-        'loss_of_pay_days' => max(0, $remaining)
-    ];
-}
 
 
 protected function identifySandwichLeaves($employeeId, Carbon $startDate, Carbon $endDate)

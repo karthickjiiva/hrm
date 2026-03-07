@@ -77,7 +77,7 @@ public function index()
             abort(404, 'Payroll record not found');
         }
 
-        $payroll = PayrollNew::with(['employee.designation','employee.department',])->findOrFail($id);     
+        $payroll = PayrollNew::with(['employee.designation','employee.department','employee.bankMaster'])->findOrFail($id);     
 
         $company = Company::first();
         $logoUrl = $company->dark_logo_url;
@@ -100,6 +100,60 @@ public function index()
 
     
     public function proftax_export(Request $request)
+    {
+        $monthRange = $request->get('month'); 
+        $year = $request->get('year');
+        $type = $request->get('type');
+    
+        if (!$monthRange || !$year) {
+            return response()->json(['message' => 'Month and Year are required.'], 422);
+        }
+    
+        try {
+            [$startMonth, $endMonth] = explode('-', $monthRange);
+    
+            $query = User::with('employeeType');
+    
+            if ($type === 'bangalore') {
+                $query->whereHas('employeeType', function ($q) {
+                    $q->where('type', 'Bang Office Emp');
+                });
+            }
+    
+            $users = $query->get();
+    
+            if ($users->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No users found.'
+                ], 404);
+            }
+    
+            $filename = $type === 'bangalore'
+                ? "prof_tax_bangalore_{$monthRange}_{$year}.xlsx"
+                : "prof_tax_{$monthRange}_{$year}.xlsx";
+    
+            $export = new ProfTaxExport($users, $monthRange, $year);
+            $filePath = 'exports/' . $filename;
+    
+            Excel::store($export, $filePath, 'public');
+    
+            return response()->json([
+                'success' => true,
+                'download_url' => asset('storage/' . $filePath),
+                'filename' => $filename
+            ]);
+    
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Export failed: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+    public function proftax_exportxx(Request $request)
     {
         $monthRange = $request->get('month'); 
         $year = $request->get('year');
@@ -195,8 +249,68 @@ public function index()
         }
     }
 
-
     public function export(Request $request)
+    {
+        $month = $request->get('month');
+        $year = $request->get('year');
+        $type = $request->get('type');
+    
+        if (!$month || !$year) {
+            return response()->json(['message' => 'Month and Year are required.'], 422);
+        }
+    
+        try {
+    
+            $query = PayrollNew::with(['employee.designation', 'employee.employeeType'])
+                ->where('month', $month)
+                ->where('year', $year)
+               ->whereHas('employee', function ($query) {
+                $query->where('has_resigned', 0)
+                    ->where('name', '!=', 'Admin')
+                    ->where('hold_status', 0);
+                });
+    
+            if ($type == 'bangalore') {
+                $query->whereHas('employee.employeeType', function ($q) {
+                    $q->where('type', 'Bang Office Emp');
+                });
+            }
+    
+            $payrolls = $query->get();
+            
+            // $filteredPayrolls = $payrolls->filter(function ($payroll) {
+            // $employee = $payroll->employee;
+            // $employeeType = $employee->employeeType->type ?? '';
+            // if (trim($employeeType) === 'Consultant Emp') return false;
+            // return true;
+            // })->values();
+
+            $filename = $type === 'bangalore'
+                ? "Payroll_bangalore_{$month}_{$year}.xlsx"
+                : "Payroll_{$month}_{$year}.xlsx";
+    
+            $export = new PayrollExport($payrolls);  
+    
+            $filePath = 'exports/' . $filename;
+    
+            Excel::store($export, $filePath, 'public');
+    
+            return response()->json([
+                'success' => true,
+                'download_url' => asset('storage/' . $filePath),
+                'filename' => $filename
+            ]);
+    
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Export failed: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+    public function exportworkzxx(Request $request)
     {
         $month = $request->get('month');
         $year = $request->get('year');
@@ -209,6 +323,7 @@ public function index()
             $filename = "Payroll_{$month}_{$year}.xlsx";
             $export = new PayrollExport($month, $year);
             $filePath = 'exports/' . $filename;
+            // Store in storage/app/public/exports
             Excel::store($export, $filePath, 'public');
             return response()->json([
                 'success' => true,

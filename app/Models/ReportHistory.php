@@ -12,6 +12,8 @@ class ReportHistory extends Model
         'report_name',
         'year',
         'filename',
-        'path'
+        'path',
+        'bank_filename',
+        'bank_path'
     ];
 }

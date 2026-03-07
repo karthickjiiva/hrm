@@ -33,28 +33,31 @@ class BankStatementsExport implements FromCollection, WithHeadings, ShouldAutoSi
     public function headings(): array
     {
         return [
-            'Bank Name',
-            'IFSC Code',
-            'MICR Code',
-            'Account Number',
-            'Employee Name',
+            'Transaction Type',        
             'Amount',
-            'Remark',
-            'Date',
+            'Debit Account No',        
+            'IFSC',
+            'Beneficiary Account No',
+            'Beneficiary Name',
+            'Remarks for Client',
+            'Remarks for Beneficiary',
         ];
     }
 
     public function map($statement): array
     {
+        $monthName = \Carbon\Carbon::createFromDate($this->year, $this->month, 1)->format('F');
+        $remarkText = 'SALARY' . strtoupper($monthName) . $this->year;
+    
         return [
-            optional($statement->bankMaster)->bank_name ?? '-',
+            'WIB',
+            round($statement->amount),
+            '602651003205', 
             optional($statement->bankMaster)->ifsc ?? '-',
-            optional($statement->bankMaster)->micr ?? '-',
             optional($statement->bankMaster)->account_number ?? '-',
             optional($statement->employee)->name ?? '-',
-            $statement->amount,
-            $statement->remark,
-            $statement->created_at ? $statement->created_at->format('d-m-Y') : '-',
+            $remarkText,
+            $remarkText,
         ];
     }
 
@@ -62,44 +65,44 @@ class BankStatementsExport implements FromCollection, WithHeadings, ShouldAutoSi
     {
         return [
             AfterSheet::class => function (AfterSheet $event) {
-                $sheet = $event->sheet->getDelegate();
+            $sheet = $event->sheet->getDelegate();
+            
+            $monthName = \Carbon\Carbon::createFromDate($this->year, $this->month, 1)->format('F');
+            $title = "Bank Statements Report - {$monthName} {$this->year}";
+            
+            $sheet->insertNewRowBefore(1, 1);
+            $sheet->mergeCells('A1:H1'); 
+            $sheet->setCellValue('A1', $title);
 
-$monthName = \Carbon\Carbon::createFromDate($this->year, $this->month, 1)->format('F');
-$title = "Bank Statements Report - {$monthName} {$this->year}";
+            $sheet->getStyle('A1')->applyFromArray([
+                'font' => [
+                    'bold' => true,
+                    'size' => 14,
+                ],
+                'alignment' => [
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                    'vertical'   => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                ],
+                'fill' => [
+                    'fillType'   => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => 'E0E0E0'],  
+                ],
+            ]);
 
-                $sheet->insertNewRowBefore(1, 1);
-                $sheet->mergeCells('A1:H1'); 
-                $sheet->setCellValue('A1', $title);
-
-                $sheet->getStyle('A1')->applyFromArray([
-                    'font' => [
-                        'bold' => true,
-                        'size' => 14,
-                    ],
-                    'alignment' => [
-                        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                        'vertical'   => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-                    ],
-                    'fill' => [
-                        'fillType'   => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => ['rgb' => 'E0E0E0'],  
-                    ],
-                ]);
- 
-                $sheet->getStyle('A2:H2')->applyFromArray([
-                    'font' => [
-                        'bold' => true,
-                        'size' => 12,
-                        'color' => ['rgb' => 'FFFFFF'],
-                    ],
-                    'alignment' => [
-                        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                    ],
-                    'fill' => [
-                        'fillType'   => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => ['rgb' => '4F81BD'], 
-                    ],
-                ]);
+            $sheet->getStyle('A2:H2')->applyFromArray([
+                'font' => [
+                    'bold' => true,
+                    'size' => 12,
+                    'color' => ['rgb' => 'FFFFFF'],
+                ],
+                'alignment' => [
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                ],
+                'fill' => [
+                    'fillType'   => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => '4F81BD'], 
+                ],
+            ]);
             }
         ];
     }

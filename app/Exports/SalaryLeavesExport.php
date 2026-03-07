@@ -24,9 +24,15 @@ class SalaryLeavesExport implements FromCollection, WithHeadings, WithMapping, W
         $this->year  = $year;
     }
 
-    public function collection()
+   public function collection()
     {
-        return User::orderBy('id')->get();
+        return User::with('employeeType')
+            ->where('name', '!=', 'Admin') 
+            ->whereHas('employeeType', function ($query) {
+                $query->where('type', '!=', 'Consultant Emp'); 
+            })
+            ->orderBy('id')
+            ->get();
     }
 
     public function map($user): array
@@ -42,8 +48,8 @@ class SalaryLeavesExport implements FromCollection, WithHeadings, WithMapping, W
         return [
             $rowIndex,
             $user->name,
-            '18-Feb-08', // dummy DOJ
-            'BCIPL-C-073', // dummy emp code
+            $user->joining_date ? date('d-M-Y', strtotime($user->joining_date)) : '-', 
+            $user->employee_number ?? '-', 
             // CL
             $leaveSummary->opening_cl ?? 0,
             $leaveSummary->availed_cl ?? 0,

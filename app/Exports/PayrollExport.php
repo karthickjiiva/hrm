@@ -6,12 +6,19 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use App\Models\PayrollNew;
 
-class PayrollExport implements FromCollection, WithHeadings, WithStyles, WithColumnWidths
+class PayrollExport implements 
+    FromCollection, 
+    WithHeadings, 
+    WithStyles, 
+    WithColumnWidths,
+    WithColumnFormatting
+
 {
-    protected $month;
-    protected $year;
+    protected $payrolls;
 
     public function columnWidths(): array
     {
@@ -21,51 +28,68 @@ class PayrollExport implements FromCollection, WithHeadings, WithStyles, WithCol
         ];
     }
 
-    public function __construct($month, $year)
+    public function __construct($payrolls)
     {
-        $this->month = $month;
-        $this->year = $year;
+        $this->payrolls = $payrolls;
     }
+
+    public function columnFormats(): array
+    {
+        return [
+            'E' => NumberFormat::FORMAT_NUMBER_00,
+            'F' => NumberFormat::FORMAT_NUMBER_00,
+            'G' => NumberFormat::FORMAT_NUMBER_00,
+            'H' => NumberFormat::FORMAT_NUMBER_00,
+            'I' => NumberFormat::FORMAT_NUMBER_00,
+            'J' => NumberFormat::FORMAT_NUMBER_00,
+            'K' => NumberFormat::FORMAT_NUMBER_00,
+            'L' => NumberFormat::FORMAT_NUMBER_00,
+            'M' => NumberFormat::FORMAT_NUMBER_00,
+            'Q' => NumberFormat::FORMAT_NUMBER_00,
+            'R' => NumberFormat::FORMAT_NUMBER_00,
+            'S' => NumberFormat::FORMAT_NUMBER_00,
+            'T' => NumberFormat::FORMAT_NUMBER_00,
+            'V' => NumberFormat::FORMAT_NUMBER_00,
+        ];
+    }
+
 
     public function collection()
     {
-          $payrolls = PayrollNew::with(['employee.designation'])
-        ->where('month', $this->month)
-        ->where('year', $this->year)
-        ->whereHas('employee', function ($query) {
-            $query->where('has_resigned', 1)
-                  ->where('name', '!=', 'Admin');
-        })
-        ->get();
-        
-        return $payrolls->map(function ($payroll, $index) {
-            return [
-                'SL' => $index + 1,
-                'NAME' => $payroll->employee->name ?? '-',
-                'EMP NO' => $payroll->employee->employee_number ?? '-', 
-                'DESIGNATION' => $payroll->employee->designation->name ?? '-',
-                'NEW GROSS' => $payroll->total_earnings,
-                'BASIC 60%' => $payroll->basic,
-                'LIMIT' => 15000, 
-                'HRA 30%' => $payroll->hra,
-                'FOOD ALLOW 6%' => $payroll->food_allowance,
-                'CONVEY 4%' => $payroll->allowance,
-                'GROSS PAY' => round($payroll->total_earnings),
-                'PF' => $payroll->pf_employee,
-                'ESI' => $payroll->esi_employee,
-                'NO OF DAYS FOR THE MONTH' => $payroll->total_working_days,
-                'DAYS OF LOP' => $payroll->loss_of_pay_days,
-                'ACTUAL DAYS OF SALARY' => $payroll->actual_payable_days,
-                'TDS' => $payroll->tds,
-                'PRO TAX' => $payroll->professional_tax,
-                'NET SALARY' => round($payroll->net_salary), 
-                'GROSS SALARY CHECK' => $payroll->total_earnings,
-                'OTHERS' => '',
-                'NET SALARY (2)' => round($payroll->net_salary), 
-                'REMARKS' => '',
-            ];
-        });
-    }
+    return $this->payrolls->map(function ($payroll, $index) {
+        return [
+            'SL' => $index + 1,
+            'NAME' => $payroll->employee->name ?? '-',
+            'EMP NO' => $payroll->employee->employee_number ?? '-', 
+            'DESIGNATION' => $payroll->employee->designation->name ?? '-',
+            'NEW GROSS' => $payroll->total_earnings,
+            'BASIC 60%' => $payroll->basic,
+            'LIMIT' => 15000, 
+            'HRA 30%' => $payroll->hra,
+            'FOOD ALLOW 6%' => $payroll->food_allowance,
+            'CONVEY 4%' => $payroll->allowance,
+            'GROSS PAY' => round($payroll->total_earnings),
+            'PF' => $payroll->pf_employee,
+            'ESI' => $payroll->esi_employee,
+            'NO OF DAYS FOR THE MONTH' => $payroll->total_working_days,
+            'DAYS OF LOP' => $payroll->loss_of_pay_days,
+            'ACTUAL DAYS OF SALARY' => $payroll->actual_payable_days,
+            'TDS' => $payroll->tds,
+            'PRO TAX' => $payroll->professional_tax,
+            'NET SALARY' => round($payroll->net_salary), 
+            'GROSS SALARY CHECK' => $payroll->total_earnings,
+            'OTHERS' => '',
+            'NET SALARY (2)' => round($payroll->net_salary), 
+            'REMARKS' => '',
+        ];
+    });
+}
+
+private function formatAmount($value)
+{
+    return round($value ?? 0, 0);  
+}
+
 
     public function headings(): array
     {

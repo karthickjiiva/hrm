@@ -209,61 +209,53 @@
                                 </a-col>
                             </a-row>
 
-                            <a-row :gutter="16">
-                                <a-col :xs="24" :sm="24" :md="12" :lg="12">
-                                    <a-form-item
-                                        :label="$t('user.allow_login')"
-                                        name="allow_login"
-                                        :help="
-                                            rules.allow_login
-                                                ? rules.allow_login.message
-                                                : null
-                                        "
-                                        :validateStatus="
-                                            rules.allow_login ? 'error' : null
-                                        "
-                                    >
-                                        <a-switch
-                                            v-model:checked="
-                                                formData.allow_login
-                                            "
-                                            :checkedValue="1"
-                                            :unCheckedValue="0"
-                                        />
-                                    </a-form-item>
-                                </a-col>
-                                <a-col
-                                    :xs="24"
-                                    :sm="24"
-                                    :md="12"
-                                    :lg="12"
-                                    v-if="formData.allow_login == 1"
-                                >
-                                    <a-form-item
-                                        :label="$t('user.password')"
-                                        name="password"
-                                        :help="
-                                            rules.password
-                                                ? rules.password.message
-                                                : null
-                                        "
-                                        :validateStatus="
-                                            rules.password ? 'error' : null
-                                        "
-                                        class="required"
-                                    >
-                                        <a-input-password
-                                            v-model:value="formData.password"
-                                            :placeholder="
-                                                $t(
-                                                    'common.placeholder_default_text',
-                                                    [$t('user.password')]
-                                                )
-                                            "
-                                        />
-                                    </a-form-item>
-                                </a-col>
-                            </a-row>
+                           <a-row :gutter="16">
+    <a-col :xs="24" :sm="24" :md="12" :lg="12">
+        <a-form-item
+            :label="$t('user.allow_login')"
+            name="allow_login"
+            :help="rules.allow_login ? rules.allow_login.message : null"
+            :validateStatus="rules.allow_login ? 'error' : null"
+        >
+            <a-switch
+                v-model:checked="formData.allow_login"
+                :checkedValue="1"
+                :unCheckedValue="0"
+            />
+        </a-form-item>
+    </a-col>
+
+    <a-col :xs="24" :sm="24" :md="12" :lg="12">
+        <a-form-item
+            label="Hold Status"
+            name="hold_status"
+            :help="rules.hold_status ? rules.hold_status.message : null"
+            :validateStatus="rules.hold_status ? 'error' : null"
+        >
+            <a-switch
+                v-model:checked="formData.hold_status"
+                :checkedValue="1"
+                :unCheckedValue="0"
+            />
+        </a-form-item>
+    </a-col>
+</a-row>
+<a-row :gutter="16" v-if="formData.allow_login == 1">
+    <a-col :xs="24" :sm="24" :md="12" :lg="12">
+        <a-form-item
+            :label="$t('user.password')"
+            name="password"
+            :help="rules.password ? rules.password.message : null"
+            :validateStatus="rules.password ? 'error' : null"
+            class="required"
+        >
+            <a-input-password
+                v-model:value="formData.password"
+                :placeholder="$t('common.placeholder_default_text', [$t('user.password')])"
+            />
+        </a-form-item>
+    </a-col>
+</a-row>
                         </a-col>
                     </a-row>
                     <a-row :gutter="16">
@@ -918,7 +910,7 @@
                         </a-col>
                     </a-row>
                     <a-row :gutter="16">
-                        <a-col :xs="24" :sm="24" :md="12" :lg="12">
+                        <!-- <a-col :xs="24" :sm="24" :md="12" :lg="12">
                             <a-form-item
                                 :label="$t('user.end_date')"
                                 name="end_date"
@@ -938,7 +930,7 @@
                                     style="width: 100%"
                                 />
                             </a-form-item>
-                        </a-col>
+                        </a-col> -->
                         <a-col :xs="24" :sm="24" :md="12" :lg="12">
                             <a-form-item
                                 :label="$t('user.employee_work_status')"
@@ -1005,6 +997,35 @@
                             </a-form-item>
                         </a-col>
                     </a-row>
+                    <a-form-item label="Resignation">
+    <a-switch v-model:checked="formData.has_resigned" />
+</a-form-item>
+
+<a-row :gutter="16" v-if="formData.has_resigned">
+    <a-col :xs="24" :sm="24" :md="12" :lg="12">
+        <a-form-item
+            label="Resignation Date"
+            :help="rules.resignation_date ? rules.resignation_date.message : null"
+            :validateStatus="rules.resignation_date ? 'error' : null"
+        >
+            <a-date-picker
+                v-model:value="formData.resignation_date"
+                :format="appSetting.date_format"
+                valueFormat="YYYY-MM-DD"
+                style="width: 100%"
+            />
+        </a-form-item>
+    </a-col>
+
+    <a-col :xs="24" :sm="24" :md="12" :lg="12">
+        <a-form-item label="Resignation Reason">
+            <a-input
+                v-model:value="formData.resignation_reason"
+                placeholder="Enter reason"
+            />
+        </a-form-item>
+    </a-col>
+</a-row>
                 </a-tab-pane>
                 <a-tab-pane
                     key="salary_details"

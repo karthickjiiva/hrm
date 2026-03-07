@@ -98,13 +98,13 @@ class User extends BaseModel implements AuthenticatableContract, JWTSubject
         'emergency_contact_number' => 'string',
         'alternate_phone' => 'string',
         'has_resigned' => 'boolean',
-    'resignation_date' => 'date',
-    'resignation_reason' => 'string',
-    'has_rejoined' => 'boolean',
-    'rejoining_date' => 'date',
-    'rejoining_reason' => 'string',
-    'esi_enabled' => 'boolean',
-    'pf_enabled' => 'boolean',
+        'resignation_date' => 'date',
+        'resignation_reason' => 'string',
+        'has_rejoined' => 'boolean',
+        'rejoining_date' => 'date',
+        'rejoining_reason' => 'string',
+        'esi_enabled' => 'boolean',
+        'pf_enabled' => 'boolean',
         'prof_tax_enabled' => 'boolean',
         'tds_enabled' => 'boolean',
         'esi_percentage' => 'float',
@@ -291,6 +291,16 @@ class User extends BaseModel implements AuthenticatableContract, JWTSubject
     {
         return $this->hasMany(SalaryGroupUser::class, 'user_id');
     }
+    
+    public function leaveMaster()
+{
+    return $this->hasOne(EmployeeLeaveMaster::class, 'employee_id');
+}
+    public function bankMaster()
+{
+    return $this->hasOne(BankMaster::class, 'employee_id', 'id');
+}
+
 
     public function basicSalaryDetails()
     {
