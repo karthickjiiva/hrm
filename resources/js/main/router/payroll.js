@@ -177,7 +177,7 @@ export default [
                 name: "admin.leave.insurance_report",
                 meta: {
                     requireAuth: true,
-                    menuParent: "allreports",
+                    menuParent: "",
                     menuKey: (route) => "insurance_report",
                     permission: "salary_settings",
                 },
@@ -189,7 +189,7 @@ export default [
                 name: "admin.leave.settlement_report",
                 meta: {
                     requireAuth: true,
-                    menuParent: "allreports",
+                    menuParent: "",
                     menuKey: (route) => "settlement_report",
                     permission: "salary_settings",
                 },
