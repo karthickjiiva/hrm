@@ -63,10 +63,6 @@
             {{ formatDate(record.exit_date) }}
           </template>
 
-          <template v-if="column.key === 'gratuity_amount'">
-            {{ formatAmount(record.gratuity_amount) }}
-          </template>
-
           <template v-if="column.key === 'created_at'">
             {{ formatDate(record.created_at) }}
           </template>
@@ -128,11 +124,8 @@ const pagination = reactive({
 
 const columns = [
   { title: 'Employee', key: 'employee' },
-  { title: 'Date of Joining', key: 'date_of_joining' },
+  { title: 'Joining Date', key: 'date_of_joining' },
   { title: 'Exit Date', key: 'exit_date' },
-  { title: 'Service', dataIndex: 'total_service', key: 'total_service' },
-  { title: 'Gratuity Amount', key: 'gratuity_amount' },
-  { title: 'File Name', dataIndex: 'filename', key: 'filename' },
   { title: 'Generated On', key: 'created_at' },
   { title: 'Action', key: 'action', width: '220px' },
 ];
@@ -190,9 +183,8 @@ const handleGenerate = async () => {
   generating.value = true;
   try {
     const res = await axios.post(`${API}/generate`, { employee_id: filters.employee_id });
-    message.success(res.data.message);
     await downloadFile(res.data.data);
-    message.success("Gratuity form downloaded successfully.");
+    message.success(res.data.message || "Gratuity form generated successfully.");
     filters.employee_id = null;
     pagination.current = 1;
     fetchHistory(); // Refresh the list
@@ -235,10 +227,6 @@ const handleTableChange = (pag) => {
 
 const formatDate = (date) => {
   return date ? dayjs(date).format('DD MMM YYYY') : '-';
-};
-
-const formatAmount = (v) => {
-  return v === null || v === undefined ? '-' : Number(v).toLocaleString('en-IN', { maximumFractionDigits: 2 });
 };
 
 onMounted(() => {
