@@ -15,6 +15,17 @@ export default [
                 },
             },
             {
+                path: "wfh-leaves",
+                component: () => import("../views/leave/wfhleaves/index.vue"),
+                name: "admin.wfh-leaves.index",
+                meta: {
+                    requireAuth: true,
+                    menuParent: "leaves",
+                    menuKey: (route) => "wfhleaves",
+                    permission: "leaves_view",
+                },
+            },
+            {
                 path: "leave_types",
                 component: () => import("../views/leave/leave-types/index.vue"),
                 name: "admin.leave_types.index",

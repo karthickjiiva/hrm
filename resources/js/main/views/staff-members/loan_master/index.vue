@@ -61,7 +61,7 @@
             <a-col :xs="24" :sm="24" :md="12" :lg="18" :xl="18">
                 <a-row :gutter="[16, 16]" justify="end">
                     <a-col :xs="24" :sm="24" :md="12" :lg="6" :xl="6">
-                        <!-- <a-input-search
+                        <a-input-search
                             style="width: 100%"
                             v-model:value="table.searchString"
                             show-search
@@ -70,7 +70,7 @@
                             @search="onTableSearch"
                             :loading="table.filterLoading"
                             placeholder="Search By Employee Name"
-                        /> -->
+                        />
                     </a-col>
                 </a-row>
             </a-col>

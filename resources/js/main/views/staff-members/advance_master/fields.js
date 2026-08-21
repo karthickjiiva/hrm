@@ -65,15 +65,10 @@ const fields = () => {
 
     const filterableColumns = [
         {
-            key: "advance_type",
-            value: "Advance Type",
-            type: "select",
-            options: [
-                { label: "Salary Advance", value: "salary_advance" },
-                { label: "Site Advance", value: "site_advance" },
-            ],
-            multiple: false,
-        },
+        key: "employee.name",
+        value: "Employee Name",
+        type: "text",
+    },
     ];
 
     return {

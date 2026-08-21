@@ -196,7 +196,7 @@
                 </td>
                 <td>
                     <span class="label">Date Joined</span>
-                 {{ filled($payroll->employee->joining_date ?? null) ? \Carbon\Carbon::parse($payroll->employee->joining_date)->format('d M Y') : 'N/A' }}
+                    {{ filled($payroll->employee->joining_date ?? null) ? \Carbon\Carbon::parse($payroll->employee->joining_date)->format('d M Y') : 'N/A' }}
                 </td>
                 <td>
                     <span class="label">Department</span>

@@ -22,7 +22,7 @@
                 </a-col>
             </a-row>
             <a-row :gutter="[15, 15]">
-                <a-col :xs="24" :sm="24" :md="12" :lg="10" :xl="10">
+                <!-- <a-col :xs="24" :sm="24" :md="12" :lg="10" :xl="10">
                     <a-row>
                         <a-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
                             <a-card class="clock-in">
@@ -33,7 +33,7 @@
                                 <MarkTodayAttendance />
                             </a-card>
                         </a-col> </a-row
-                ></a-col>
+                ></a-col> -->
                 <a-col :xs="24" :sm="24" :md="12" :lg="14" :xl="14">
                     <a-row
                         :gutter="[15, 15]"
@@ -71,7 +71,7 @@
                             </StateWidget>
                         </a-col></a-row
                     >
-                    <a-row :gutter="[15, 15]">
+                    <!-- <a-row :gutter="[15, 15]">
                         <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                             <StateWidget>
                                 <template #image>
@@ -108,12 +108,12 @@
                                 </template>
                             </StateWidget>
                         </a-col></a-row
-                    >
+                    > -->
                 </a-col>
             </a-row>
         </div>
         <div class="mb-20">
-            <a-row :gutter="[15, 15]" class="equal-height mb-20">
+            <!-- <a-row :gutter="[15, 15]" class="equal-height mb-20">
                 <a-col :xs="24" :sm="24" :md="24" :lg="8" :xl="8">
                     <div class="card-wrapper">
                         <EmployeeStatus
@@ -202,7 +202,7 @@
                         />
                     </div>
                 </a-col>
-            </a-row>
+            </a-row> -->
 
             <a-row class="mb-20" :gutter="[15, 15]">
                 <a-col :xs="24" :sm="24" :md="24" :lg="8" :xl="8">
@@ -225,7 +225,7 @@
                 <a-col :xs="24" :sm="24" :md="24" :lg="8" :xl="8">
                     <WeekendHoliday :data="responseData" @fetchYearData="fetchWeekend" />
                 </a-col>
-                <a-col :xs="24" :sm="24" :md="24" :lg="8" :xl="8">
+                <!-- <a-col :xs="24" :sm="24" :md="24" :lg="8" :xl="8">
                     <EmployeeWorkStatus :data="responseData" />
                 </a-col>
                 <a-col :xs="24" :sm="24" :md="24" :lg="8" :xl="8">
@@ -233,9 +233,9 @@
                         :data="responseData"
                         @employeeAppriciationData="employeeAppriciationData"
                     />
-                </a-col>
+                </a-col> -->
             </a-row>
-            <a-row :gutter="[15, 15]">
+            <!-- <a-row :gutter="[15, 15]">
                 <a-col :xs="24" :sm="24" :md="24" :lg="8" :xl="8">
                     <IncrementPromotion
                         :data="responseData"
@@ -245,7 +245,7 @@
                 <a-col :xs="24" :sm="24" :md="24" :lg="8" :xl="8">
                     <PendingLeaves />
                 </a-col>
-            </a-row>
+            </a-row> -->
         </div>
     </div>
 </template>

@@ -56,7 +56,7 @@ const datatable = () => {
 
         if (typeof tableUrl.value.filters == "object") {
             forOwn(tableUrl.value.filters, (value, key) => {
-                if (value != undefined && value != "") {
+                if (value !== undefined && value !== null && value !== "") {
                     filterString += `${key} eq "${value}" and `;
                     trimString = true;
 
@@ -107,7 +107,7 @@ const datatable = () => {
             typeof tableUrl.value.extraFilters == "object"
         ) {
             forOwn(tableUrl.value.extraFilters, (value, key) => {
-                if (value != undefined && value != "") {
+                if (value !== undefined && value !== null && value !== "") {
                     url += `&${key}=${value}`;
 
                     // May be Hashable
