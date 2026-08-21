@@ -34,7 +34,7 @@ protected $appends = ['xid'];
         return $this->hasMany(EmployeeLoanRepayment::class);
     }
 
-    public static function filterable()
+public static function getFilterableFields()
 {
     return [
         'employee.name',
@@ -42,7 +42,7 @@ protected $appends = ['xid'];
         'tenure',
         'start_month',
         'end_month',
-        'employee_id',  
+        'employee_id',
     ];
 }
 

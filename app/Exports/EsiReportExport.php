@@ -24,29 +24,51 @@ class EsiReportExport implements FromCollection, WithHeadings, WithStyles, WithC
         $this->year = $year;
     }
 
-    public function collection()
-    {
-        $employees = StaffMember::where('esi_enabled', 1)->where('name', '!=', 'Admin')->get();
+     public function collection()
+{
+    $employees = StaffMember::where('esi_enabled', 1)
+        ->where('name', '!=', 'Admin')
+        ->where('has_resigned', 0)
 
-        return $employees->map(function ($user, $index) {
-            $payroll = PayrollNew::where('employee_id', $user->id)
-                ->where('month', $this->month)
-                ->where('year', $this->year)
-                ->first();
+       ->whereDate('joining_date', '<=', \Carbon\Carbon::create($this->year, $this->month, 1)->endOfMonth())
+        ->get();
+ 
+    return $employees->map(function ($user, $index) {
+        $payroll = PayrollNew::where('employee_id', $user->id)
+            ->where('month', $this->month)
+            ->where('year', $this->year)
+            ->first();
 
-            $grossSalary = (float) ($user->monthly_amount ?? 0);
-            $esiAmount = round(($grossSalary * 0.75) / 100, 0);
+       
+       // 1. Base gross
+$basic = (float) ($user->basic_salary ?? 0);
+$hra   = (float) ($user->monthly_hra_percent_monthly ?? 0);
+$grossBase = $basic + $hra;
 
-            return [
-                'sl' => $index + 1,
-                'name' => strtoupper($user->name),
-                'esi_no' => $user->esi_number ?? '-',
-                'working_days' => $payroll?->days_payable ?? 0,
-                'gross' => $grossSalary,
-                'esi' => (float)$esiAmount,
-            ];
-        });
-    }
+// 2. Get total days + payable days
+$totalDays   = (float) ($payroll?->total_working_days ?? 0);
+$payableDays = (float) ($payroll?->days_payable ?? 0);
+
+// 3. Per day salary
+$perDay = $totalDays > 0 ? ($grossBase / $totalDays) : 0;
+
+// 4. Final gross (pro-rated)
+$grossSalary = round($perDay * $payableDays, 0);
+
+// 5. ESI (0.75%)
+$esiAmount = round(($grossSalary * 0.75) / 100, 0);
+
+
+        return [
+            'sl' => $index + 1,
+            'name' => strtoupper($user->name),
+            'esi_no' => $user->esi_number ?? '-',
+            'working_days' => $payroll?->days_payable ?? 0,
+            'gross' => $grossSalary,
+            'esi' => (float)$esiAmount,
+        ];
+    });
+}
 
     public function headings(): array {
         $dateStr = '1-' . date('M', mktime(0, 0, 0, $this->month, 10)) . '-' . substr($this->year, 2);

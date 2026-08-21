@@ -159,6 +159,24 @@
             margin: 0 0 5px 0;
             font-weight: bold;
         }
+		
+		.leave-table {
+		width: 300px;
+		border-collapse: collapse;
+		margin-top: 10px;
+		}
+
+		.leave-table th,
+		.leave-table td {
+			border: 1px solid #c7c7c7;
+			padding: 6px;
+			text-align: center;
+		}
+
+		.leave-table th {
+			font-weight: bold;
+			background: #f5f5f5;
+		}
     </style>
 </head>
 <body>
@@ -182,7 +200,7 @@
         
         <!-- Company Address below the name/logo line -->
         <p class="company-address">
-            No. 61, 2nd floor, 2nd street, Kamdar Nagar, Nungambakkam, Chennai- 600034.            
+            No. 61, 2nd floor, 2nd street, Kamdar Nagar, Nungambakkam, Chennai- 600034.  
         </p>
 
         <hr class="section-break">
@@ -196,7 +214,7 @@
                 </td>
                 <td>
                     <span class="label">Date Joined</span>
-                 {{ filled($payroll->employee->joining_date ?? null) ? \Carbon\Carbon::parse($payroll->employee->joining_date)->format('d M Y') : 'N/A' }}
+                    {{ optional($payroll->employee->joining_date)->format('d M Y') ?? 'N/A' }}
                 </td>
                 <td>
                     <span class="label">Department</span>
@@ -219,17 +237,17 @@
                 <td>
                     <span class="label">Bank</span>
                     {{-- Assuming bank name is stored on employee, adjust if needed --}}
-                    {{ $payroll->employee->bank_name ?? 'HDFC Bank' }}
+                   {{ $payroll->employee->bankMaster->bank_name ?? 'N/A' }}
                 </td>
                 <td>
                     <span class="label">Bank IFSC</span>
-                    {{ $payroll->employee->ifsc_code ?? 'HDFC0000444' }}
+                    {{ $payroll->employee->bankMaster->ifsc ?? 'N/A' }}
                 </td>
             </tr>
             <tr>
                 <td>
                     <span class="label">Bank Account</span>
-                    {{ $payroll->employee->account_number ?? '50100739571816' }}
+                    {{ $payroll->employee->bankMaster->account_number ?? 'N/A' }}  
                 </td>
                 <td>
                     <span class="label">UAN</span>
@@ -264,7 +282,7 @@
 
                 <td>
                     <span class="label">Actual Payable Days</span>
-                    {{ $payroll->days_payable }} {{ $payroll->days_payable == 1 ? 'Day' : 'Days' }}
+                    {{ $payroll->actual_payable_days }} {{ $payroll->actual_payable_days == 1 ? 'Day' : 'Days' }}
                 </td>
 
                 <td>
@@ -303,10 +321,10 @@
                                 <td>Conveyance Allowance</td>
                                 <td class="amount">{{ number_format($payroll->allowance, 2) }}</td>
                             </tr>
-                            <tr>
-                                <td>Food Allowance</td>
-                                <td class="amount">{{ number_format($payroll->food_allowance, 2) }}</td>
-                            </tr>
+                            <!--<tr>-->
+                            <!--    <td>Food Allowance</td>-->
+                            <!--    <td class="amount">{{ number_format($payroll->food_allowance, 2) }}</td>-->
+                            <!--</tr>-->
                         </tbody>
                         <tfoot>
                             <tr class="total-row">
@@ -413,19 +431,49 @@
             
             return $full . '';
             }
+            
+            function convertToIndianCurrencyWordsround($amount) {
+                $amount = round($amount); 
+                $formatter = new \NumberFormatter('en', \NumberFormatter::SPELLOUT);
+                if ($amount > 0) {
+                    $full = ucfirst($formatter->format($amount)) . ' rupees only';
+                } else {
+                    $full = 'Zero rupees';
+                }
+                return $full;
+            }
         @endphp
             <tr>
                 <td class="label">Net Salary Payable (A - B - C - D)</td>
-                <td class="total-amount">{{ number_format($payroll->net_salary, 2) }}</td>
+                <td class="total-amount">
+                  {{ number_format(round($payroll->net_salary), 2) }}  
+                </td>
             </tr>
             <tr>
                 <td class="label">Net Salary in words</td>
-                <td class="total-amount">{{ convertToIndianCurrencyWords($payroll->net_salary) }}</td>
+                <td class="total-amount">
+                    {{ convertToIndianCurrencyWordsround(round($payroll->net_salary)) }}
+                </td>
             </tr>
         </table>
         
         <p class="note"><strong>**Note :</strong> All amounts displayed in this payslip are in INR</p>
+		<div style="margin-top:15px;">
+			<div style="font-weight:bold; margin-bottom:5px;">Total Leaves</div>
 
+			<table class="leave-table">
+				<tr>
+					<th>Earned Leave</th>
+					<th>Sick Leave</th>
+					<th>Casual Leave</th>
+				</tr>
+				<tr>
+					<td>{{ $leaveMaster->el ?? 0 }}</td>
+					<td>{{ $leaveMaster->sl ?? 0 }}</td>
+					<td>{{ $leaveMaster->cl ?? 0 }}</td>
+				</tr>
+			</table>
+		</div>
         <div class="footer">
             * This is computer generated statement, does not require signature.
         </div>

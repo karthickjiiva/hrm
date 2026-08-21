@@ -101,12 +101,13 @@ public function export(Request $request)
     }
     
     $employees = User::where('name', '!=', 'Admin')
-        ->whereHas('employeeType', function ($q) {
-            $q->where('type', '!=', 'Consultant Emp');
-        })
-        ->with(['leaveMaster'])  
-        ->get();
-
+    ->where('has_resigned', 0)
+    ->whereHas('employeeType', function ($q) {
+        $q->where('type', '!=', 'Consultant Emp');
+    })
+    ->with(['leaveMaster'])
+    ->get();
+    
     \DB::transaction(function () use ($year, $employees) {
         foreach ($employees as $employee) {
             $master = $employee->leaveMaster;

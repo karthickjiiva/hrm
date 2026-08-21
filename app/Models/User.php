@@ -29,7 +29,7 @@ class User extends BaseModel implements AuthenticatableContract, JWTSubject
     'is_manager', 'hra', 'performance_pay', 'allowance','employeeType',
     'uan_number', 'pf_number', 'esi_number', 'pan_number', 'aadhar_number',
     'emergency_contact_name','emergency_contact_number','alternate_phone',
-    'has_resigned','resignation_date','resignation_reason','has_rejoined','rejoining_date','rejoining_reason',
+    'has_resigned','hold_status','resignation_date','resignation_reason','has_rejoined','rejoining_date','rejoining_reason',
     'esi_enabled', 'esi_percentage', 'monthly_esi','monthly_amount', 'annual_esi',
     'pf_enabled', 'pf_percentage', 'monthly_pf', 'annual_pf',
         'prof_tax_enabled', 'prof_tax_percentage', 'monthly_prof_tax', 'annual_prof_tax',

@@ -30,7 +30,7 @@ class WageRegisterExport implements FromCollection, WithEvents, WithColumnWidths
 
     public function collection()
     {
-        $employees   = StaffMember::where('name', '!=', 'Admin')->get();
+        $employees   = StaffMember::where('name', '!=', 'Admin')->where('has_resigned', 0)->get();
         $paymentDate = Carbon::createFromDate($this->year, $this->month, 1)
             ->endOfMonth()
             ->format('d-m-Y');

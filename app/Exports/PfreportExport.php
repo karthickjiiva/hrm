@@ -97,16 +97,31 @@ class PfreportExport implements FromCollection, WithHeadings, WithStyles, WithCo
                 'SL' => $index + 1,
                 'UAN NUMBER' => " " . ($employee->uan_number ?? ''),
                 'MEMBER NAME' => $employee->name ?? '-',
-                'GROSS WAGES' => ceil($payroll->total_earnings ?? 0),
-                'EPF WAGES' => $epsWages,
-                'EPS WAGES' => $epsWages1,
-                'EDLI WAGES' => $edliWages,
-                'EE SHARE REMITTED' => $eeShare,
-                'EPS CONTRIBUTION REMITTED' => $epsContributionDisplay,
-                'ER SHARE REMITTED' => $erShare,
+                'GROSS WAGES' => round($payroll->total_earnings ?? 0),
+                'EPF WAGES' => round($epsWages),
+                'EPS WAGES' => round($epsWages1),
+                'EDLI WAGES' => round($edliWages),
+                'EE SHARE REMITTED' => round($eeShare),
+                'EPS CONTRIBUTION REMITTED' => round($epsContributionDisplay),
+                'ER SHARE REMITTED' => round($erShare),
                 'NCP DAYS' => $payroll->loss_of_pay_days ?? 0,
                 'REFUND OF ADVANCE' => '0',
             ];
+            
+                        // return [
+            //     'SL' => $index + 1,
+            //     'UAN NUMBER' => " " . ($employee->uan_number ?? ''),
+            //     'MEMBER NAME' => $employee->name ?? '-',
+            //     'GROSS WAGES' => ceil($payroll->total_earnings ?? 0),
+            //     'EPF WAGES' => $epsWages,
+            //     'EPS WAGES' => $epsWages1,
+            //     'EDLI WAGES' => $edliWages,
+            //     'EE SHARE REMITTED' => $eeShare,
+            //     'EPS CONTRIBUTION REMITTED' => $epsContributionDisplay,
+            //     'ER SHARE REMITTED' => $erShare,
+            //     'NCP DAYS' => $payroll->loss_of_pay_days ?? 0,
+            //     'REFUND OF ADVANCE' => '0',
+            // ];
         });
     }
 

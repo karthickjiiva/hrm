@@ -59,7 +59,6 @@ class AccountEntriesExport implements FromCollection, WithHeadings, WithMapping,
             $balance = $this->openingBalance;
         }
         $company = company();
-        // Adjust balance based on debit or credit
         $balance = $entry->is_debit ? $balance - $entry->amount : $balance + $entry->amount;
 
         return [

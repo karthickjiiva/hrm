@@ -14,9 +14,12 @@ class EmpAdvanceController extends ApiBaseController
 {
     protected $model = EmpAdvance::class;
 
- protected function modifyIndex($query)
+protected function modifyIndex($query)
 {
-    return $query->with('employee');
+    return $query
+        ->leftJoin('users as employee', 'employee.id', '=', 'emp_advances.employee_id')
+        ->select('emp_advances.*')
+        ->with('employee');
 }
 
 

@@ -11,6 +11,7 @@ use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 
 class FormXLeaveRegisterExport implements FromCollection, WithEvents, WithColumnWidths, WithCustomStartCell
 {
@@ -31,6 +32,7 @@ class FormXLeaveRegisterExport implements FromCollection, WithEvents, WithColumn
     {
         return User::with('employeeType')
             ->where('name', '!=', 'Admin')
+            ->where('has_resigned', 0)
             ->whereHas('employeeType', fn ($q) => $q->where('type', '!=', 'Consultant Emp'))
             ->orderBy('id')
             ->get()
@@ -41,13 +43,22 @@ class FormXLeaveRegisterExport implements FromCollection, WithEvents, WithColumn
                     ->where('year', $this->year)
                     ->first();
 
+                $earnedTotal =
+                    ($ls->earned_el ?? 0) +
+                    ($ls->earned_sl ?? 0) +
+                    ($ls->earned_cl ?? 0);
+
+                $openingtotal =
+                    ($ls->availed_el ?? 0) +
+                    ($ls->closing_el ?? 0);
+
                 return [
                     $index + 1,
                     strtoupper($user->name),
                     $user->employee_number ?? '-',
 
-                    (float)($ls->opening_el ?? 0),
-                    (float)($ls->earned_el ?? 0),
+                    (float)$openingtotal,
+                    (float)$earnedTotal,
                     (float)($ls->availed_el ?? 0),
                     (float)($ls->closing_el ?? 0),
 
@@ -85,7 +96,7 @@ class FormXLeaveRegisterExport implements FromCollection, WithEvents, WithColumn
             AfterSheet::class => function (AfterSheet $event) {
 
                 $sheet = $event->sheet->getDelegate();
-            
+
                 /* ===== GROUP HEADERS ===== */
                 $sheet->mergeCells('D1:G1'); $sheet->setCellValue('D1', 'EARNED LEAVE');
                 $sheet->mergeCells('H1:J1'); $sheet->setCellValue('H1', 'MEDICAL LEAVE');
@@ -121,7 +132,6 @@ class FormXLeaveRegisterExport implements FromCollection, WithEvents, WithColumn
 
                 /* ===== STYLES ===== */
 
-                // Group headers
                 $sheet->getStyle('D1:U1')->applyFromArray([
                     'font' => ['bold' => true, 'size' => 10],
                     'alignment' => [
@@ -130,7 +140,6 @@ class FormXLeaveRegisterExport implements FromCollection, WithEvents, WithColumn
                     ],
                 ]);
 
-                // Sub headers rotated
                 $sheet->getStyle('D2:U2')->applyFromArray([
                     'font' => ['bold' => true, 'size' => 8],
                     'alignment' => [
@@ -140,7 +149,6 @@ class FormXLeaveRegisterExport implements FromCollection, WithEvents, WithColumn
                     ],
                 ]);
 
-                // Sl.No & Emp No rotated ONLY (A and C)
                 $sheet->getStyle('A1:A3')->applyFromArray([
                     'font' => ['bold' => true, 'size' => 9],
                     'alignment' => [
@@ -159,7 +167,6 @@ class FormXLeaveRegisterExport implements FromCollection, WithEvents, WithColumn
                     ],
                 ]);
 
-                // ✅ Name of the Employee — STRAIGHT
                 $sheet->getStyle('B1:B3')->applyFromArray([
                     'font' => ['bold' => true, 'size' => 9],
                     'alignment' => [
@@ -170,7 +177,6 @@ class FormXLeaveRegisterExport implements FromCollection, WithEvents, WithColumn
                     ],
                 ]);
 
-                // Remarks straight
                 $sheet->getStyle('V1:V3')->applyFromArray([
                     'font' => ['bold' => true, 'size' => 9],
                     'alignment' => [
@@ -191,6 +197,22 @@ class FormXLeaveRegisterExport implements FromCollection, WithEvents, WithColumn
                 $sheet->getStyle("A1:V{$highestRow}")
                     ->getBorders()->getAllBorders()
                     ->setBorderStyle(Border::BORDER_THIN);
+
+                /* ===== FIX: Force 0 to show as numeric, not blank ===== */
+                foreach (array_merge(range('D', 'Q'), range('S', 'U')) as $col) {
+                    for ($row = 4; $row <= $highestRow; $row++) {
+                        $cell = $sheet->getCell("{$col}{$row}");
+                        $val  = $cell->getValue();
+                        if ($val === null || $val === '') {
+                            $cell->setValueExplicit(0, DataType::TYPE_NUMERIC);
+                        } else {
+                            $cell->setValueExplicit((float)$val, DataType::TYPE_NUMERIC);
+                        }
+                        $sheet->getStyle("{$col}{$row}")
+                            ->getNumberFormat()
+                            ->setFormatCode('0');
+                    }
+                }
 
                 $sheet->freezePane('A4');
             },

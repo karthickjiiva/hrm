@@ -32,12 +32,13 @@ ApiRoute::group(['namespace' => 'App\Http\Controllers\Api'], function () {
     ApiRoute::get('leave-salary-statement/history', 'SalaryLeaveController@statementHistory');
     ApiRoute::get('salaryleave_statement/{month}/{year}/download', 'SalaryLeaveController@downloadSalaryLeaveStatement');
 
+
     ApiRoute::post('upload_arrears', 'ArrearsController@uploadArrears');
     ApiRoute::post('arrears/generate', 'ArrearsController@generateArrears');
     ApiRoute::get('get_arrears/{xid}/download', 'ArrearsController@downloadPayslip');
     ApiRoute::get('arrear_pf/export', 'ArrearsController@pfexport');
-
-     //Allreports
+    
+    //Allreports
     ApiRoute::get('reports/history/{type}', 'ReportController@history');
     ApiRoute::post('reports/generate/bonus', 'ReportController@generateBonus');
     ApiRoute::post('reports/generate/office_esi', 'ReportController@generateOfficeEsi');
@@ -54,8 +55,6 @@ ApiRoute::group(['namespace' => 'App\Http\Controllers\Api'], function () {
     ApiRoute::get('employee-insurances', 'MasterController@list_insurance');
     ApiRoute::delete('employee-insurances/{id}', 'MasterController@delete_insurance');
     ApiRoute::post('employee-insurances/generate-report','MasterController@generateInsuranceReport');
- 
-    
 
     // Check visibility of module according to subscription plan
     ApiRoute::post('check-subscription-module-visibility', ['as' => 'api.extra.check-subscription-module-visibility', 'uses' => 'AuthController@checkSubscriptionModuleVisibility']);
@@ -88,6 +87,9 @@ ApiRoute::group(['namespace' => 'App\Http\Controllers\Api'], function () {
         ApiRoute::get('leaves/remaining-leaves', ['as' => 'api.leaves.remaining-leaves', 'uses' => 'LeaveController@remainingLeaves']);
         ApiRoute::get('leaves/unpaid-leaves', ['as' => 'api.leaves.unpaid-leaves', 'uses' => 'LeaveController@unpaidLeaves']);
         ApiRoute::resource('leaves', 'LeaveController', ['as' => 'api']);
+        ApiRoute::resource('wfhleaves', 'WFHLeaveController', ['as' => 'api']);
+        ApiRoute::post('wfhleaves-update/{id}', [\App\Http\Controllers\Api\WFHLeaveController::class, 'updateRaw']);
+        
         
     });
 

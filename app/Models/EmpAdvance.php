@@ -29,5 +29,17 @@ class EmpAdvance extends BaseModel
     {
         return $this->belongsTo(User::class, 'employee_id');
     }
+
+     public static function getFilterableFields()
+    {
+        return [
+            'id',
+            'employee_id',
+            'amount',
+            'deduct_month',
+            'advance_type',
+            'employee.name',
+        ];
+    }
    
 }

@@ -70,18 +70,18 @@ class EmployeeMasterExport implements FromCollection, WithHeadings, WithMapping,
             $user->dob ? $user->dob : 'N/A',
             $user->joining_date ? $user->joining_date : 'N/A',
             $user->employeeType ? $user->employeeType->name : 'N/A',
-            $user->designation ? $user->designation->name : 'N/A', // Assuming designation relationships
+            $user->designation ? $user->designation->name : 'N/A', 
             $user->location ? $user->location->name : 'N/A',
             $user->aadhar_number,
             $user->pan_number,
             $user->uan_number,
             $user->esi_number,
-            $user->basic_salary,
-            $user->hra,
+            round($user->basic_salary),
+            round($user->hra),
             $user->pf_enabled ? 'Yes' : 'No',
             $user->esi_enabled ? 'Yes' : 'No',
-            $user->monthly_tds,
-            $user->monthly_prof_tax,
+            round($user->monthly_tds),
+            round($user->monthly_prof_tax),
         ];
     }
 

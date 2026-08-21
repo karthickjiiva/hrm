@@ -20,9 +20,12 @@ class EmployeeLoanController extends ApiBaseController
     protected $indexRequest = IndexRequest::class;
     protected $deleteRequest = DeleteRequest::class;
 
- protected function modifyIndex($query)
+protected function modifyIndex($query)
 {
-    return $query->with('employee');
+    return $query
+        ->leftJoin('users as employee', 'employee.id', '=', 'employee_loans.employee_id')
+        ->select('employee_loans.*')
+        ->with('employee');
 }
 
 public function store()

@@ -27,49 +27,33 @@ class BonusReportExport implements FromCollection, WithHeadings, WithStyles, Wit
     public function columnWidths(): array {
         return [
             'A' => 8, 'B' => 30, 'C' => 15, 'D' => 15, 'E' => 25,
-            'F' => 15,'G' => 15,'H' => 15, 'I' => 10, 'J' => 20, 'K' => 10, 'L' => 18,
+            'F' => 15, 'G' => 15, 'H' => 15, 'I' => 10, 'J' => 20, 'K' => 10, 'L' => 18,
             'M' => 15, 'N' => 15, 'O' => 15, 'P' => 15, 'Q' => 15,
         ];
     }
 
     /**
-     * This ensures the columns show as 0.00 format in Excel
+     * Updated to FORMAT_NUMBER (no decimals) since all values are now rounded
      */
     public function columnFormats(): array {
         return [
-            'F' => NumberFormat::FORMAT_NUMBER_00, // New Gross
-            'M' => NumberFormat::FORMAT_NUMBER_00, // Basic 60%
-            'N' => NumberFormat::FORMAT_NUMBER_00, // (B*1)
-            'O' => NumberFormat::FORMAT_NUMBER_00, // New Year
-            'P' => NumberFormat::FORMAT_NUMBER_00, // Deepavali
-            'Q' => NumberFormat::FORMAT_NUMBER_00, // Pongal
+            'F' => NumberFormat::FORMAT_NUMBER, // New Gross
+            'M' => NumberFormat::FORMAT_NUMBER, // Basic 60%
+            'N' => NumberFormat::FORMAT_NUMBER, // (B*1)
+            'O' => NumberFormat::FORMAT_NUMBER, // New Year
+            'P' => NumberFormat::FORMAT_NUMBER, // Deepavali
+            'Q' => NumberFormat::FORMAT_NUMBER, // Pongal
         ];
     }
 
-// 1. Get all payrolls for the Financial Year (April of Prev Year to March of Selected Year)
-// $payrolls = PayrollNew::where('employee_id', $user->id)
-//     ->where(function($query) {
-//         $query->where(function($q) {
-//             // April (4) to December (12) of the previous year
-//             $q->where('year', $this->year - 1)
-//               ->where('month', '>=', 4);
-//         })
-//         ->orWhere(function($q) {
-//             // January (1) to March (3) of the selected year
-//             $q->where('year', $this->year)
-//               ->where('month', '<=', 3);
-//         });
-//     })
-//     ->orderBy('year', 'desc')
-//     ->orderBy('month', 'desc')
-//     ->get();
-    
+
     public function collection()
     {
-       // $users = User::with(['designation'])->get();
-        $users = StaffMember::with(['designation'])
-        ->where('user_type', 'staff_members') // Filter for staff only
+       $users = StaffMember::with(['designation'])
+        ->where('user_type', 'staff_members') 
+        ->where('has_resigned', 0)
         ->get();
+
         return $users->map(function ($user, $index) {
             $payrolls = PayrollNew::where('employee_id', $user->id)
                                   ->where('year', $this->year)
@@ -78,7 +62,6 @@ class BonusReportExport implements FromCollection, WithHeadings, WithStyles, Wit
 
             if ($payrolls->isEmpty()) return null;
 
-          //  $totalLop = $payrolls->sum('loss_of_pay_days');
             $totalLop = (float) ($payrolls->sum('loss_of_pay_days') ?? 0);
             $latestPayroll = $payrolls->first(); 
             
@@ -88,21 +71,20 @@ class BonusReportExport implements FromCollection, WithHeadings, WithStyles, Wit
             
             $b1Value = ($annualBasic * $netDays) / 365;
 
-            // Math logic: Round to nearest whole number, but stored as float for Excel formatting
             return [
                 'S.No' => $index + 1,
                 'NAME' => $user->name,
                 'DOJ' => $user->joining_date,
                 'DOC' => '--', 
                 'DESIGNATION' => $user->designation->name ?? '-',
-                'NEW GROSS' => (float) $latestPayroll->total_earnings,
+                'NEW GROSS' => (float) round($latestPayroll->total_earnings),  
                 'ELIGIBLE DATE' => '',
                 'RESIGNED DATE' => '',
                 'A (365)' => 365,
                 'WORKING DAYS' => 365 - $totalLop,
                 'LOP' => (float) $totalLop,
                 'NET DAYS' => $finalnetdays,
-                'BASIC 60%' => (float) $annualBasic,
+                'BASIC 60%' => (float) round($annualBasic),  
                 '(B * 1)' => (float) round($b1Value, 0),
                 'NEW YEAR' => (float) round($b1Value * 0.25, 0),
                 'DEEPAVALI' => (float) round($b1Value * 0.50, 0),

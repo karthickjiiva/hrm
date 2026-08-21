@@ -22,11 +22,23 @@ class BankStatementsExport implements FromCollection, WithHeadings, ShouldAutoSi
         $this->year  = $year;
     }
 
+    // public function collection()
+    // {
+    //     return BankStatement::with(['employee', 'bankMaster'])
+    //         ->where('month', $this->month)
+    //         ->where('year', $this->year)
+    //         ->get();
+    // }
+    
     public function collection()
     {
         return BankStatement::with(['employee', 'bankMaster'])
             ->where('month', $this->month)
             ->where('year', $this->year)
+            ->whereHas('employee', function ($q) {
+                $q->where('has_resigned', 0)
+                ->where('hold_status', 0);
+            })
             ->get();
     }
 
@@ -44,16 +56,21 @@ class BankStatementsExport implements FromCollection, WithHeadings, ShouldAutoSi
         ];
     }
 
+
     public function map($statement): array
     {
         $monthName = \Carbon\Carbon::createFromDate($this->year, $this->month, 1)->format('F');
         $remarkText = 'SALARY' . strtoupper($monthName) . $this->year;
+     
+        $ifsc = optional($statement->bankMaster)->ifsc ?? '';
+     
+        $transactionType = str_starts_with(strtoupper($ifsc), 'ICIC') ? 'WIB' : 'NEFT';
     
         return [
-            'WIB',
+            $transactionType,  
             round($statement->amount),
             '602651003205', 
-            optional($statement->bankMaster)->ifsc ?? '-',
+            $ifsc ?: '-',
             optional($statement->bankMaster)->account_number ?? '-',
             optional($statement->employee)->name ?? '-',
             $remarkText,

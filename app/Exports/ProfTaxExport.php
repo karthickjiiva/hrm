@@ -68,70 +68,102 @@ class ProfTaxExport implements FromCollection, WithHeadings, WithStyles, WithCol
     }
 
     public function collection()
-    {
-        $periodStart = $this->monthRange === "10-3"
-            ? Carbon::create($this->year, 10, 1)
-            : Carbon::create($this->year, 4, 1);
+{
+    $periodStart = $this->monthRange === "10-3"
+        ? Carbon::create($this->year, 10, 1)
+        : Carbon::create($this->year, 4, 1);
 
-        $periodEnd = $this->monthRange === "10-3"
-            ? Carbon::create($this->year + 1, 3, 31)
-            : Carbon::create($this->year, 9, 30);
+    $periodEnd = $this->monthRange === "10-3"
+        ? Carbon::create($this->year + 1, 3, 31)
+        : Carbon::create($this->year, 9, 30);
 
-        return $this->users
-            ->filter(function ($user) use ($periodStart, $periodEnd) {
-                if ($user->name === 'Admin') return false;
+    $rows = $this->users
+        ->filter(function ($user) use ($periodStart, $periodEnd) {
+            if ($user->name === 'Admin') return false;
 
-                if (!$user->employeeType || $user->employeeType->prof_tax_enabled == 0) return false;
+            if (!$user->employeeType || $user->employeeType->prof_tax_enabled == 0) return false;
 
-                if ($user->has_resigned == 0 && $user->resignation_date) {
-                    $resignationDate = Carbon::parse($user->resignation_date);
-                    if ($resignationDate->lt($periodStart)) {
-                        return false;
-                    }
+            if ($user->has_resigned == 0 && $user->resignation_date) {
+                $resignationDate = Carbon::parse($user->resignation_date);
+                if ($resignationDate->lt($periodStart)) {
+                    return false;
                 }
+            }
 
-                return true;
-            })
-            ->values() 
-            ->map(function ($user, $index) use ($periodStart, $periodEnd) {
-                $monthlySalary = $user->monthly_amount ?? 0;
+            return true;
+        })
+        ->values()
+        ->map(function ($user, $index) use ($periodStart, $periodEnd) {
 
-                $joined = Carbon::parse($user->joining_date);
-                $resignation = ($user->has_resigned && $user->resignation_date)
-                    ? Carbon::parse($user->resignation_date)
-                    : null;
+            $monthlySalary = $user->monthly_amount ?? 0;
 
-                $monthsToCount = 6; 
+            $joined = Carbon::parse($user->joining_date);
+            $resignation = ($user->has_resigned && $user->resignation_date)
+                ? Carbon::parse($user->resignation_date)
+                : null;
 
-               if ($joined->gt($periodStart)) {
-                    $monthsToCount = $periodEnd->month - $joined->month + 1;
-                    $monthsToCount = max(1, $monthsToCount);
-                }
+            $monthsToCount = 6;
 
+            if ($joined->gt($periodStart)) {
+                $monthsToCount = $periodEnd->month - $joined->month + 1;
+                $monthsToCount = max(1, $monthsToCount);
+            }
 
-                if ($resignation && $resignation->between($periodStart, $periodEnd)) {
-                    $monthsToCount = 6;
-                }
+            if ($resignation && $resignation->between($periodStart, $periodEnd)) {
+                $monthsToCount = 6;
+            }
 
-                $halfYearlyIncome = $monthlySalary * $monthsToCount;
-                $tax = $this->calculateTax($halfYearlyIncome);
+            $halfYearlyIncome = $monthlySalary * $monthsToCount;
+            $tax = $this->calculateTax($halfYearlyIncome);
 
-                return [
-                    'SL' => $index + 1,
-                    'NAME & DESIGNATION' => $user->name ?? '-',
-                    'GROSS HALF-YEARLY INCOME' => $halfYearlyIncome,
-                    'AMOUNT OF TAX DEDUCTED & PAID' => $tax,
-                    'TOTAL AMOUNT' => $tax,
-                    'DETAILS OF PAYMENT' => 'Paid by ICICI Bank Chennai',
-                    'EMPLOYEE NO' => $user->employee_number ?? '-',
-                    'EMPLOYEE NAME' => $user->name ?? '-',
-                    'MONTHLY SALARY' => $monthlySalary,
-                    'MONTHS' => $monthsToCount,
-                    'GROSS HALF-YEARLY INCOME (DETAIL)' => $halfYearlyIncome,
-                    'TAX DEDUCTED' => $tax,
-                ];
-            });
-    }
+            // return [
+            //     'SL' => $index + 1,
+            //     'NAME & DESIGNATION' => $user->name ?? '-',
+            //     'GROSS HALF-YEARLY INCOME' => $halfYearlyIncome,
+            //     'AMOUNT OF TAX DEDUCTED & PAID' => $tax,
+            //     'TOTAL AMOUNT' => $tax,
+            //     'DETAILS OF PAYMENT' => 'Paid by ICICI Bank Chennai',
+            //     'EMPLOYEE NO' => $user->employee_number ?? '-',
+            //     'EMPLOYEE NAME' => $user->name ?? '-',
+            //     'MONTHLY SALARY' => $monthlySalary,
+            //     'MONTHS' => $monthsToCount,
+            //     'GROSS HALF-YEARLY INCOME (DETAIL)' => $halfYearlyIncome,
+            //     'TAX DEDUCTED' => $tax,
+            // ];
+            
+            return [
+                'SL' => $index + 1,
+                'NAME & DESIGNATION' => $user->name ?? '-',
+                'GROSS HALF-YEARLY INCOME' => round($halfYearlyIncome),
+                'AMOUNT OF TAX DEDUCTED & PAID' => round($tax),
+                'TOTAL AMOUNT' => round($tax),
+                'DETAILS OF PAYMENT' => 'Paid by ICICI Bank Chennai',
+                'EMPLOYEE NO' => $user->employee_number ?? '-',
+                'EMPLOYEE NAME' => $user->name ?? '-',
+                'MONTHLY SALARY' => round($monthlySalary),
+                'MONTHS' => $monthsToCount,
+                'GROSS HALF-YEARLY INCOME (DETAIL)' => round($halfYearlyIncome),
+                'TAX DEDUCTED' => round($tax),
+            ];
+        });
+
+    $rows->push([
+        'SL' => $rows->count() + 1,
+        'NAME & DESIGNATION' => 'Buildcraft',
+        'GROSS HALF-YEARLY INCOME' => 0,
+        'AMOUNT OF TAX DEDUCTED & PAID' => 1250,
+        'TOTAL AMOUNT' => 1250,
+        'DETAILS OF PAYMENT' => 'Paid by ICICI Bank Chennai',
+        'EMPLOYEE NO' => '-',
+        'EMPLOYEE NAME' => 'Buildcraft',
+        'MONTHLY SALARY' => '-',
+        'MONTHS' => '6',
+        'GROSS HALF-YEARLY INCOME (DETAIL)' => '-',
+        'TAX DEDUCTED' => '1250',
+    ]);
+
+    return $rows;
+}
 
     public function headings(): array
     {
@@ -142,7 +174,6 @@ class ProfTaxExport implements FromCollection, WithHeadings, WithStyles, WithCol
             'Amount of Tax Deducted & Paid',
             'Total Amount',
             'Details of challan / payment',
-
             'Employee Number',
             'Name',
             'Salary',

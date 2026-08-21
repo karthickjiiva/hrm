@@ -42,7 +42,7 @@ class LeaveListExport implements FromCollection, WithHeadings, WithMapping, With
             'Name',
             'Emp. Number',
             'Date',
-            'Leave Type',
+          //  'Leave Type',
             'Halfday'
         ];
     }
@@ -57,7 +57,7 @@ class LeaveListExport implements FromCollection, WithHeadings, WithMapping, With
             $leave->user->name ?? 'N/A',
             $leave->user->employee_number ?? 'N/A', 
             $leave->leave_date ? $leave->leave_date->format('d-m-Y') : 'N/A',
-            $leaveTypeName,
+           // $leaveTypeName,
             $leave->is_half_day ? 'Yes' : 'No',
         ];
     }

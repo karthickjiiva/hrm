@@ -24,16 +24,19 @@ class SalaryLeavesExport implements FromCollection, WithHeadings, WithMapping, W
         $this->year  = $year;
     }
 
-   public function collection()
+    public function collection()
     {
         return User::with('employeeType')
-            ->where('name', '!=', 'Admin') 
+            ->where('name', '!=', 'Admin')
+            ->where('has_resigned', 0)
+            ->where('hold_status', 0)
             ->whereHas('employeeType', function ($query) {
                 $query->where('type', '!=', 'Consultant Emp'); 
             })
             ->orderBy('id')
             ->get();
     }
+
 
     public function map($user): array
     {

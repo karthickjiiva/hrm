@@ -29,9 +29,9 @@ class LeaveSalaryStatementExport implements FromCollection, WithHeadings, WithMa
             $snapshot->employee->name ?? '-',
             $snapshot->employee->joining_date ? date('d-M-Y', strtotime($snapshot->employee->joining_date)) : '-',
             $snapshot->employee->employee_number ?? '-',
-            number_format($snapshot->new_gross, 2),
+            round($snapshot->new_gross),
             $snapshot->earned_leave,
-            number_format($snapshot->leave_salary, 2),
+            round($snapshot->leave_salary),
         ];
     }
 

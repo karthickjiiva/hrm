@@ -73,7 +73,7 @@ export default [
                     menuKey: (route) => "payroll_reportexcel",
                     permission: "salary_settings",
                 },
-            },
+            },           
             {
                 path: "payroll_report",
                 component: () =>
@@ -123,138 +123,6 @@ export default [
                 },
             },
             {
-                path: "leave_list_report",
-                component: () =>
-                    import("../views/reports/LeaveListReport.vue"),
-                name: "admin.leave.leave_list_report",
-                meta: {
-                    requireAuth: true,
-                    menuParent: "allreports",
-                    menuKey: (route) => "leave_list_report",
-                    permission: "salary_settings",
-                },
-            }, 
-            {
-                path: "master_report",
-                component: () =>
-                    import("../views/reports/MasterReports.vue"),
-                name: "admin.leave.master_report",
-                meta: {
-                    requireAuth: true,
-                    menuParent: "allreports",
-                    menuKey: (route) => "master_report",
-                    permission: "salary_settings",
-                },
-            },
-            {
-                path: "leave_salarystatement",
-                component: () =>
-                    import("../views/employee/leaves/LeaveSalaryStatement.vue"),
-                name: "admin.leave.leave_salarystatement",
-                meta: {
-                    requireAuth: true,
-                    menuParent: "allreports",
-                    menuKey: (route) => "leave_salarystatement",
-                    permission: "salary_settings",
-                },
-            },
-            {
-                path: "leave_salarybankstatement",
-                component: () =>
-                    import("../views/employee/leaves/LeaveSalaryBankStatement.vue"),
-                name: "admin.leave.leave_salarybankstatement",
-                meta: {
-                    requireAuth: true,
-                    menuParent: "allreports",
-                    menuKey: (route) => "leave_salarybankstatement",
-                    permission: "salary_settings",
-                },
-            },
-            {
-                path: "insurance_report",
-                component: () =>
-                    import("../views/employeeInsurance/Index.vue"),
-                name: "admin.leave.insurance_report",
-                meta: {
-                    requireAuth: true,
-                    menuParent: "",
-                    menuKey: (route) => "insurance_report",
-                    permission: "salary_settings",
-                },
-            },
-            {
-                path: "settlement_report",
-                component: () =>
-                    import("../views/reports/SettlementReport.vue"),
-                name: "admin.leave.settlement_report",
-                meta: {
-                    requireAuth: true,
-                    menuParent: "",
-                    menuKey: (route) => "settlement_report",
-                    permission: "salary_settings",
-                },
-            },
-            {
-                path: "bonusreport_yearly",
-                component: () =>
-                    import("../views/reports/BonusReport.vue"),
-                name: "admin.reports.bonusreport_yearly",
-                meta: {
-                    requireAuth: true,
-                    menuParent: "allreports",
-                    menuKey: (route) => "bonusreport_yearly",
-                    permission: "salary_settings",
-                },
-            },
-             {
-                path: "office_esi_report",
-                component: () =>
-                    import("../views/reports/OfficeEsireport.vue"),
-                name: "admin.reports.office_esi_report",
-                meta: {
-                    requireAuth: true,
-                    menuParent: "allreports",
-                    menuKey: (route) => "office_esi_report",
-                    permission: "salary_settings",
-                },
-            },
-            {
-                path: "wage_register_report",
-                component: () =>
-                    import("../views/reports/WageRegister.vue"),
-                name: "admin.reports.wage_register_report",
-                meta: {
-                    requireAuth: true,
-                    menuParent: "allreports",
-                    menuKey: (route) => "wage_register_report",
-                    permission: "salary_settings",
-                },
-            },
-            {
-                path: "form_x_report",
-                component: () =>
-                    import("../views/reports/FormXReport.vue"),
-                name: "admin.reports.form_x_report",
-                meta: {
-                    requireAuth: true,
-                    menuParent: "allreports",
-                    menuKey: (route) => "form_x_report",
-                    permission: "salary_settings",
-                },
-            }, 
-              {
-                path: "bangalore_reports",
-                component: () =>
-                    import("../views/reports/BangaloreReports.vue"),
-                name: "admin.reports.bangalore_reports",
-                meta: {
-                    requireAuth: true,
-                    menuParent: "allreports",
-                    menuKey: (route) => "bangalore_reports",
-                    permission: "salary_settings",
-                },
-            },
-            {
                 path: "professsional_tax",
                 component: () =>
                     import("../views/Extras/professsional_tax.vue"),
@@ -268,7 +136,8 @@ export default [
             },
             {
                 path: "arrears",
-                component: () => import("../views/Extras/arrear_generate.vue"),
+                component: () =>
+                    import("../views/Extras/arrear_generate.vue"),
                 name: "admin.arrears.arrear_generate",
                 meta: {
                     requireAuth: true,
@@ -279,7 +148,8 @@ export default [
             },
             {
                 path: "arrear_slip",
-                component: () => import("../views/Extras/arrear_slip.vue"),
+                component: () =>
+                    import("../views/Extras/arrear_slip.vue"),
                 name: "admin.arrears.arrear_slip",
                 meta: {
                     requireAuth: true,
@@ -299,7 +169,7 @@ export default [
                     menuKey: (route) => "arrears_pfreports",
                     permission: "salary_settings",
                 },
-            },
+            },          
         ],
     },
 ];

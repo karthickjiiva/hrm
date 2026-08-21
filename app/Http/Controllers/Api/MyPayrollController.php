@@ -75,14 +75,32 @@ class MyPayrollController extends ApiBaseController
 
     protected function processEmployeePayroll($employee, $month, $year)
     {
-        $totalDaysInMonth = Carbon::create($year, $month)->daysInMonth;
+       // $totalDaysInMonth = Carbon::create($year, $month)->daysInMonth;
+       $fullMonthDays = Carbon::create($year, $month, 1)->daysInMonth;
+$monthStart = Carbon::create($year, $month, 1)->startOfDay();
+$monthEnd = $monthStart->copy()->endOfMonth();
 
+      
+$joiningDate = Carbon::parse($employee->joining_date);
+
+// Decide start date
+$effectiveStart = $joiningDate->greaterThan($monthStart) ? $joiningDate : $monthStart;
+
+// Total working days from joining date
+$totalDaysInMonth = $effectiveStart->diffInDays($monthEnd) + 1;
+
+// Days before joining (LOP)
+$preJoinDays = $joiningDate->greaterThan($monthStart)
+    ? $monthStart->diffInDays($joiningDate)
+    : 0;
+    
         $leaveMasterBefore = \App\Models\EmployeeLeaveMaster::firstOrNew(['employee_id' => $employee->id]);
         $openingCL = (float) ($leaveMasterBefore->cl ?? 0);
         $openingSL = (float) ($leaveMasterBefore->sl ?? 0);
         $openingEL = (float) ($leaveMasterBefore->el ?? 0);
 
-        $leaveInfo = $this->getDetailedLeaveInfo($employee->id, $month, $year);
+        //$leaveInfo = $this->getDetailedLeaveInfo($employee->id, $month, $year);
+        $leaveInfo = $this->getDetailedLeaveInfo($employee->id, $month, $year, $effectiveStart);
         $totalLeavesTaken = round(array_sum($leaveInfo['all_leave_dates']), 2);
         $daysPresent = $totalDaysInMonth - $totalLeavesTaken;
         
@@ -101,21 +119,28 @@ class MyPayrollController extends ApiBaseController
         // $leaveMaster = $this->updateEarnedLeaves($employee->id, $earned);
 
         $leaveDeduction = $this->applyLeaveDeductions($employee->id, $totalLeavesTaken, $leaveMaster);
-        $lossOfPayDays = $leaveDeduction['loss_of_pay_days'];
+        
+       // $lossOfPayDays = $leaveDeduction['loss_of_pay_days'];
+        $lossOfPayDays = $leaveDeduction['loss_of_pay_days'] + $preJoinDays;
+        
         $ded = $leaveDeduction['deductions'];
-        $payableDays = $totalDaysInMonth - $lossOfPayDays;
+        
+        $payableDays = $fullMonthDays - $lossOfPayDays;
+        
+        //$payableDays = $totalDaysInMonth - $leaveDeduction['loss_of_pay_days'];
+        
 
         $monthlyBasic = (float) $employee->basic_salary;
         $monthlyHRA = (float) $employee->monthly_hra_percent_monthly;
         $monthlyAllowance = (float) $employee->monthly_allowance_percent;
         $monthlyFood = (float) $employee->monthly_food_allowance_percent;
 
-        $perDaySalary = ($monthlyBasic + $monthlyHRA + $monthlyAllowance + $monthlyFood) / $totalDaysInMonth;
+        $perDaySalary = ($monthlyBasic + $monthlyHRA + $monthlyAllowance + $monthlyFood) / $fullMonthDays;
 
-        $basic = round(($monthlyBasic / $totalDaysInMonth) * $payableDays, 2);
-        $hra = round(($monthlyHRA / $totalDaysInMonth) * $payableDays, 2);
-        $allowance = round(($monthlyAllowance / $totalDaysInMonth) * $payableDays, 2);
-        $foodAllowance = round(($monthlyFood / $totalDaysInMonth) * $payableDays, 2);
+        $basic = round(($monthlyBasic / $fullMonthDays) * $payableDays, 2);
+        $hra = round(($monthlyHRA / $fullMonthDays) * $payableDays, 2);
+        $allowance = round(($monthlyAllowance / $fullMonthDays) * $payableDays, 2);
+        $foodAllowance = round(($monthlyFood / $fullMonthDays) * $payableDays, 2);
 
         $totalEarnings = $basic + $hra + $allowance + $foodAllowance;
 
@@ -149,17 +174,34 @@ class MyPayrollController extends ApiBaseController
 
         $monthString = sprintf('%04d-%02d', $year, $month); 
 
-        $advanceDeduction = EmpAdvance::where('employee_id', $employee->id)
+        // $advanceDeduction = EmpAdvance::where('employee_id', $employee->id)
+        //     ->where('status', 'pending')
+        //     ->where('deduct_month', $monthString)
+        //     ->first();      
+        
+        //$advanceAmount = $advanceDeduction ? (float)$advanceDeduction->amount : 0;
+        
+        $advanceDeductions = EmpAdvance::where('employee_id', $employee->id)
             ->where('status', 'pending')
             ->where('deduct_month', $monthString)
-            ->first();      
-
-        if ($advanceDeduction) {
-            $advanceDeduction->status = 'paid';
-            $advanceDeduction->save();
-        }            
-
-        $advanceAmount = $advanceDeduction ? (float)$advanceDeduction->amount : 0;
+            ->get();
+        
+        $siteAdvanceTotal = 0;
+        $salaryAdvanceTotal = 0;
+        
+        foreach ($advanceDeductions as $deduction) {
+        
+            if ($deduction->advance_type === 'site_advance') {
+                $siteAdvanceTotal += (float)$deduction->amount;
+            } elseif ($deduction->advance_type === 'salary_advance') {
+                $salaryAdvanceTotal += (float)$deduction->amount;
+            }
+        
+            $deduction->status = 'paid';
+            $deduction->save();
+        }
+        
+        $advanceAmount = $siteAdvanceTotal + $salaryAdvanceTotal;
 
         $loanDeductionAmount = 0;
         $activeLoans = EmployeeLoan::where('employee_id', $employee->id)
@@ -191,7 +233,7 @@ class MyPayrollController extends ApiBaseController
         $netSalary = round($netSalary, 2);
 
         $payrollData = [
-        'total_working_days' => $totalDaysInMonth,
+        'total_working_days' => $fullMonthDays,
         'loss_of_pay_days' => $lossOfPayDays,
         'days_payable' => $payableDays, 
         'actual_payable_days' => $payableDays,     
@@ -209,6 +251,8 @@ class MyPayrollController extends ApiBaseController
         'total_taxes_deductions' => $pt + $tds,
         'net_salary' => $netSalary,
         'loan_deduct' => round($loanDeductionAmount, 2), 
+        'site_advance_deduct' => round($siteAdvanceTotal, 2),
+        'salary_advance_deduct' => round($salaryAdvanceTotal, 2), 
         'advance_deduct' => round($advanceAmount, 2)
     ];
 
@@ -262,7 +306,7 @@ class MyPayrollController extends ApiBaseController
             'sandwich_days' => count($leaveInfo['sandwich']),
             'half_days' => collect($leaveInfo['all_leave_dates'])->filter(fn($v) => $v == 0.5)->count(),
 
-            'total_working_days' => $totalDaysInMonth,
+            'total_working_days' => $fullMonthDays,
             'days_payable' => $payableDays,
             'loss_of_pay_days' => $lossOfPayDays,
         ];
@@ -276,11 +320,16 @@ class MyPayrollController extends ApiBaseController
 
     }
 
-protected function getDetailedLeaveInfo($employeeId, $month, $year)
+// protected function getDetailedLeaveInfo($employeeId, $month, $year)
+// {
+//     $start = Carbon::create($year, $month, 1)->startOfMonth();
+//     $end = Carbon::create($year, $month, 1)->endOfMonth();
+    
+protected function getDetailedLeaveInfo($employeeId, $month, $year, $startOverride = null)
 {
-    $start = Carbon::create($year, $month, 1)->startOfMonth();
+    $start = $startOverride ?? Carbon::create($year, $month, 1)->startOfMonth();
     $end = Carbon::create($year, $month, 1)->endOfMonth();
-
+    
     $leaves = Leave::where('user_id', $employeeId)
         ->whereBetween('leave_date', [$start, $end])
         ->get();

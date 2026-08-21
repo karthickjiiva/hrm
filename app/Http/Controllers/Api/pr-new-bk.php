@@ -271,9 +271,9 @@ public function index()
                 ->where('month', $month)
                 ->where('year', $year)
                ->whereHas('employee', function ($query) {
-                $query->where('name', '!=', 'Admin');
-                  //->where('has_resigned', 0)
-                  //->where('hold_status', 0);
+                $query->where('has_resigned', 0)
+                    ->where('name', '!=', 'Admin')
+                    ->where('hold_status', 0);
                 });
     
             if ($type == 'bangalore') {
