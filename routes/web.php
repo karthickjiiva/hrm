@@ -57,10 +57,10 @@ ApiRoute::group(['namespace' => 'App\Http\Controllers\Api'], function () {
 
     // Gratuity claim form (LIC group gratuity) – generate / list / download PDFs for resigned employees
     ApiRoute::get('gratuity-forms/resigned-employees', 'GratuityFormController@resignedEmployees');
-    ApiRoute::get('gratuity-forms', 'GratuityFormController@index');
+    ApiRoute::get('gratuity-forms/history', 'GratuityFormController@history');
     ApiRoute::post('gratuity-forms/generate', 'GratuityFormController@generate');
     ApiRoute::get('gratuity-forms/{xid}/download', 'GratuityFormController@download');
-    ApiRoute::delete('gratuity-forms/{xid}', 'GratuityFormController@destroy');
+    ApiRoute::delete('gratuity-forms/{xid}/remove', 'GratuityFormController@remove');
     ApiRoute::post('employee-insurances/generate-report','MasterController@generateInsuranceReport');
 
     // Check visibility of module according to subscription plan

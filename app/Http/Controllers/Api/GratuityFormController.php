@@ -59,10 +59,10 @@ class GratuityFormController extends ApiBaseController
     }
 
     /**
-     * GET gratuity-forms?limit=10&page=1
+     * GET gratuity-forms/history?limit=10&page=1
      * Paginated history of generated forms.
      */
-    public function index(Request $request)
+    public function history(Request $request)
     {
         $forms = GratuityForm::with(['employee'])
             ->orderBy('id', 'desc')
@@ -137,9 +137,9 @@ class GratuityFormController extends ApiBaseController
     }
 
     /**
-     * DELETE gratuity-forms/{xid}
+     * DELETE gratuity-forms/{xid}/remove
      */
-    public function destroy($xid)
+    public function remove($xid)
     {
         $form = GratuityForm::findOrFail($this->getIdFromHash($xid));
 

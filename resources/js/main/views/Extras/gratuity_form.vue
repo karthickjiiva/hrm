@@ -206,7 +206,7 @@ export default {
         const fetchForms = async (page = 1, pageSize = pagination.value.pageSize) => {
             tableLoading.value = true;
             try {
-                const res = await axios.get(API, {
+                const res = await axios.get(`${API}/history`, {
                     params: { page, limit: pageSize },
                     headers: authHeaders(),
                 });
@@ -292,7 +292,7 @@ export default {
 
         const deleteForm = async (record) => {
             try {
-                await axios.delete(`${API}/${record.xid}`, { headers: authHeaders() });
+                await axios.delete(`${API}/${record.xid}/remove`, { headers: authHeaders() });
                 message.success("Gratuity form deleted.");
                 const page = forms.value.length === 1 && pagination.value.current > 1
                     ? pagination.value.current - 1
