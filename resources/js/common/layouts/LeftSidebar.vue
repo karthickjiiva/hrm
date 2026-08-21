@@ -829,6 +829,16 @@
                         " key="professsional_tax">
                             <span>Professional Tax Report</span>
                         </a-menu-item>
+                        <a-menu-item v-if="permsArray.includes('admin')" @click="
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.reports.gratuity_form',
+                                });
+                            }
+                        " key="gratuity_form">
+                            <span>Gratuity Form</span>
+                        </a-menu-item>
                     </a-sub-menu>
 
                     <a-menu-item v-if="

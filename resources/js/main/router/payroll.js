@@ -267,6 +267,18 @@ export default [
                 },
             },
             {
+                path: "gratuity_form",
+                component: () =>
+                    import("../views/Extras/gratuity_form.vue"),
+                name: "admin.reports.gratuity_form",
+                meta: {
+                    requireAuth: true,
+                    menuParent: "allreports",
+                    menuKey: (route) => "gratuity_form",
+                    permission: "salary_settings",
+                },
+            },
+            {
                 path: "arrears",
                 component: () => import("../views/Extras/arrear_generate.vue"),
                 name: "admin.arrears.arrear_generate",
