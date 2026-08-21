@@ -204,12 +204,13 @@ protected function amountToWords($number)
             $sheet->setCellValue('F5', $this->relievingDate->format('d-M-y'));
             $sheet->setCellValue('E7', 'BASIC :');
             $sheet->setCellValue('F7', $this->user->basic_salary);
+            // Same source columns as payroll generation (MyPayrollController), legacy columns as fallback
             $sheet->setCellValue('E8', 'HRA :');
-            $sheet->setCellValue('F8', $this->user->hra);
+            $sheet->setCellValue('F8', (float) ($this->user->monthly_hra_percent_monthly ?: $this->user->hra ?: 0));
             $sheet->setCellValue('E9', 'FOOD ALLOW :');
-            $sheet->setCellValue('F9', $this->user->food_allow ?? 0);
+            $sheet->setCellValue('F9', (float) ($this->user->monthly_food_allowance_percent ?: 0));
             $sheet->setCellValue('E10', 'CONVEYANCE :');
-            $sheet->setCellValue('F10', $this->user->conveyance ?? 0);
+            $sheet->setCellValue('F10', (float) ($this->user->monthly_allowance_percent ?: $this->user->allowance ?: 0));
             $sheet->setCellValue('E11', 'GROSS :');
             $sheet->setCellValue('F11', $this->user->monthly_amount);
 
@@ -356,20 +357,29 @@ protected function amountToWords($number)
             }
 
             /** * ==========================================================
-             * TOTALS & FOOTER (UNTOUCHED LOGIC)
+             * TOTALS & FOOTER
+             * Written as values (not formulas): excel.exports.pre_calculate_formulas is
+             * false in this app, so formula cells would show 0 until recalculated.
              * ==========================================================
              */
+            $totalEarnings += round($leaveSalaryAmount);
+            $totalEarnings += (float) $this->siteAdvance;
+            $totalEarnings += (float) $this->others;
+            $totalDeductions += $totalProfTax;
+            $bonusDue = 0;
+            $netFinal = $totalEarnings + $bonusDue - $totalDeductions;
+
             $summaryRow = $currentRow + 1;
 
             $sheet->getStyle("A13:F$summaryRow")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
             // Total - (A) Row
             $sheet->setCellValue("A$summaryRow", 'Total - (A)');
-            $sheet->setCellValue("C$summaryRow", "=SUM(C14:C$currentRow)");
+            $sheet->setCellValue("C$summaryRow", $totalEarnings);
 
             // Total - (B) Row
             $sheet->setCellValue("D$summaryRow", '(B)');
-            $sheet->setCellValue("F$summaryRow", "=SUM(F14:F$currentRow)");
+            $sheet->setCellValue("F$summaryRow", $totalDeductions);
 
             $sheet->getStyle("C$summaryRow")->getBorders()->getOutline()->setBorderStyle(Border::BORDER_THICK);
             $sheet->getStyle("F$summaryRow")->getBorders()->getOutline()->setBorderStyle(Border::BORDER_THICK);
@@ -382,9 +392,9 @@ protected function amountToWords($number)
             // Settlement Calculation Row
             $settleRow = $spacerRow + 1;
             $sheet->setCellValue("A$settleRow", '(C) BONUS DUE : RS.');
-            $sheet->setCellValue("B$settleRow", '0.00');
+            $sheet->setCellValue("B$settleRow", $bonusDue);
             $sheet->setCellValue("D$settleRow", 'SETTLEMENT :(A+C-B)');
-            $sheet->setCellValue("F$settleRow", "=C$summaryRow-F$summaryRow");
+            $sheet->setCellValue("F$settleRow", $netFinal);
             $sheet->getStyle("F$settleRow")->getFont()->setBold(true);
 
             $sheet->getStyle("A$settleRow:F$settleRow")->getBorders()->getTop()->setBorderStyle(Border::BORDER_THIN);
@@ -393,15 +403,9 @@ protected function amountToWords($number)
             // Final Amount Payable
             $payableRow = $settleRow + 2;
             $sheet->setCellValue("A$payableRow", 'TOTAL AMOUNT PAYABLE BY EMPLOYER :');
-            $sheet->setCellValue("C$payableRow", "=F$settleRow");
+            $sheet->setCellValue("C$payableRow", $netFinal);
 
-            // Word Conversion Data
-            $totalEarnings += round($leaveSalaryAmount);
-            $totalEarnings += $this->siteAdvance;
-            $totalEarnings += $this->others;
-            $totalDeductions += $totalProfTax;
-
-            $netFinal = $totalEarnings - $totalDeductions;
+            // Word Conversion Data (same figure as the cells above)
             $words = $this->amountToWords($netFinal);
 
             $wordsRow = $payableRow + 2;
