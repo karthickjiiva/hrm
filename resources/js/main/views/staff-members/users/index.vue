@@ -57,24 +57,17 @@
                 <a-row :gutter="[16, 16]" justify="end">
                     <a-col :xs="24" :sm="24" :md="12" :lg="4" :xl="4">
                         <a-select
-                            v-model:value="extraFilters.shift"
+                            v-model:value="extraFilters.hold_status"
                             @change="setUrlData"
-                            show-search
                             style="width: 100%"
-                            :placeholder="
-                                $t('common.select_default_text', [
-                                    $t('user.shift_id'),
-                                ])
-                            "
+                            placeholder="Select hold status"
                             :allowClear="true"
                         >
-                            <a-select-option
-                                v-for="shift in shifts"
-                                :key="shift.xid"
-                                :value="shift.xid"
-                                :title="shift.name"
-                            >
-                                {{ shift.name }}
+                            <a-select-option :value="0">
+                                Not on hold
+                            </a-select-option>
+                            <a-select-option :value="1">
+                                On hold
                             </a-select-option>
                         </a-select>
                     </a-col>
@@ -228,15 +221,25 @@
                                     <user-info :user="record" />
                                 </a-button>
                             </template>
-                            <template v-if="column.dataIndex === 'report_to'">
+                            <!-- <template v-if="column.dataIndex === 'report_to'">
                                 {{
                                     record.reporter ? record.reporter.name : "-"
                                 }}
-                            </template>
-                            <template v-if="column.dataIndex === 'location_id'">
-                                {{
-                                    record.location ? record.location.name : "-"
-                                }}
+                            </template> -->
+                            <template v-if="column.dataIndex === 'hold_status'">
+                                <a-tag
+                                    :color="
+                                        record.hold_status == 1
+                                            ? 'orange'
+                                            : 'green'
+                                    "
+                                >
+                                    {{
+                                        record.hold_status == 1
+                                            ? "On hold"
+                                            : "Not on hold"
+                                    }}
+                                </a-tag>
                             </template>
                             <template v-if="column.dataIndex === 'department'">
                                 {{
@@ -365,15 +368,13 @@ export default {
             location: undefined,
             department: undefined,
             designation: undefined,
-            shift: undefined,
+            hold_status: undefined,
             employee_type_id: undefined,
         });
         const departments = ref([]);
         const designations = ref([]);
         const locations = ref([]);
-        const shifts = ref([]);
         const employeeType = ref([]);
-        const shiftUrl = "shifts?limit=10000";
         const departmentUrl = "departments?limit=10000";
         const designationUrl = "designations?limit=10000";
         const locationUrl = "locations?limit=10000";
@@ -398,27 +399,23 @@ export default {
             const employeeTypePromise = axiosAdmin.get(employeeTypeUrl);
             const departmentsPromise = axiosAdmin.get(departmentUrl);
             const designationsPromise = axiosAdmin.get(designationUrl);
-            const shiftsPromise = axiosAdmin.get(shiftUrl);
 
             Promise.all([
                 departmentsPromise,
                 designationsPromise,
                 locationPromise,
                 employeeTypePromise,
-                shiftsPromise,
             ]).then(
                 ([
                     departmentsResponse,
                     designationsResponse,
                     locationResponse,
                     employeeTypeResponse,
-                    shiftsResponse,
                 ]) => {
                     departments.value = departmentsResponse.data;
                     designations.value = designationsResponse.data;
                     locations.value = locationResponse.data;
                     employeeType.value = employeeTypeResponse.data;
-                    shifts.value = shiftsResponse.data;
                 }
             );
         });
@@ -459,7 +456,6 @@ export default {
             departments,
             designations,
             locations,
-            shifts,
             extraFilters,
             addItems,
             detailsVisibles,

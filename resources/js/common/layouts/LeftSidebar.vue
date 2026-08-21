@@ -9,15 +9,15 @@
             themeMode == 'dark' ? '1px solid #303030' : '1px solid #f0f0f0',
     }" :trigger="null" :collapsed="menuCollapsed"
         :theme="themeMode == 'dark' ? 'light' : appSetting.left_sidebar_theme" class="sidebar-right-border">
-        <!--<div v-if="menuCollapsed" class="logo">
+        <div v-if="menuCollapsed" class="logo">
             <img :style="{
                 height: '32px',
             }" :src="themeMode == 'dark'
-                        ? appSetting.small_dark_logo_url
-                        : appSetting.left_sidebar_theme == 'dark'
-                            ? appSetting.small_dark_logo_url
-                            : appSetting.small_light_logo_url
-                    " />
+                ? appSetting.small_dark_logo_url
+                : appSetting.left_sidebar_theme == 'dark'
+                    ? appSetting.small_dark_logo_url
+                    : appSetting.small_light_logo_url
+                " />
         </div>
         <div v-else>
             <img :style="{
@@ -31,11 +31,11 @@
                 marginRight: appSetting.rtl ? '10px' : '0px',
                 display: 'inline-flex',
             }" :src="themeMode == 'dark'
-                        ? appSetting.dark_logo_url
-                        : appSetting.left_sidebar_theme == 'dark'
-                            ? appSetting.dark_logo_url
-                            : appSetting.light_logo_url
-                    " />
+                ? appSetting.dark_logo_url
+                : appSetting.left_sidebar_theme == 'dark'
+                    ? appSetting.dark_logo_url
+                    : appSetting.light_logo_url
+                " />
             <CloseOutlined v-if="innerWidth <= 991" :style="{
                 marginLeft: appSetting.rtl ? '0px' : '45px',
                 marginRight: appSetting.rtl ? '45px' : '0px',
@@ -47,7 +47,7 @@
                             ? '#fff'
                             : '#000000',
             }" @click="menuSelected" />
-        </div>-->
+        </div>
 
         <div class="main-sidebar">
             <a-tabs v-if="authStore && authStore.user && authStore.user.is_manager" v-model:activeKey="activeKey"
@@ -84,8 +84,8 @@
                 suppressScrollX: true,
             }">
                 <a-menu :theme="themeMode == 'dark'
-                        ? 'light'
-                        : appSetting.left_sidebar_theme
+                    ? 'light'
+                    : appSetting.left_sidebar_theme
                     " :openKeys="openKeys" v-model:selectedKeys="selectedKeys" :mode="mode" @openChange="onOpenChange"
                     :style="{ borderRight: 'none' }">
                     <a-menu-item @click="
@@ -115,13 +115,13 @@
                             permsArray.includes('users_view') ||
                             permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.employee_types.index',
-                                    });
-                                }
-                            " key="employee_type">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.employee_types.index',
+                                });
+                            }
+                        " key="employee_type">
                             <!-- <span>{{ $t("menu.staff_members") }}</span> -->
                             <span>Employee Type</span>
                         </a-menu-item>
@@ -129,39 +129,39 @@
                             permsArray.includes('users_view') ||
                             permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.staffs.index',
-                                    });
-                                }
-                            " key="staff">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.staffs.index',
+                                });
+                            }
+                        " key="staff">
                             <span>{{ $t("menu.staff_members") }}</span>
                         </a-menu-item>
                         <a-menu-item v-if="
                             permsArray.includes('departments_view') ||
                             permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.departments.index',
-                                    });
-                                }
-                            " key="departments">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.departments.index',
+                                });
+                            }
+                        " key="departments">
                             <span>{{ $t("menu.departments") }}</span>
                         </a-menu-item>
                         <a-menu-item v-if="
                             permsArray.includes('designations_view') ||
                             permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.designations.index',
-                                    });
-                                }
-                            " key="designations">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.designations.index',
+                                });
+                            }
+                        " key="designations">
                             <span>{{ $t("menu.designations") }}</span>
                         </a-menu-item>
                         <!-- <a-menu-item
@@ -185,13 +185,13 @@
                             permsArray.includes('users_view') ||
                             permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.bank_master.index',
-                                    });
-                                }
-                            " key="bank_master">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.bank_master.index',
+                                });
+                            }
+                        " key="bank_master">
                             <!-- <span>{{ $t("menu.staff_members") }}</span> -->
                             <span>Bank Master</span>
                         </a-menu-item>
@@ -199,13 +199,13 @@
                             permsArray.includes('users_view') ||
                             permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.employee_leave_master.index',
-                                    });
-                                }
-                            " key="employee_leave_master">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.employee_leave_master.index',
+                                });
+                            }
+                        " key="employee_leave_master">
                             <!-- <span>{{ $t("menu.staff_members") }}</span> -->
                             <span>Employee Leave Master</span>
                         </a-menu-item>
@@ -225,26 +225,26 @@
                             permsArray.includes('asset_types_view') ||
                             permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.asset_types.index',
-                                    });
-                                }
-                            " key="asset_types">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.asset_types.index',
+                                });
+                            }
+                        " key="asset_types">
                             <span>{{ $t("menu.asset_types") }}</span>
                         </a-menu-item>
                         <a-menu-item v-if="
                             permsArray.includes('assets_view') ||
                             permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.assets.index',
-                                    });
-                                }
-                            " key="assets">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.assets.index',
+                                });
+                            }
+                        " key="assets">
                             <span>{{ $t("menu.assets") }}</span>
                         </a-menu-item>
                     </a-sub-menu>
@@ -307,26 +307,26 @@
                             permsArray.includes('appreciations_view') ||
                             permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.appreciations.index',
-                                    });
-                                }
-                            " key="appreciations">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.appreciations.index',
+                                });
+                            }
+                        " key="appreciations">
                             <span>{{ $t("menu.appreciations") }}</span>
                         </a-menu-item>
                         <a-menu-item v-if="
                             permsArray.includes('awards_view') ||
                             permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.awards.index',
-                                    });
-                                }
-                            " key="awards">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.awards.index',
+                                });
+                            }
+                        " key="awards">
                             <span>{{ $t("menu.awards") }}</span>
                         </a-menu-item>
                     </a-sub-menu>
@@ -391,18 +391,15 @@
                         " key="arrear_slip">
                             <span>Payslip Download</span>
                         </a-menu-item>
-                        <a-menu-item
-                        @click="
+                        <a-menu-item @click="
                             () => {
-                            menuSelected();
-                            $router.push({
-                                name: 'admin.arrears.arrears_pfreports',   
-                            });
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.arrears.arrears_pfreports',
+                                });
                             }
-                        "
-                        key="arrears_pfreports"  
-                        >
-                        <span>PF Report</span>
+                        " key="arrears_pfreports">
+                            <span>PF Report</span>
                         </a-menu-item>
                     </a-sub-menu>
 
@@ -421,15 +418,33 @@
                             permsArray.includes('leaves_view') ||
                             permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.leaves.index',
-                                    });
-                                }
-                            " key="leaves">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.leaves.index',
+                                });
+                            }
+                        " key="leaves">
                             <span>{{ $t("menu.leaves") }}</span>
                         </a-menu-item>
+
+                        <a-menu-item
+                                v-if="
+                                    permsArray.includes('leaves_view') ||
+                                    permsArray.includes('admin')
+                                "
+                                @click="
+                                    () => {
+                                        menuSelected();
+                                        $router.push({
+                                            name: 'admin.wfh-leaves.index',
+                                        });
+                                    }
+                                "
+                                key="wfhleaves"
+                            >
+                                <span>WFH Leaves</span>
+                            </a-menu-item>
                         <!-- <a-menu-item
                             v-if="
                                 permsArray.includes('leave_types_view') ||
@@ -531,11 +546,11 @@
                         permsArray.includes('news_view') ||
                         permsArray.includes('admin')
                     " @click="
-                            () => {
-                                menuSelected();
-                                $router.push({ name: 'admin.news.index' });
-                            }
-                        " key="news">
+                        () => {
+                            menuSelected();
+                            $router.push({ name: 'admin.news.index' });
+                        }
+                    " key="news">
                         <ReadOutlined />
                         <span>{{ $t("menu.news") }}</span>
                     </a-menu-item>
@@ -641,6 +656,30 @@
                         </a-menu-item>
 
                     </a-sub-menu>
+
+                        <a-menu-item v-if="permsArray.includes('admin')" @click="
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.leave.insurance_report',
+                                });
+                            }
+                        " key="insurance_report">
+                           <ScheduleOutlined />  <span>Insurance Report</span>
+                        </a-menu-item>
+
+
+                        <a-menu-item v-if="permsArray.includes('admin')" @click="
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.leave.settlement_report',
+                                });
+                            }
+                        " key="settlement_report">
+                           <ScheduleOutlined />  <span>Settlement Report</span>
+                        </a-menu-item>
+
                     <a-sub-menu key="allreports" v-if="
                         permsArray.includes('salary_settings') ||
                         permsArray.includes('admin')
@@ -651,6 +690,18 @@
                                 <span>All Reports</span>
                             </span>
                         </template>
+
+                         <a-menu-item v-if="permsArray.includes('admin')" @click="
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.leave.master_report',
+                                });
+                            }
+                        " key="master_report">
+                            <span>Master Reports</span>
+                        </a-menu-item>
+                
                         <a-menu-item v-if="permsArray.includes('admin')" @click="
                             () => {
                                 menuSelected();
@@ -682,6 +733,28 @@
                             <span>PF Report</span>
                         </a-menu-item>
 
+                         <a-menu-item v-if="permsArray.includes('admin')" @click="
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.reports.bangalore_reports',
+                                });
+                            }
+                        " key="bangalore_reports">
+                            <span>Bangalore Reports</span>
+                        </a-menu-item> 
+
+                          <a-menu-item v-if="permsArray.includes('admin')" @click="
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.leave.leave_list_report',
+                                });
+                            }
+                        " key="leave_list_report">
+                            <span>Leave List Report</span>
+                        </a-menu-item>
+
                         <a-menu-item v-if="permsArray.includes('admin')" @click="
                             () => {
                                 menuSelected();
@@ -692,7 +765,61 @@
                         " key="leave_salaryreport">
                             <span>Leave Salary Report</span>
                         </a-menu-item>
+
+                        <a-menu-item v-if="permsArray.includes('admin')" @click="
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.leave.leave_salarystatement',
+                                });
+                            }
+                        " key="leave_salarystatement">
+                            <span>Leave Salary Statement</span>
+                        </a-menu-item>
                          <a-menu-item v-if="permsArray.includes('admin')" @click="
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.reports.bonusreport_yearly',
+                                });
+                            }
+                        " key="bonusreport_yearly">
+                            <span>Bonus Report(Yearly)</span>
+                        </a-menu-item> 
+
+                         <a-menu-item v-if="permsArray.includes('admin')" @click="
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.reports.office_esi_report',
+                                });
+                            }
+                        " key="office_esi_report">
+                            <span>Office ESI Report</span>
+                        </a-menu-item> 
+                          <a-menu-item v-if="permsArray.includes('admin')" @click="
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.reports.wage_register_report',
+                                });
+                            }
+                        " key="wage_register_report">
+                            <span>Wage Register Report</span>
+                        </a-menu-item> 
+
+                          <a-menu-item v-if="permsArray.includes('admin')" @click="
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.reports.form_x_report',
+                                });
+                            }
+                        " key="form_x_report">
+                            <span>Form X Report</span>
+                        </a-menu-item> 
+
+                        <a-menu-item v-if="permsArray.includes('admin')" @click="
                             () => {
                                 menuSelected();
                                 $router.push({
@@ -708,13 +835,13 @@
                         permsArray.includes('company_policies_view') ||
                         permsArray.includes('admin')
                     " @click="
-                            () => {
-                                menuSelected();
-                                $router.push({
-                                    name: 'admin.company-policies.index',
-                                });
-                            }
-                        " key="company_policies">
+                        () => {
+                            menuSelected();
+                            $router.push({
+                                name: 'admin.company-policies.index',
+                            });
+                        }
+                    " key="company_policies">
                         <FilePptOutlined />
                         <span>{{ $t("menu.company_policies") }}</span>
                     </a-menu-item>
@@ -736,26 +863,26 @@
                             permsArray.includes('warnings_view') ||
                             permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.warnings.index',
-                                    });
-                                }
-                            " key="warnings">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.warnings.index',
+                                });
+                            }
+                        " key="warnings">
                             <span>{{ $t("menu.warnings") }}</span>
                         </a-menu-item>
                         <a-menu-item v-if="
                             permsArray.includes('resignations_view') ||
                             permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.resignations.index',
-                                    });
-                                }
-                            " key="resignations">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.resignations.index',
+                                });
+                            }
+                        " key="resignations">
                             <span>{{ $t("menu.resignations") }}</span>
                         </a-menu-item>
                         <a-menu-item v-if="permsArray.includes('admin')" @click="
@@ -772,26 +899,26 @@
                             permsArray.includes('terminations_view') ||
                             permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.terminations.index',
-                                    });
-                                }
-                            " key="terminations">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.terminations.index',
+                                });
+                            }
+                        " key="terminations">
                             <span>{{ $t("menu.terminations") }}</span>
                         </a-menu-item>
                         <a-menu-item v-if="
                             permsArray.includes('complaints_view') ||
                             permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.complaints.index',
-                                    });
-                                }
-                            " key="complaints">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.complaints.index',
+                                });
+                            }
+                        " key="complaints">
                             <span>{{ $t("menu.complaints") }}</span>
                         </a-menu-item>
                     </a-sub-menu>
@@ -812,26 +939,26 @@
                                 'letter_head_templates_view'
                             ) || permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.email-templates.index',
-                                    });
-                                }
-                            " key="templates">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.email-templates.index',
+                                });
+                            }
+                        " key="templates">
                             <span>{{ $t("menu.templates") }}</span>
                         </a-menu-item>
                         <a-menu-item v-if="
                             permsArray.includes('generates_view') ||
                             permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.generates.index',
-                                    });
-                                }
-                            " key="generates">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.generates.index',
+                                });
+                            }
+                        " key="generates">
                             <span>{{ $t("menu.generates") }}</span>
                         </a-menu-item>
                     </a-sub-menu>
@@ -852,37 +979,37 @@
                             permsArray.includes('forms_view') ||
                             permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({ name: 'admin.forms.index' });
-                                }
-                            " key="forms">
+                            () => {
+                                menuSelected();
+                                $router.push({ name: 'admin.forms.index' });
+                            }
+                        " key="forms">
                             <span>{{ $t("menu.forms") }}</span>
                         </a-menu-item>
                         <a-menu-item v-if="
                             permsArray.includes('indicators_view') ||
                             permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.indicators.index',
-                                    });
-                                }
-                            " key="indicators">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.indicators.index',
+                                });
+                            }
+                        " key="indicators">
                             <span>{{ $t("menu.indicators") }}</span>
                         </a-menu-item>
                         <a-menu-item v-if="
                             permsArray.includes('feedbacks_view') ||
                             permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.feedbacks.index',
-                                    });
-                                }
-                            " key="feedbacks">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.feedbacks.index',
+                                });
+                            }
+                        " key="feedbacks">
                             <span>{{ $t("menu.feedbacks") }}</span>
                         </a-menu-item>
                     </a-sub-menu>
@@ -906,39 +1033,39 @@
                             permsArray.includes('accounts_view') ||
                             permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.accounts.index',
-                                    });
-                                }
-                            " key="accounts">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.accounts.index',
+                                });
+                            }
+                        " key="accounts">
                             <span>{{ $t("menu.accounts") }}</span>
                         </a-menu-item>
                         <a-menu-item v-if="
                             permsArray.includes('payees_view') ||
                             permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.payees.index',
-                                    });
-                                }
-                            " key="payees">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.payees.index',
+                                });
+                            }
+                        " key="payees">
                             <span>{{ $t("menu.payees") }}</span>
                         </a-menu-item>
                         <a-menu-item v-if="
                             permsArray.includes('payers_view') ||
                             permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.payers.index',
-                                    });
-                                }
-                            " key="payers">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.payers.index',
+                                });
+                            }
+                        " key="payers">
                             <span>{{ $t("menu.payers") }}</span>
                         </a-menu-item>
                         <a-menu-item v-if="
@@ -946,13 +1073,13 @@
                                 'deposit_categories_view'
                             ) || permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.deposit_categories.index',
-                                    });
-                                }
-                            " key="deposit_categories">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.deposit_categories.index',
+                                });
+                            }
+                        " key="deposit_categories">
                             <span>{{ $t("menu.deposit_categories") }}</span>
                         </a-menu-item>
                         <a-menu-item v-if="
@@ -960,39 +1087,39 @@
                                 'expense_categories_view'
                             ) || permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.expense_categories.index',
-                                    });
-                                }
-                            " key="expense_categories">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.expense_categories.index',
+                                });
+                            }
+                        " key="expense_categories">
                             <span>{{ $t("menu.expense_categories") }}</span>
                         </a-menu-item>
                         <a-menu-item v-if="
                             permsArray.includes('deposits_view') ||
                             permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.deposits.index',
-                                    });
-                                }
-                            " key="deposits">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.deposits.index',
+                                });
+                            }
+                        " key="deposits">
                             <span>{{ $t("menu.deposits") }}</span>
                         </a-menu-item>
                         <a-menu-item v-if="
                             permsArray.includes('expenses_view') ||
                             permsArray.includes('admin')
                         " @click="
-                                () => {
-                                    menuSelected();
-                                    $router.push({
-                                        name: 'admin.expenses.index',
-                                    });
-                                }
-                            " key="expenses">
+                            () => {
+                                menuSelected();
+                                $router.push({
+                                    name: 'admin.expenses.index',
+                                });
+                            }
+                        " key="expenses">
                             <span>{{ $t("menu.expenses") }}</span>
                         </a-menu-item>
                     </a-sub-menu>
@@ -1016,13 +1143,13 @@
                         appType == 'saas' &&
                         appSetting.x_admin_id == user.xid
                     " @click="
-                            () => {
-                                menuSelected();
-                                $router.push({
-                                    name: 'admin.subscription.current_plan',
-                                });
-                            }
-                        " key="subscription">
+                        () => {
+                            menuSelected();
+                            $router.push({
+                                name: 'admin.subscription.current_plan',
+                            });
+                        }
+                    " key="subscription">
                         <DollarCircleOutlined />
                         <span>{{ $t("menu.subscription") }}</span>
                     </a-menu-item>
@@ -1039,8 +1166,8 @@
                 suppressScrollX: true,
             }">
                 <a-menu :theme="themeMode == 'dark'
-                        ? 'light'
-                        : appSetting.left_sidebar_theme
+                    ? 'light'
+                    : appSetting.left_sidebar_theme
                     " :openKeys="openKeys" v-model:selectedKeys="selectedKeys" :mode="mode" @openChange="onOpenChange"
                     :style="{ borderRight: 'none' }">
                     <a-menu-item @click="

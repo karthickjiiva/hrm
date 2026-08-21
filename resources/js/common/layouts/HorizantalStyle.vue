@@ -5,13 +5,13 @@
 				<a-row>
 					<a-col :span="1">
 						<div class="logo">
-							<!--<img
+							<img
 								:src="
 									appSetting.left_sidebar_theme == 'dark'
 										? appSetting.small_dark_logo_url
 										: appSetting.small_light_logo_url
 								"
-							/>-->
+							/>
 						</div>
 					</a-col>
 					<a-col :span="20">
