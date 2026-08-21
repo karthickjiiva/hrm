@@ -24,17 +24,17 @@
                     <a-descriptions-item :label="$t('leave.start_date')">
                         {{ formatDateTime(data.start_date) }}
                     </a-descriptions-item>
-                    <a-descriptions-item :label="$t('leave.end_date')">
+                    <!-- <a-descriptions-item :label="$t('leave.end_date')">
                         {{ formatDateTime(data.start_date) }}
-                    </a-descriptions-item>
+                    </a-descriptions-item> -->
                     <a-descriptions-item :label="$t('leave.is_half_day')">
                         {{ data.is_half_day }}
                     </a-descriptions-item>
-                    <a-descriptions-item :label="$t('leave.status')">
+                    <!-- <a-descriptions-item :label="$t('leave.status')">
                         <a-tag :color="leaveRequestColors[data.status]">
                             {{ $t(`common.${data.status}`) }}
                         </a-tag>
-                    </a-descriptions-item>
+                    </a-descriptions-item> -->
                     <a-descriptions-item :label="$t('leave.reason')">
                         <div v-if="data && data.reason" style="white-space: pre-wrap">
                             {{ data.reason }}

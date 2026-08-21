@@ -117,9 +117,9 @@
                 <a-col :span="24">
                     <a-tabs v-model:activeKey="filters.status" @change="setUrlData">
                         <a-tab-pane key="all" :tab="`${$t('common.all')}`" />
-                        <a-tab-pane key="pending" :tab="`${$t('common.pending')}`" />
+                        <!-- <a-tab-pane key="pending" :tab="`${$t('common.pending')}`" />
                         <a-tab-pane key="approved" :tab="`${$t('common.approved')}`" />
-                        <a-tab-pane key="rejected" :tab="`${$t('common.rejected')}`" />
+                        <a-tab-pane key="rejected" :tab="`${$t('common.rejected')}`" /> -->
                     </a-tabs>
                 </a-col>
             </a-row>

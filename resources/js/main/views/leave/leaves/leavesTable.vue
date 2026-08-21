@@ -51,9 +51,9 @@
                             <template v-if="column.dataIndex == 'start_date'">
                                 {{ formatDate(record.start_date) }}
                             </template>
-                            <template v-if="column.dataIndex == 'end_date'">
+                            <!-- <template v-if="column.dataIndex == 'end_date'">
                                 {{ formatDate(record.end_date) }}
-                            </template>
+                            </template> -->
                             <template v-if="column.dataIndex == 'is_half_day'">
                                 {{
                                     record.is_half_day
@@ -65,7 +65,7 @@
                             <template v-if="column.dataIndex == 'leave_type_id'">
                                 {{ record.leave_type.name }}
                             </template>
-                            <template v-if="column.dataIndex === 'status'">
+                            <!-- <template v-if="column.dataIndex === 'status'">
                                 <div v-if="record.status == 'pending'">
                                     <a-tag color="yellow">
                                         {{ $t(`common.${"pending"}`) }}
@@ -81,7 +81,7 @@
                                         {{ $t(`common.${"rejected"}`) }}
                                     </a-tag>
                                 </div>
-                            </template>
+                            </template> -->
 
                             <template v-if="column.dataIndex === 'action'">
                                 <a-space>
@@ -92,7 +92,7 @@
                                     >
                                         <template #icon><EyeOutlined /></template>
                                     </a-button>
-                                    <a-button
+                                    <!-- <a-button
                                         type="primary"
                                         @click="leaveApproved(record.xid)"
                                         v-if="
@@ -118,7 +118,7 @@
                                         "
                                     >
                                         <template #icon><CloseOutlined /></template>
-                                    </a-button>
+                                    </a-button> -->
                                     <a-button
                                         v-if="
                                             record.status == 'pending' &&

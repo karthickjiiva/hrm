@@ -71,6 +71,7 @@ const crud = () => {
             }
         });
 
+        
         itemDetails["_method"] = "PUT";
         formData.value = itemDetails;
 

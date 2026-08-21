@@ -24,6 +24,16 @@ export default [
                 },
             },
             {
+                path: "rejoining",
+                component: () => import("../views/offboardings/rejoining/index.vue"),
+                name: "admin.rejoining.index",
+                meta: {
+                    requireAuth: true,
+                    menuParent: "offboardings",
+                    menuKey: (route) => "rejoining",
+                },
+            },
+            {
                 path: "terminations",
                 component: () => import("../views/offboardings/terminations/index.vue"),
                 name: "admin.terminations.index",

@@ -15,6 +15,46 @@ ApiRoute::group(['namespace' => 'App\Http\Controllers\Api'], function () {
     ApiRoute::post('account-csv', ['as' => 'api.extra.account-csv', 'uses' => 'PdfController@exportAccountEntries']);
     ApiRoute::post('account-xlsx', ['as' => 'api.extra.account-xlsx', 'uses' => 'PdfController@downloadAccountEntriesExcel']);
     ApiRoute::post('payroll-pdf/{xid}', ['as' => 'api.extra.payroll-pdf', 'uses' => 'PdfController@payrollPdf']);
+    ApiRoute::get('payroll-check-exists',  ['as' => 'api.payroll-check-exists', 'uses' => 'PayrollNewController@checkPayrollExists']);
+    //ApiRoute::post('payroll-generate',  ['as' => 'api.payroll-generate', 'uses' => 'PayrollNewController@generatePayroll']);
+    ApiRoute::post('payroll-generate',  ['as' => 'api.payroll-generate', 'uses' => 'MyPayrollController@generatePayroll']);
+    ApiRoute::get('payroll_new/{xid}/download', 'PayrollNewController@downloadPayslip');
+    ApiRoute::get('payroll/export', 'PayrollNewController@export');
+    ApiRoute::get('pf_report/export', 'PayrollNewController@pfexport');
+    ApiRoute::get('prof_tax/export', 'PayrollNewController@proftax_export');
+    ApiRoute::get('bank_statements/export', 'BankstatementsController@export');
+    ApiRoute::get('loan_repayments/{xid}', 'EmployeeLoanController@getRepayments');
+    ApiRoute::post('loan_repayments/{id}/skip', 'EmployeeLoanController@skipMonth');
+    ApiRoute::post('loan_repayments/{loan}/close', 'EmployeeLoanController@closeLoan');   
+    ApiRoute::get('salary_leave/export', 'SalaryLeaveController@export');
+
+    ApiRoute::post('leave-salary-statement/generate', 'SalaryLeaveController@statementgenerate');
+    ApiRoute::get('leave-salary-statement/history', 'SalaryLeaveController@statementHistory');
+    ApiRoute::get('salaryleave_statement/{month}/{year}/download', 'SalaryLeaveController@downloadSalaryLeaveStatement');
+
+
+    ApiRoute::post('upload_arrears', 'ArrearsController@uploadArrears');
+    ApiRoute::post('arrears/generate', 'ArrearsController@generateArrears');
+    ApiRoute::get('get_arrears/{xid}/download', 'ArrearsController@downloadPayslip');
+    ApiRoute::get('arrear_pf/export', 'ArrearsController@pfexport');
+    
+    //Allreports
+    ApiRoute::get('reports/history/{type}', 'ReportController@history');
+    ApiRoute::post('reports/generate/bonus', 'ReportController@generateBonus');
+    ApiRoute::post('reports/generate/office_esi', 'ReportController@generateOfficeEsi');
+    ApiRoute::post('reports/generate/wage_register', 'ReportController@generateWageRegister');
+    ApiRoute::post('reports/generate/form_x', 'ReportController@generateFormX');
+    ApiRoute::get('leavelist/export', 'SalaryLeaveController@export_leavelist');
+    ApiRoute::get('master-reports/employee-export', 'MasterController@master_employee_export'); 
+    ApiRoute::get('master-reports/payroll-export', 'MasterController@master_payroll_export'); 
+    ApiRoute::post('reports/generate/settlement', 'MasterController@generateSettlementReport');
+    
+    ApiRoute::get('employees/all', 'MasterController@getEmployeesList'); 
+    ApiRoute::get('employeesinfo/{id}', 'MasterController@employeesinfo');  
+    ApiRoute::post('add-emp-insurances', 'MasterController@addEmpInsurances');
+    ApiRoute::get('employee-insurances', 'MasterController@list_insurance');
+    ApiRoute::delete('employee-insurances/{id}', 'MasterController@delete_insurance');
+    ApiRoute::post('employee-insurances/generate-report','MasterController@generateInsuranceReport');
 
     // Check visibility of module according to subscription plan
     ApiRoute::post('check-subscription-module-visibility', ['as' => 'api.extra.check-subscription-module-visibility', 'uses' => 'AuthController@checkSubscriptionModuleVisibility']);
@@ -47,6 +87,10 @@ ApiRoute::group(['namespace' => 'App\Http\Controllers\Api'], function () {
         ApiRoute::get('leaves/remaining-leaves', ['as' => 'api.leaves.remaining-leaves', 'uses' => 'LeaveController@remainingLeaves']);
         ApiRoute::get('leaves/unpaid-leaves', ['as' => 'api.leaves.unpaid-leaves', 'uses' => 'LeaveController@unpaidLeaves']);
         ApiRoute::resource('leaves', 'LeaveController', ['as' => 'api']);
+        ApiRoute::resource('wfhleaves', 'WFHLeaveController', ['as' => 'api']);
+        ApiRoute::post('wfhleaves-update/{id}', [\App\Http\Controllers\Api\WFHLeaveController::class, 'updateRaw']);
+        
+        
     });
 
     // Routes Accessable to thouse user who have permissions realted to route
@@ -79,7 +123,21 @@ ApiRoute::group(['namespace' => 'App\Http\Controllers\Api'], function () {
         ApiRoute::resource('holidays', 'HolidayController', $options);
 
         ApiRoute::resource('shifts', 'ShiftController', $options);
+        ApiRoute::resource('employee_types', 'EmployeeTypeController', $options);
+        // ApiRoute::post('/generate-payroll', [PayrollNewController::class, 'generatePayroll']);
+        // ApiRoute::post('/revert-payroll', [PayrollNewController::class, 'revertPayroll']);
+        
+        ApiRoute::resource('bank_masters', 'BankMasterController', $options);
+
+        ApiRoute::resource('employee_leave_masters', 'EmployeeLeaveMasterController', $options);
         ApiRoute::resource('departments', 'DepartmentController', $options);
+
+        ApiRoute::resource('payroll_new', 'PayrollNewController', $options);
+        ApiRoute::resource('arrears_fetch', 'ArrearsController', $options);
+        ApiRoute::resource('bank_statements', 'BankstatementsController', $options);
+        ApiRoute::resource('salary_leave', 'SalaryLeaveController', $options);
+        ApiRoute::resource('employee_loans', 'EmployeeLoanController', $options);
+        ApiRoute::apiResource('emp_advance', 'EmpAdvanceController', $options);
         ApiRoute::resource('designations', 'DesignationController', $options);
         ApiRoute::resource('leave-types', 'LeaveTypeController', $options);
         ApiRoute::resource('awards', 'AwardController', $options);
@@ -115,6 +173,7 @@ ApiRoute::group(['namespace' => 'App\Http\Controllers\Api'], function () {
         ApiRoute::resource('deposits', 'DepositController', $options);
         ApiRoute::resource('warnings', 'WarningController', $options);
         ApiRoute::resource('resignations', 'ResignationController', $options);
+        ApiRoute::resource('rejoining', 'RejoinController', $options);
         ApiRoute::resource('terminations', 'TerminationController', $options);
         ApiRoute::resource('indicators', 'IndicatorController', $options);
         ApiRoute::resource('salary-components', 'SalaryComponentController', $options);

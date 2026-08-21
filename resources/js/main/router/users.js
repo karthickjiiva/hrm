@@ -63,6 +63,66 @@ export default [
                     permission: "employees_view",
                 },
             },
+            {
+                path: "/admin/employee_types",
+                component: () =>
+                    import("../views/staff-members/employee_types/index.vue"),
+                name: "admin.employee_types.index",
+                meta: {
+                    requireAuth: true,
+                    menuParent: "staff",
+                    menuKey: "employee_type",
+                    permission: "users_view",
+                },
+            },
+            {
+                path: "/admin/employee_leave_master",
+                component: () =>
+                    import("../views/staff-members/employee_leave_master/index.vue"),
+                name: "admin.employee_leave_master.index",
+                meta: {
+                    requireAuth: true,
+                    menuParent: "staff",
+                    menuKey: "employee_leave_master",
+                    permission: "users_view",
+                },
+            },
+            {
+                path: "/admin/bank_master",
+                component: () =>
+                    import("../views/staff-members/bank_master/index.vue"),
+                name: "admin.bank_master.index",
+                meta: {
+                    requireAuth: true,
+                    menuParent: "staff",
+                    menuKey: "bank_master",
+                    permission: "users_view",
+                },
+            },
+            {
+                path: "/admin/loan_master",
+                component: () =>
+                    import("../views/staff-members/loan_master/index.vue"),
+                name: "admin.loan_master.index",
+                meta: {
+                    requireAuth: true,
+                    menuParent: "myloans",
+                    menuKey: "loan_master",
+                    permission: "users_view",
+                },
+            },
+              {
+                path: "/admin/advance_master",
+                component: () =>
+                    import("../views/staff-members/advance_master/index.vue"),
+                name: "admin.advance_master.index",
+                meta: {
+                    requireAuth: true,
+                    menuParent: "myloans",
+                    menuKey: "advance_master",
+                    permission: "users_view",
+                },
+            },
         ],
     },
 ];

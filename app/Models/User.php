@@ -13,6 +13,7 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Hash as FacadesHash;
 use Illuminate\Database\Eloquent\Builder;
+use App\Models\EmployeeType;
 
 class User extends BaseModel implements AuthenticatableContract, JWTSubject
 {
@@ -21,12 +22,23 @@ class User extends BaseModel implements AuthenticatableContract, JWTSubject
     protected $table = 'users';
 
     protected $default = [
-        'xid', 'name', 'employee_number', 'joining_date',
-        'probation_end_date', 'probation_start_date', 'profile_image',
-        'notice_end_date', 'notice_start_date', 'address', 'end_date', 'dob',
-        'profile_image_url', 'location_id', 'designation_id', 'department_id',
-        'is_manager', 'hra', 'performance_pay', 'allowance'
-    ];
+    'id','xid', 'name', 'employee_number', 'joining_date',
+    'probation_end_date', 'probation_start_date', 'profile_image',
+    'notice_end_date', 'notice_start_date', 'address', 'end_date', 'dob',
+    'profile_image_url', 'location_id','employee_type_id','designation_id', 'department_id',
+    'is_manager', 'hra', 'performance_pay', 'allowance','employeeType',
+    'uan_number', 'pf_number', 'esi_number', 'pan_number', 'aadhar_number',
+    'emergency_contact_name','emergency_contact_number','alternate_phone',
+    'has_resigned','hold_status','resignation_date','resignation_reason','has_rejoined','rejoining_date','rejoining_reason',
+    'esi_enabled', 'esi_percentage', 'monthly_esi','monthly_amount', 'annual_esi',
+    'pf_enabled', 'pf_percentage', 'monthly_pf', 'annual_pf',
+        'prof_tax_enabled', 'prof_tax_percentage', 'monthly_prof_tax', 'annual_prof_tax',
+        'tds_enabled', 'tds_percentage', 'monthly_tds', 'annual_tds',
+        'hra_percent_monthly', 'monthly_hra_percent_monthly', 'annual_hra_percent_monthly',
+        'allowance_percent', 'monthly_allowance_percent', 'annual_allowance_percent',
+        'food_allowance_percent', 'monthly_food_allowance_percent', 'annual_food_allowance_percent'
+];
+
 
 
 
@@ -34,9 +46,9 @@ class User extends BaseModel implements AuthenticatableContract, JWTSubject
 
     protected $dates = ['last_active_on'];
 
-    protected $hidden = ['id', 'role_id', 'employee_status_id', 'password', 'remember_token', 'department_id', 'designation_id', 'shift_id', 'location_id', 'salary_group_id'];
+    protected $hidden = [ 'role_id', 'employee_status_id', 'password', 'remember_token', 'department_id', 'designation_id', 'shift_id', 'location_id', 'salary_group_id'];
 
-    protected $appends = ['xid', 'x_company_id', 'x_employee_status_id', 'x_role_id', 'x_salary_group_id', 'x_report_to', 'profile_image_url', 'x_department_id', 'x_designation_id', 'x_shift_id', 'x_location_id', 'duration'];
+    protected $appends = ['xid', 'x_company_id', 'x_employee_status_id', 'x_role_id', 'x_salary_group_id', 'x_report_to', 'profile_image_url', 'x_department_id', 'x_designation_id', 'x_shift_id', 'x_location_id', 'x_employee_type_id' , 'duration'];
 
     protected $filterable = ['name', 'user_type', 'email', 'status', 'phone', 'shift_id'];
 
@@ -47,6 +59,7 @@ class User extends BaseModel implements AuthenticatableContract, JWTSubject
         'getXDesignationIdAttribute' => 'designation_id',
         'getXShiftIdAttribute' => 'shift_id',
         'getXLocationIdAttribute' => 'location_id',
+        'getXEmployeeTypeIdAttribute' => 'employee_type_id',
         'getXReportToAttribute' => 'report_to',
         'getXSalaryGroupIdAttribute' => 'salary_group_id',
         'getXEmployeeStatusIdAttribute' => 'employee_status_id'
@@ -61,6 +74,7 @@ class User extends BaseModel implements AuthenticatableContract, JWTSubject
         'department_id' => Hash::class . ':hash',
         'designation_id' => Hash::class . ':hash',
         'location_id' => Hash::class . ':hash',
+        'employee_type_id' => Hash::class . ':hash',
         'shift_id' => Hash::class . ':hash',
         'is_married' => 'integer',
         'is_manager' => 'integer',
@@ -75,6 +89,47 @@ class User extends BaseModel implements AuthenticatableContract, JWTSubject
         'hra' => 'double',
         'performance_pay' => 'double',
         'allowance' => 'double',
+        'aadhar_number' => 'string',
+        'uan_number' => 'string',
+        'pf_number' => 'string',
+        'esi_number' => 'string',
+        'pan_number' => 'string',
+        'emergency_contact_name' => 'string',
+        'emergency_contact_number' => 'string',
+        'alternate_phone' => 'string',
+        'has_resigned' => 'boolean',
+        'resignation_date' => 'date',
+        'resignation_reason' => 'string',
+        'has_rejoined' => 'boolean',
+        'rejoining_date' => 'date',
+        'rejoining_reason' => 'string',
+        'esi_enabled' => 'boolean',
+        'pf_enabled' => 'boolean',
+        'prof_tax_enabled' => 'boolean',
+        'tds_enabled' => 'boolean',
+        'esi_percentage' => 'float',
+        'prof_tax_percentage' => 'float',
+        'tds_percentage' => 'float',
+        'monthly_esi' => 'float',
+        'annual_esi' => 'float',
+        'pf_percentage'=>'float',
+        'monthly_amount' => 'float',
+        'monthly_pf' => 'float',
+        'annual_pf' => 'float',
+        'monthly_prof_tax' => 'float',
+        'annual_prof_tax' => 'float',
+        'monthly_tds' => 'float',
+        'annual_tds' => 'float',
+        'hra_percent_monthly' => 'float',
+        'monthly_hra_percent_monthly' => 'float',
+        'annual_hra_percent_monthly' => 'float',
+        'allowance_percent' => 'float',
+        'monthly_allowance_percent' => 'float',
+        'annual_allowance_percent' => 'float',
+        'food_allowance_percent' => 'float',
+        'monthly_food_allowance_percent' => 'float',
+        'annual_food_allowance_percent' => 'float'
+
     ];
 
     protected $permissions = ['salary_settings', 'leaves_view', 'assets_view', 'leave_types_view'];
@@ -91,6 +146,12 @@ class User extends BaseModel implements AuthenticatableContract, JWTSubject
     public function location()
     {
         return $this->belongsTo(Location::class, 'location_id', 'id');
+    }
+
+    public function employeeType()
+    {
+        // return $this->belongsTo(EmployeeType::class, 'employee_type_id', 'id');
+        return $this->belongsTo(EmployeeType::class, 'employee_type_id', 'id');
     }
 
     public function employeeWorkStatus()
@@ -230,6 +291,16 @@ class User extends BaseModel implements AuthenticatableContract, JWTSubject
     {
         return $this->hasMany(SalaryGroupUser::class, 'user_id');
     }
+    
+    public function leaveMaster()
+{
+    return $this->hasOne(EmployeeLeaveMaster::class, 'employee_id');
+}
+    public function bankMaster()
+{
+    return $this->hasOne(BankMaster::class, 'employee_id', 'id');
+}
+
 
     public function basicSalaryDetails()
     {

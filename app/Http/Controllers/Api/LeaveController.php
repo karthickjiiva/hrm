@@ -174,58 +174,64 @@ class LeaveController extends ApiBaseController
         return ApiResponse::make('Success', []);
     }
 
-
     public function remainingLeaves(RemainingLeavesRequest $request)
-    {
-        // Check if user have permssion to view all leaves
-        $loggedUser = user();
-        $userId = $loggedUser->ability('admin', 'leaves_edit') && $request->has('user_id') ? $this->getIdFromHash($request->user_id) : $loggedUser->id;
+{
+    $loggedUser = user();
+    $userId = $loggedUser->ability('admin', 'leaves_edit') && $request->has('user_id') 
+        ? $this->getIdFromHash($request->user_id) 
+        : $loggedUser->id;
 
-        if (!$loggedUser->ability('admin', 'leaves_view')) {
-            throw new ApiException("Not have valid permission");
-        }
-
-        $allLeaveTypes = LeaveType::select('id', 'name', 'total_leaves', 'is_paid')->get();
-        $year = $request->year;
-
-        // If request year is same as current year
-        $fincialDates = CommonHrm::getFincialYearStartEndDate($year);
-        $startDate = $fincialDates['startDate'];
-        $endDate = $fincialDates['endDate'];
-
-        foreach ($allLeaveTypes as $allLeaveType) {
-            $totalFullDayLeavesCount = Attendance::where('attendances.is_leave', 1)
-                ->where('is_holiday', 0)
-                ->whereBetween('attendances.date', [$startDate, $endDate])
-                ->where('attendances.leave_type_id', $allLeaveType->id)
-                ->where('attendances.user_id', $userId)
-                ->where('attendances.is_half_day', 0);
-
-            if ($allLeaveType->is_paid == 1) {
-                $totalFullDayLeavesCount = $totalFullDayLeavesCount->where('attendances.is_paid', 1);
-            }
-            $totalFullDayLeavesCount = $totalFullDayLeavesCount->count();
-
-            $totalHalfDayLeavesCount = Attendance::where('attendances.is_leave', 1)
-                ->where('is_holiday', 0)
-                ->whereBetween('attendances.date', [$startDate, $endDate])
-                ->where('attendances.leave_type_id', $allLeaveType->id)
-                ->where('attendances.user_id', $userId)
-                ->where('attendances.is_half_day', 1);
-
-            if ($allLeaveType->is_paid == 1) {
-                $totalHalfDayLeavesCount = $totalHalfDayLeavesCount->where('attendances.is_paid', 1);
-            }
-            $totalHalfDayLeavesCount = $totalHalfDayLeavesCount->count();
-
-            $totalLeaves = ($totalHalfDayLeavesCount / 2) + $totalFullDayLeavesCount;
-            $allLeaveType->remaining_leaves = $allLeaveType->total_leaves - $totalLeaves;
-        }
-
-        return ApiResponse::make('Data fetched', [
-            'data' => $allLeaveTypes
-        ]);
+    if (!$loggedUser->ability('admin', 'leaves_view')) {
+        throw new ApiException("Not have valid permission");
     }
+
+    $year = $request->year;
+    $fincialDates = CommonHrm::getFincialYearStartEndDate($year);
+    $startDate = $fincialDates['startDate'];
+    $endDate = $fincialDates['endDate'];
+
+    // Fetch employee leave master entry
+    $leaveMaster = \App\Models\EmployeeLeaveMaster::where('employee_id', $userId)->first();
+
+    if (!$leaveMaster) {
+        throw new ApiException("Leave master not found for employee.");
+    }
+
+    $leaveTypes = [
+        ['id' => 1, 'name' => 'Sick Leave', 'total_leaves' => $leaveMaster->sl],
+        ['id' => 2, 'name' => 'Casual Leave', 'total_leaves' => $leaveMaster->cl],
+        ['id' => 3, 'name' => 'Earned Leave', 'total_leaves' => $leaveMaster->el],
+    ];
+
+    foreach ($leaveTypes as &$leaveType) {
+        $fullDayCount = Attendance::where('attendances.is_leave', 1)
+            ->where('attendances.is_holiday', 0)
+            ->whereBetween('attendances.date', [$startDate, $endDate])
+            ->where('attendances.leave_type_id', $leaveType['id'])
+            ->where('attendances.user_id', $userId)
+            ->where('attendances.is_half_day', 0)
+            ->where('attendances.is_paid', 1)
+            ->count();
+
+        $halfDayCount = Attendance::where('attendances.is_leave', 1)
+            ->where('attendances.is_holiday', 0)
+            ->whereBetween('attendances.date', [$startDate, $endDate])
+            ->where('attendances.leave_type_id', $leaveType['id'])
+            ->where('attendances.user_id', $userId)
+            ->where('attendances.is_half_day', 1)
+            ->where('attendances.is_paid', 1)
+            ->count();
+
+        $used = $fullDayCount + ($halfDayCount / 2);
+        $leaveType['used'] = $used;
+        $leaveType['remaining_leaves'] = max(0, $leaveType['total_leaves'] - $used);
+    }
+
+    return ApiResponse::make('Leave balance fetched', [
+        'data' => $leaveTypes
+    ]);
+}
+
 
     public function unpaidLeaves(UnpaidLeavesRequest $request)
     {

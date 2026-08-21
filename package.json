@@ -10,7 +10,7 @@
         "ant-design-vue": "4.2.6",
         "axios": "^0.23.0",
         "chart.js": "^3.9.1",
-        "dayjs": "^1.10.7",
+        "dayjs": "^1.11.13",
         "jspdf": "^2.5.1",
         "jspdf-autotable": "^3.8.2",
         "jspdf-html2canvas": "^1.5.2",

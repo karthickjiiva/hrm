@@ -21,7 +21,9 @@
                                         ? rules.profile_image.message
                                         : null
                                 "
-                                :validateStatus="rules.profile_image ? 'error' : null"
+                                :validateStatus="
+                                    rules.profile_image ? 'error' : null
+                                "
                             >
                                 <Upload
                                     :formData="formData"
@@ -30,7 +32,8 @@
                                     @onFileUploaded="
                                         (file) => {
                                             formData.profile_image = file.file;
-                                            formData.profile_image_url = file.file_url;
+                                            formData.profile_image_url =
+                                                file.file_url;
                                         }
                                     "
                                 />
@@ -42,16 +45,23 @@
                                     <a-form-item
                                         :label="$t('user.name')"
                                         name="name"
-                                        :help="rules.name ? rules.name.message : null"
-                                        :validateStatus="rules.name ? 'error' : null"
+                                        :help="
+                                            rules.name
+                                                ? rules.name.message
+                                                : null
+                                        "
+                                        :validateStatus="
+                                            rules.name ? 'error' : null
+                                        "
                                         class="required"
                                     >
                                         <a-input
                                             v-model:value="formData.name"
                                             :placeholder="
-                                                $t('common.placeholder_default_text', [
-                                                    $t('user.name'),
-                                                ])
+                                                $t(
+                                                    'common.placeholder_default_text',
+                                                    [$t('user.name')]
+                                                )
                                             "
                                         />
                                     </a-form-item>
@@ -66,16 +76,19 @@
                                                 : null
                                         "
                                         :validateStatus="
-                                            rules.employee_number ? 'error' : null
+                                            rules.employee_number
+                                                ? 'error'
+                                                : null
                                         "
                                         class="required"
                                     >
                                         <a-input
                                             v-model:value="employeeId"
                                             :placeholder="
-                                                $t('common.placeholder_default_text', [
-                                                    $t('user.employee_id'),
-                                                ])
+                                                $t(
+                                                    'common.placeholder_default_text',
+                                                    [$t('user.employee_id')]
+                                                )
                                             "
                                         />
                                     </a-form-item>
@@ -86,16 +99,22 @@
                                     <a-form-item
                                         :label="$t('user.working_email')"
                                         name="email"
-                                        :help="rules.email ? rules.email.message : null"
-                                        :validateStatus="rules.email ? 'error' : null"
-                                        class="required"
+                                        :help="
+                                            rules.email
+                                                ? rules.email.message
+                                                : null
+                                        "
+                                        :validateStatus="
+                                            rules.email ? 'error' : null
+                                        "
                                     >
                                         <a-input
                                             v-model:value="formData.email"
                                             :placeholder="
-                                                $t('common.placeholder_default_text', [
-                                                    $t('user.working_email'),
-                                                ])
+                                                $t(
+                                                    'common.placeholder_default_text',
+                                                    [$t('user.working_email')]
+                                                )
                                             "
                                         />
                                     </a-form-item>
@@ -104,20 +123,92 @@
                                     <a-form-item
                                         :label="$t('user.working_phone')"
                                         name="phone"
-                                        :help="rules.phone ? rules.phone.message : null"
-                                        :validateStatus="rules.phone ? 'error' : null"
+                                        :help="
+                                            rules.phone
+                                                ? rules.phone.message
+                                                : null
+                                        "
+                                        :validateStatus="
+                                            rules.phone ? 'error' : null
+                                        "
                                     >
                                         <a-input
                                             v-model:value="formData.phone"
                                             :placeholder="
-                                                $t('common.placeholder_default_text', [
-                                                    $t('user.working_phone'),
-                                                ])
+                                                $t(
+                                                    'common.placeholder_default_text',
+                                                    [$t('user.working_phone')]
+                                                )
                                             "
                                         />
                                     </a-form-item>
                                 </a-col>
                             </a-row>
+                            <!-- Row 1: UAN, PF, ESI -->
+                            <a-row :gutter="16">
+                                <a-col :xs="24" :sm="24" :md="8" :lg="8">
+                                    <a-form-item
+                                        label="UAN Number"
+                                        name="uan_number"
+                                    >
+                                        <a-input
+                                            v-model:value="formData.uan_number"
+                                            placeholder="Please Enter UAN Number"
+                                        />
+                                    </a-form-item>
+                                </a-col>
+                                <a-col :xs="24" :sm="24" :md="8" :lg="8">
+                                    <a-form-item
+                                        label="PF Number"
+                                        name="pf_number"
+                                    >
+                                        <a-input
+                                            v-model:value="formData.pf_number"
+                                            placeholder="Please Enter PF Number"
+                                        />
+                                    </a-form-item>
+                                </a-col>
+                                <a-col :xs="24" :sm="24" :md="8" :lg="8">
+                                    <a-form-item
+                                        label="ESI Number"
+                                        name="esi_number"
+                                    >
+                                        <a-input
+                                            v-model:value="formData.esi_number"
+                                            placeholder="Please Enter ESI Number"
+                                        />
+                                    </a-form-item>
+                                </a-col>
+                            </a-row>
+
+                            <!-- Row 2: PAN, Aadhar -->
+                            <a-row :gutter="16">
+                                <a-col :xs="24" :sm="24" :md="12" :lg="12">
+                                    <a-form-item
+                                        label="PAN Number"
+                                        name="pan_number"
+                                    >
+                                        <a-input
+                                            v-model:value="formData.pan_number"
+                                            placeholder="Please Enter PAN Number"
+                                        />
+                                    </a-form-item>
+                                </a-col>
+                                <a-col :xs="24" :sm="24" :md="12" :lg="12">
+                                    <a-form-item
+                                        label="Aadhar Number"
+                                        name="aadhar_number"
+                                    >
+                                        <a-input
+                                            v-model:value="
+                                                formData.aadhar_number
+                                            "
+                                            placeholder="Please Enter Aadhar Number"
+                                        />
+                                    </a-form-item>
+                                </a-col>
+                            </a-row>
+
                             <a-row :gutter="16">
                                 <a-col :xs="24" :sm="24" :md="12" :lg="12">
                                     <a-form-item
@@ -133,7 +224,9 @@
                                         "
                                     >
                                         <a-switch
-                                            v-model:checked="formData.allow_login"
+                                            v-model:checked="
+                                                formData.allow_login
+                                            "
                                             :checkedValue="1"
                                             :unCheckedValue="0"
                                         />
@@ -150,17 +243,22 @@
                                         :label="$t('user.password')"
                                         name="password"
                                         :help="
-                                            rules.password ? rules.password.message : null
+                                            rules.password
+                                                ? rules.password.message
+                                                : null
                                         "
-                                        :validateStatus="rules.password ? 'error' : null"
+                                        :validateStatus="
+                                            rules.password ? 'error' : null
+                                        "
                                         class="required"
                                     >
                                         <a-input-password
                                             v-model:value="formData.password"
                                             :placeholder="
-                                                $t('common.placeholder_default_text', [
-                                                    $t('user.password'),
-                                                ])
+                                                $t(
+                                                    'common.placeholder_default_text',
+                                                    [$t('user.password')]
+                                                )
                                             "
                                         />
                                     </a-form-item>
@@ -174,9 +272,13 @@
                                 :label="$t('user.joining_date')"
                                 name="joining_date"
                                 :help="
-                                    rules.joining_date ? rules.joining_date.message : null
+                                    rules.joining_date
+                                        ? rules.joining_date.message
+                                        : null
                                 "
-                                :validateStatus="rules.joining_date ? 'error' : null"
+                                :validateStatus="
+                                    rules.joining_date ? 'error' : null
+                                "
                                 class="required"
                             >
                                 <a-date-picker
@@ -191,7 +293,9 @@
                             <a-form-item
                                 :label="$t('user.status')"
                                 name="status"
-                                :help="rules.status ? rules.status.message : null"
+                                :help="
+                                    rules.status ? rules.status.message : null
+                                "
                                 :validateStatus="rules.status ? 'error' : null"
                             >
                                 <a-radio-group
@@ -214,7 +318,9 @@
                             <a-form-item
                                 :label="$t('user.address')"
                                 name="address"
-                                :help="rules.address ? rules.address.message : null"
+                                :help="
+                                    rules.address ? rules.address.message : null
+                                "
                                 :validateStatus="rules.address ? 'error' : null"
                             >
                                 <a-textarea
@@ -230,13 +336,19 @@
                         </a-col>
                     </a-row>
                 </a-tab-pane>
-                <a-tab-pane key="personal" :tab="$t('user.personal_info')" force-render>
+                <a-tab-pane
+                    key="personal"
+                    :tab="$t('user.personal_info')"
+                    force-render
+                >
                     <a-row :gutter="16">
                         <a-col :xs="24" :sm="24" :md="12" :lg="12">
                             <a-form-item
                                 :label="$t('user.gender')"
                                 name="gender"
-                                :help="rules.gender ? rules.gender.message : null"
+                                :help="
+                                    rules.gender ? rules.gender.message : null
+                                "
                                 :validateStatus="rules.gender ? 'error' : null"
                                 class="required"
                             >
@@ -287,7 +399,9 @@
                                         ? rules.personal_email.message
                                         : null
                                 "
-                                :validateStatus="rules.personal_email ? 'error' : null"
+                                :validateStatus="
+                                    rules.personal_email ? 'error' : null
+                                "
                             >
                                 <a-input
                                     v-model:value="formData.personal_email"
@@ -308,7 +422,9 @@
                                         ? rules.personal_phone.message
                                         : null
                                 "
-                                :validateStatus="rules.personal_phone ? 'error' : null"
+                                :validateStatus="
+                                    rules.personal_phone ? 'error' : null
+                                "
                             >
                                 <a-input
                                     v-model:value="formData.personal_phone"
@@ -321,13 +437,60 @@
                             </a-form-item>
                         </a-col>
                     </a-row>
+                    <!-- Row 3: Emergency Contact Name, Emergency Contact Number, Alternate Number -->
+                    <a-row :gutter="16">
+                        <a-col :xs="24" :sm="24" :md="8" :lg="8">
+                            <a-form-item
+                                label="Emergency Contact Name"
+                                name="emergency_contact_name"
+                            >
+                                <a-input
+                                    v-model:value="
+                                        formData.emergency_contact_name
+                                    "
+                                    placeholder="Please Enter Emergency Contact Name"
+                                />
+                            </a-form-item>
+                        </a-col>
+                        <a-col :xs="24" :sm="24" :md="8" :lg="8">
+                            <a-form-item
+                                label="Emergency Contact Number"
+                                name="emergency_contact_number"
+                            >
+                                <a-input
+                                    v-model:value="
+                                        formData.emergency_contact_number
+                                    "
+                                    placeholder="Please Enter Emergency Contact Number"
+                                />
+                            </a-form-item>
+                        </a-col>
+                        <a-col :xs="24" :sm="24" :md="8" :lg="8">
+                            <a-form-item
+                                label="Alternate Phone Number"
+                                name="alternate_phone"
+                            >
+                                <a-input
+                                    v-model:value="formData.alternate_phone"
+                                    placeholder="Please Enter Alternate Phone Number"
+                                />
+                            </a-form-item>
+                        </a-col>
+                    </a-row>
+
                     <a-row :gutter="16">
                         <a-col :xs="24" :sm="24" :md="12" :lg="12">
                             <a-form-item
                                 :label="$t('user.is_married')"
                                 name="is_married"
-                                :help="rules.is_married ? rules.is_married.message : null"
-                                :validateStatus="rules.is_married ? 'error' : null"
+                                :help="
+                                    rules.is_married
+                                        ? rules.is_married.message
+                                        : null
+                                "
+                                :validateStatus="
+                                    rules.is_married ? 'error' : null
+                                "
                             >
                                 <a-switch
                                     v-model:checked="formData.is_married"
@@ -351,7 +514,9 @@
                                         ? rules.marriage_date.message
                                         : null
                                 "
-                                :validateStatus="rules.marriage_date ? 'error' : null"
+                                :validateStatus="
+                                    rules.marriage_date ? 'error' : null
+                                "
                                 class="required"
                             >
                                 <a-date-picker
@@ -364,16 +529,133 @@
                         </a-col>
                     </a-row>
                 </a-tab-pane>
-                <a-tab-pane key="company" :tab="$t('user.company_relation')" force-render>
+                <a-tab-pane
+                    key="company"
+                    :tab="$t('user.company_relation')"
+                    force-render
+                >
+                    <a-row :gutter="16">
+                        <!-- New: Employee Type -->
+                        <!-- <a-col :xs="24" :sm="24" :md="12" :lg="12">
+                            <a-form-item
+                                label="Employee Type"
+                                name="employee_type_id"
+                                :help="
+                                    rules.employee_type_id
+                                        ? rules.employee_type_id.message
+                                        : null
+                                "
+                                :validateStatus="
+                                    rules.employee_type_id ? 'error' : null
+                                "
+                                class="required"
+                            >
+                                <span style="display: flex">
+                                    <a-select
+                                        v-model:value="
+                                            formData.employee_type_id
+                                        "
+                                        placeholder="Please select the employee type"
+                                        :allowClear="false"
+                                        optionFilterProp="title"
+                                        show-search
+                                    >
+                                        <a-select-option
+                                            v-for="type in employeeType"
+                                            :key="type.xid"
+                                            :value="type.xid"
+                                            :title="type.type"
+                                        >
+                                            {{ type.type }}
+                                        </a-select-option>
+                                    </a-select>
+                                    <EmployeeTypeAddButton
+                                        @onAddSuccess="employeeTypeAdded"
+                                    />
+                                </span>
+                            </a-form-item>
+                        </a-col> -->
+
+                        <!-- Existing: Report To -->
+                        <a-col :xs="24" :sm="24" :md="12" :lg="6">
+                            <a-form-item
+                                :label="$t('user.report_to')"
+                                name="report_to"
+                                :help="
+                                    rules.report_to
+                                        ? rules.report_to.message
+                                        : null
+                                "
+                                :validateStatus="
+                                    rules.report_to ? 'error' : null
+                                "
+                            >
+                                <span style="display: flex">
+                                    <a-select
+                                        v-model:value="formData.report_to"
+                                        :placeholder="
+                                            $t('common.select_default_text', [
+                                                $t('user.report_to'),
+                                            ])
+                                        "
+                                        :allowClear="true"
+                                        optionFilterProp="title"
+                                        show-search
+                                    >
+                                        <a-select-option
+                                            v-for="allStaffMember in allMembers"
+                                            :key="allStaffMember.xid"
+                                            :value="allStaffMember.xid"
+                                            :title="allStaffMember.name"
+                                        >
+                                            {{ allStaffMember.name }}
+                                        </a-select-option>
+                                    </a-select>
+                                </span>
+                            </a-form-item>
+                        </a-col>
+
+                        <!-- Existing: Is Manager -->
+                        <a-col
+                            :xs="24"
+                            :sm="24"
+                            :md="12"
+                            :lg="6"
+                            v-if="permsArray.includes('admin')"
+                        >
+                            <a-form-item
+                                :label="$t('user.is_manager')"
+                                name="is_manager"
+                                :help="
+                                    rules.is_manager
+                                        ? rules.is_manager.message
+                                        : null
+                                "
+                                :validateStatus="
+                                    rules.is_manager ? 'error' : null
+                                "
+                            >
+                                <a-switch
+                                    v-model:checked="isManager"
+                                    :checkedValue="1"
+                                    :unCheckedValue="0"
+                                />
+                            </a-form-item>
+                        </a-col>
+                    </a-row>
                     <a-row :gutter="16">
                         <a-col :xs="24" :sm="24" :md="12" :lg="12">
                             <a-form-item
                                 :label="$t('user.location_id')"
                                 name="location_id"
                                 :help="
-                                    rules.location_id ? rules.location_id.message : null
+                                    rules.location_id
+                                        ? rules.location_id.message
+                                        : null
                                 "
-                                :validateStatus="rules.location_id ? 'error' : null"
+                                :validateStatus="
+                                    rules.location_id ? 'error' : null
+                                "
                             >
                                 <span style="display: flex">
                                     <a-select
@@ -396,7 +678,9 @@
                                             {{ location.name }}
                                         </a-select-option>
                                     </a-select>
-                                    <LocationAddButton @onAddSuccess="locationAdded" />
+                                    <LocationAddButton
+                                        @onAddSuccess="locationAdded"
+                                    />
                                 </span>
                             </a-form-item>
                         </a-col>
@@ -404,8 +688,14 @@
                             <a-form-item
                                 :label="$t('user.shift_id')"
                                 name="shift_id"
-                                :help="rules.shift_id ? rules.shift_id.message : null"
-                                :validateStatus="rules.shift_id ? 'error' : null"
+                                :help="
+                                    rules.shift_id
+                                        ? rules.shift_id.message
+                                        : null
+                                "
+                                :validateStatus="
+                                    rules.shift_id ? 'error' : null
+                                "
                             >
                                 <span style="display: flex">
                                     <a-select
@@ -428,7 +718,9 @@
                                             {{ shift.name }}
                                         </a-select-option>
                                     </a-select>
-                                    <ShiftAddButton @onAddSuccess="shiftAdded" />
+                                    <ShiftAddButton
+                                        @onAddSuccess="shiftAdded"
+                                    />
                                 </span>
                             </a-form-item>
                         </a-col>
@@ -443,7 +735,9 @@
                                         ? rules.department_id.message
                                         : null
                                 "
-                                :validateStatus="rules.department_id ? 'error' : null"
+                                :validateStatus="
+                                    rules.department_id ? 'error' : null
+                                "
                             >
                                 <span style="display: flex">
                                     <a-select
@@ -481,7 +775,9 @@
                                         ? rules.designation_id.message
                                         : null
                                 "
-                                :validateStatus="rules.designation_id ? 'error' : null"
+                                :validateStatus="
+                                    rules.designation_id ? 'error' : null
+                                "
                             >
                                 <span style="display: flex">
                                     <a-select
@@ -511,134 +807,6 @@
                             </a-form-item>
                         </a-col>
                     </a-row>
-
-                    <a-row :gutter="16">
-                        <a-col :xs="24" :sm="24" :md="12" :lg="12">
-                            <a-form-item
-                                :label="$t('user.report_to')"
-                                name="report_to"
-                                :help="rules.report_to ? rules.report_to.message : null"
-                                :validateStatus="rules.report_to ? 'error' : null"
-                            >
-                                <span style="display: flex">
-                                    <a-select
-                                        v-model:value="formData.report_to"
-                                        :placeholder="
-                                            $t('common.select_default_text', [
-                                                $t('user.report_to'),
-                                            ])
-                                        "
-                                        :allowClear="true"
-                                        optionFilterProp="title"
-                                        show-search
-                                    >
-                                        <a-select-option
-                                            v-for="allStaffMember in allMembers"
-                                            :key="allStaffMember.xid"
-                                            :value="allStaffMember.xid"
-                                            :title="allStaffMember.name"
-                                        >
-                                            {{ allStaffMember.name }}
-                                        </a-select-option>
-                                    </a-select>
-                                </span>
-                            </a-form-item>
-                        </a-col>
-                        <a-col
-                            v-if="permsArray.includes('admin')"
-                            :xs="24"
-                            :sm="24"
-                            :md="12"
-                            :lg="12"
-                        >
-                            <a-form-item
-                                :label="$t('user.is_manager')"
-                                name="is_manager"
-                                :help="rules.is_manager ? rules.is_manager.message : null"
-                                :validateStatus="rules.is_manager ? 'error' : null"
-                            >
-                                <a-switch
-                                    v-model:checked="isManager"
-                                    :checkedValue="1"
-                                    :unCheckedValue="0"
-                                />
-                            </a-form-item>
-                        </a-col>
-                    </a-row>
-                    <a-row :gutter="16" v-if="permsArray.includes('admin')">
-                        <a-col :xs="24" :sm="24" :md="12" :lg="12" v-if="isManager == 1">
-                            <a-form-item
-                                :label="$t('user.role')"
-                                name="role_id"
-                                :help="rules.role_id ? rules.role_id.message : null"
-                                :validateStatus="rules.role_id ? 'error' : null"
-                                class="required"
-                            >
-                                <span style="display: flex">
-                                    <a-select
-                                        v-model:value="staffRole"
-                                        :placeholder="
-                                            $t('common.select_default_text', [
-                                                $t('user.role'),
-                                            ])
-                                        "
-                                        :allowClear="true"
-                                        optionFilterProp="title"
-                                        show-search
-                                        @change="assignRole(staffRole)"
-                                    >
-                                        <a-select-option
-                                            v-for="role in roles"
-                                            :key="role.xid"
-                                            :value="role.xid"
-                                            :title="role.display_name"
-                                        >
-                                            {{ role.display_name }}
-                                        </a-select-option>
-                                    </a-select>
-                                    <RoleAddButton @onAddSuccess="roleAdded" />
-                                </span>
-                            </a-form-item>
-                        </a-col>
-                        <a-col
-                            :xs="24"
-                            :sm="24"
-                            :md="12"
-                            :lg="12"
-                            v-if="showVisibilty && isManager"
-                        >
-                            <a-form-item
-                                :label="$t('user.visibility')"
-                                name="visibility"
-                                :help="rules.visibility ? rules.visibility.message : null"
-                                :validateStatus="rules.visibility ? 'error' : null"
-                                class="required"
-                            >
-                                <a-select
-                                    v-model:value="selectedVisibility"
-                                    :placeholder="
-                                        $t('common.select_default_text', [
-                                            $t('user.visibility'),
-                                        ])
-                                    "
-                                    :allowClear="true"
-                                >
-                                    <a-select-option value="manager">{{
-                                        $t("user.manager")
-                                    }}</a-select-option>
-                                    <a-select-option value="department">{{
-                                        $t("user.department")
-                                    }}</a-select-option>
-                                    <a-select-option value="location">{{
-                                        $t("user.location")
-                                    }}</a-select-option>
-                                    <a-select-option value="company">{{
-                                        $t("user.company")
-                                    }}</a-select-option>
-                                </a-select>
-                            </a-form-item>
-                        </a-col>
-                    </a-row>
                 </a-tab-pane>
                 <a-tab-pane key="work" :tab="$t('user.work_info')" force-render>
                     <a-row :gutter="16">
@@ -656,7 +824,9 @@
                                 "
                             >
                                 <a-date-picker
-                                    v-model:value="formData.probation_start_date"
+                                    v-model:value="
+                                        formData.probation_start_date
+                                    "
                                     :format="appSetting.date_format"
                                     valueFormat="YYYY-MM-DD"
                                     style="width: 100%"
@@ -695,7 +865,9 @@
                                         ? rules.notice_start_date.message
                                         : null
                                 "
-                                :validateStatus="rules.notice_start_date ? 'error' : null"
+                                :validateStatus="
+                                    rules.notice_start_date ? 'error' : null
+                                "
                             >
                                 <a-date-picker
                                     v-model:value="formData.notice_start_date"
@@ -714,7 +886,9 @@
                                         ? rules.notice_end_date.message
                                         : null
                                 "
-                                :validateStatus="rules.notice_end_date ? 'error' : null"
+                                :validateStatus="
+                                    rules.notice_end_date ? 'error' : null
+                                "
                             >
                                 <a-date-picker
                                     v-model:value="formData.notice_end_date"
@@ -730,8 +904,14 @@
                             <a-form-item
                                 :label="$t('user.end_date')"
                                 name="end_date"
-                                :help="rules.end_date ? rules.end_date.message : null"
-                                :validateStatus="rules.end_date ? 'error' : null"
+                                :help="
+                                    rules.end_date
+                                        ? rules.end_date.message
+                                        : null
+                                "
+                                :validateStatus="
+                                    rules.end_date ? 'error' : null
+                                "
                             >
                                 <a-date-picker
                                     v-model:value="formData.end_date"
@@ -757,7 +937,9 @@
                             >
                                 <span style="display: flex">
                                     <a-select
-                                        v-model:value="formData.employee_status_id"
+                                        v-model:value="
+                                            formData.employee_status_id
+                                        "
                                         :placeholder="
                                             $t('common.select_default_text', [
                                                 $t('user.employee_work_status'),
@@ -774,12 +956,21 @@
                                             :title="employeeStatus.display_name"
                                         >
                                             {{
-                                                employeeStatus.name === "fulltime"
-                                                    ? $t("employee_work_status.fulltime")
-                                                    : employeeStatus.name === "contract"
-                                                    ? $t("employee_work_status.contract")
-                                                    : employeeStatus.name === "probation"
-                                                    ? $t("employee_work_status.probation")
+                                                employeeStatus.name ===
+                                                "fulltime"
+                                                    ? $t(
+                                                          "employee_work_status.fulltime"
+                                                      )
+                                                    : employeeStatus.name ===
+                                                      "contract"
+                                                    ? $t(
+                                                          "employee_work_status.contract"
+                                                      )
+                                                    : employeeStatus.name ===
+                                                      "probation"
+                                                    ? $t(
+                                                          "employee_work_status.probation"
+                                                      )
                                                     : employeeStatus.name ===
                                                       "work_from_home"
                                                     ? $t(
@@ -813,13 +1004,99 @@
                         @updateSalaryData="updateSalaryData"
                     />
                 </a-tab-pane>
+                <!-- <a-tab-pane
+                    key="joining_history"
+                    tab="Joining History"
+                    force-render >
+                    <a-form layout="vertical">
+                        <a-form-item label="Resignation">
+                            <a-switch v-model:checked="formData.has_resigned" />
+                        </a-form-item>
+
+                        <a-row :gutter="16" v-if="formData.has_resigned">
+                            <a-col :xs="24" :sm="24" :md="12">
+                                <a-form-item
+                                    label="Resignation Date"
+                                    :help="
+                                        rules.resignation_date
+                                            ? rules.resignation_date.message
+                                            : null
+                                    "
+                                    :validateStatus="
+                                        rules.resignation_date ? 'error' : null
+                                    "
+                                >
+                                    <a-date-picker
+                                        v-model:value="
+                                            formData.resignation_date
+                                        "
+                                        :format="appSetting.date_format"
+                                        valueFormat="YYYY-MM-DD"
+                                        style="width: 100%"
+                                    />
+                                </a-form-item>
+                            </a-col>
+                            <a-col :xs="24" :sm="24" :md="12">
+                                <a-form-item label="Resignation Reason">
+                                    <a-input
+                                        v-model:value="
+                                            formData.resignation_reason
+                                        "
+                                        placeholder="Enter reason"
+                                    />
+                                </a-form-item>
+                            </a-col>
+                        </a-row>
+
+                        <a-form-item label="Rejoining">
+                            <a-switch v-model:checked="formData.has_rejoined" />
+                        </a-form-item>
+
+                        <a-row :gutter="16" v-if="formData.has_rejoined">
+                            <a-col :xs="24" :sm="24" :md="12">
+                                <a-form-item
+                                    label="Rejoining Date"
+                                    :help="
+                                        rules.has_rejoined
+                                            ? rules.has_rejoined.message
+                                            : null
+                                    "
+                                    :validateStatus="
+                                        rules.has_rejoined ? 'error' : null
+                                    "
+                                >
+                                    <a-date-picker
+                                        v-model:value="formData.has_rejoined"
+                                        :format="appSetting.date_format"
+                                        valueFormat="YYYY-MM-DD"
+                                        style="width: 100%"
+                                    />
+                                </a-form-item>
+                            </a-col>
+                            <a-col :xs="24" :sm="24" :md="12">
+                                <a-form-item label="Rejoining Reason">
+                                    <a-input
+                                        v-model:value="
+                                            formData.rejoining_reason
+                                        "
+                                        placeholder="Enter reason"
+                                    />
+                                </a-form-item>
+                            </a-col>
+                        </a-row>
+                    </a-form>
+                </a-tab-pane> -->
             </a-tabs>
         </a-form>
         <template #footer>
             <a-space>
                 <a-button type="primary" @click="onSubmit" :loading="loading">
                     <template #icon> <SaveOutlined /> </template>
-                    {{ addEditType == "add" ? $t("common.create") : $t("common.update") }}
+                    {{
+                        addEditType == "add"
+                            ? $t("common.create")
+                            : $t("common.update")
+                    }}
                 </a-button>
                 <a-button @click="onClose">
                     {{ $t("common.cancel") }}
@@ -831,7 +1108,11 @@
 
 <script>
 import { defineComponent, ref, onMounted, watch, nextTick } from "vue";
-import { PlusOutlined, LoadingOutlined, SaveOutlined } from "@ant-design/icons-vue";
+import {
+    PlusOutlined,
+    LoadingOutlined,
+    SaveOutlined,
+} from "@ant-design/icons-vue";
 import apiAdmin from "../../../../common/composable/apiAdmin";
 import Upload from "../../../../common/core/ui/file/Upload.vue";
 import RoleAddButton from "../../settings/roles/AddButton.vue";
@@ -873,13 +1154,13 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         const { permsArray, user, appSetting, dayjs } = common();
-        const { addEditRequestAdmin, loading, rules, addEditActiveTab } = apiAdmin(
-            "basic"
-        );
+        const { addEditRequestAdmin, loading, rules, addEditActiveTab } =
+            apiAdmin("basic");
         const roles = ref([]);
         const roleUrl = "roles?limit=10000";
         const authStore = useAuthStore();
         const departments = ref([]);
+        const employeeType = ref([]);
         const designations = ref([]);
         const selectedVisibility = ref("manager");
         const locations = ref([]);
@@ -892,6 +1173,7 @@ export default defineComponent({
         const designationUrl = "designations?limit=10000";
         const locationUrl = "locations?limit=10000";
         const shiftUrl = "shifts?limit=10000";
+        const employeeTypeUrl = "employee_types?limit=10000";
         const allMembers = ref([]);
         const allStaffMemberUrl = "users?limit=10000";
         const employeeId = ref("");
@@ -908,7 +1190,10 @@ export default defineComponent({
             const locationPromise = axiosAdmin.get(locationUrl);
             const departmentsPromise = axiosAdmin.get(departmentUrl);
             const designationsPromise = axiosAdmin.get(designationUrl);
-            const employeeWorkStatusPromise = axiosAdmin.get(employeeWorkStatusUrl);
+            const employeeTypePromise = axiosAdmin.get(employeeTypeUrl);
+            const employeeWorkStatusPromise = axiosAdmin.get(
+                employeeWorkStatusUrl
+            );
 
             Promise.all([
                 rolesPromise,
@@ -917,6 +1202,7 @@ export default defineComponent({
                 shiftsPromise,
                 locationPromise,
                 employeeWorkStatusPromise,
+                employeeTypePromise,
             ]).then(
                 ([
                     rolesResponse,
@@ -925,6 +1211,7 @@ export default defineComponent({
                     shiftsResponse,
                     locationResponse,
                     employeeWorkStatusResponse,
+                    employeeTypeResponse,
                 ]) => {
                     roles.value = rolesResponse.data;
                     departments.value = departmentsResponse.data;
@@ -932,6 +1219,7 @@ export default defineComponent({
                     shifts.value = shiftsResponse.data;
                     locations.value = locationResponse.data;
                     employeeWorkStatus.value = employeeWorkStatusResponse.data;
+                    employeeType.value = employeeTypeResponse.data;
                 }
             );
 
@@ -941,16 +1229,24 @@ export default defineComponent({
                 appSetting.value.employee_id_start;
         });
 
-        const onSubmit = () => {
-            var newFormData = {
-                ...props.formData,
-                joining_date: joiningDate.value,
-                is_manager: isManager.value,
-                role_id: staffRole.value,
-                visibility: selectedVisibility.value,
-                employee_number: employeeId.value,
-                ...newData.value,
-            };
+            const sanitizeDate = (date) => {
+  if (!date || date === '0000-00-00' || date.startsWith('-001')) return null;
+  return date; // valid date, send as-is
+};
+
+const onSubmit = () => {
+  // Merge form data and sanitize specific dates
+  const newFormData = {
+    ...props.formData,
+    joining_date: sanitizeDate(joiningDate.value),
+    resignation_date: sanitizeDate(props.formData.resignation_date),
+    rejoining_date: sanitizeDate(props.formData.rejoining_date),
+    is_manager: isManager.value,
+    role_id: staffRole.value,
+    visibility: selectedVisibility.value,
+    employee_number: employeeId.value,
+    ...newData.value,
+  };
             addEditRequestAdmin({
                 id: "add_edit_user_form",
                 url: props.url,
@@ -1009,6 +1305,17 @@ export default defineComponent({
             });
         };
 
+        const employeeTypeAdded = (xid) => {
+            axiosAdmin.get(employeeTypeUrl).then((response) => {
+                employeeTypes.value = response.data;
+                formData.employee_type_id = xid;
+                emit("addListSuccess", {
+                    type: "employee_type",
+                    id: xid,
+                });
+            });
+        };
+
         const designationAdded = (xid) => {
             axiosAdmin.get(designationUrl).then((response) => {
                 designations.value = response.data;
@@ -1051,9 +1358,11 @@ export default defineComponent({
                 addEditActiveTab.value = "basic";
                 if (newVal) {
                     const allMembersPromise = axiosAdmin.get(allStaffMemberUrl);
-                    Promise.all([allMembersPromise]).then(([allMembersResponse]) => {
-                        allMembers.value = allMembersResponse.data;
-                    });
+                    Promise.all([allMembersPromise]).then(
+                        ([allMembersResponse]) => {
+                            allMembers.value = allMembersResponse.data;
+                        }
+                    );
                     staffRole.value = undefined;
                     isManager.value = 0;
                     showVisibilty.value = false;
@@ -1126,7 +1435,8 @@ export default defineComponent({
             onClose,
             onSubmit,
             roles,
-
+            employeeTypeAdded,
+            employeeType,
             roleAdded,
             permsArray,
             appSetting,

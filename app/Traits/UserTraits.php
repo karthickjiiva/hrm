@@ -51,10 +51,9 @@ trait UserTraits
             $query = $query->where('users.status', $userStatus);
         }
 
-        // User Shift Filter
-        if ($request->has('shift') && $request->shift != '') {
-            $shiftId = $this->getIdFromHash($request->shift);
-            $query = $query->where('users.shift_id', $shiftId);
+        // User hold status filter (0 = not on hold, 1 = on hold)
+        if ($request->has('hold_status') && $request->hold_status !== '' && $request->hold_status !== null) {
+            $query = $query->where('users.hold_status', (int) $request->hold_status);
         }
 
         // User Location Filter

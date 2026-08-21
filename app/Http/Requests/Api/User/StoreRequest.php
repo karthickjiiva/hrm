@@ -38,6 +38,7 @@ class StoreRequest extends FormRequest
                 })
             ],
             'name' => 'required',
+            'employee_type_id'=>'required',
 
             'email'    => [
                 'required',

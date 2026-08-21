@@ -163,6 +163,7 @@ class LangTrans
         ],
         'menu' => [
             'dashboard' => 'Dashboard',
+            'reports' => 'Reports',
             'users' => 'Users',
             'staff_members' => 'Employees',
             'settings' => 'Settings',
@@ -193,6 +194,9 @@ class LangTrans
             'attendances' => 'Attendance',
             'staff' => 'Staff',
             'all_holidays' => 'All Holidays',
+            'loansadvance' => 'Loans & Advance',
+            'loans' => 'Loans',
+            'advance' => 'Advance',
             'leave_types' => 'Leave Types',
             'remaining_leaves' => 'Remaining Leaves',
             'unpaid_leaves' => 'Unpaid Leaves',
