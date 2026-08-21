@@ -327,11 +327,11 @@ protected function amountToWords($number)
             $sheet->setCellValue("E$currentRow", $this->fromDate->format('M y') . ' - ' . $slotEnd->format('M y'));
             $sheet->setCellValue("F$currentRow", $totalProfTax);
 
-            // TDS
+            // OTHERS (earnings side) + TDS (deductions side)
             $currentRow++;
-            foreach (['A', 'B', 'C'] as $col) {
-                $sheet->setCellValue($col . $currentRow, '');
-            }
+            $sheet->setCellValue("A$currentRow", 'OTHERS');
+            $sheet->setCellValue("B$currentRow", "0");
+            $sheet->setCellValue("C$currentRow", $this->others);
             $sheet->setCellValue("D$currentRow", 'TDS');
             $sheet->setCellValue("E$currentRow", '');
             $sheet->setCellValue("F$currentRow", 0);
@@ -398,6 +398,7 @@ protected function amountToWords($number)
             // Word Conversion Data
             $totalEarnings += round($leaveSalaryAmount);
             $totalEarnings += $this->siteAdvance;
+            $totalEarnings += $this->others;
             $totalDeductions += $totalProfTax;
 
             $netFinal = $totalEarnings - $totalDeductions;
